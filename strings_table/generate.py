@@ -15,7 +15,7 @@ def generate_distinct_strings(index, num_distinct_strings, distinct_strings):
 def write_to_file(filename, distinct_strings, rows, columns):
     with open(filename, 'w') as file:
         file.write('|'.join(['string{}'.format(x) for x in range(columns)]) + '\n')
-        file.write('|'.join(['string' for x in range(columns)]) + '\n')
+        file.write('|'.join(['string({})'.format(pow(2, x + 1) - 1) for x in range(columns)]) + '\n')
 
         counter = 0
         for i in range(rows):
@@ -31,7 +31,7 @@ def write_to_file(filename, distinct_strings, rows, columns):
 
 def main():
     columns = 8
-    rows = 10000000
+    rows = 100000
     distinctness = 0.01
 
     threads = []

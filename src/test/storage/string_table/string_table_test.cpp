@@ -8,6 +8,7 @@
 #include "operators/table_scan.hpp"
 #include "operators/table_wrapper.hpp"
 #include "storage/storage_manager.hpp"
+#include "fixed_string.hpp"
 
 namespace opossum {
 
@@ -16,6 +17,8 @@ protected:
   void SetUp() override {
     // StorageManager::get().add_table("string_table1",
     //                                 load_table("strings_table/string_table.tbl", Chunk::MAX_SIZE));
+
+    ValueColumn<char> vc(10); 
 
     // const auto table = StorageManager::get().get_table("string_table1");
 
@@ -27,9 +30,9 @@ protected:
   }
 };
 
-// TEST_F(StringTableTest, SomeRandomTest) {
-//   EXPECT_EQ(0u, 0u);
-// }
+TEST_F(StringTableTest, SomeRandomTest) {
+  EXPECT_EQ(0u, 0u);
+}
 
 
 }  // namespace opossum

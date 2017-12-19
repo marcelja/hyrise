@@ -23,6 +23,7 @@
 
 #include "null_value.hpp"
 #include "types.hpp"
+#include "fixed_string.hpp"
 
 namespace opossum {
 
