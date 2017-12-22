@@ -20,6 +20,12 @@ ValueColumn<T>::ValueColumn(bool nullable) {
 }
 
 template <typename T>
+ValueColumn<T>::ValueColumn(uint8_t fixed_string_length, bool nullable) {
+  _fixed_string_length = fixed_string_length;
+  _fixed_string = true;
+}
+
+template <typename T>
 ValueColumn<T>::ValueColumn(const PolymorphicAllocator<T>& alloc, bool nullable) : _values(alloc) {
   if (nullable) _null_values = pmr_concurrent_vector<bool>(alloc);
 }
@@ -73,7 +79,34 @@ void ValueColumn<T>::append(const AllTypeVariant& val) {
 }
 
 template <>
+const std::string ValueColumn<std::string>::get(const ChunkOffset chunk_offset) const {
+  DebugAssert(chunk_offset != INVALID_CHUNK_OFFSET, "Passed chunk offset must be valid.");
+
+  Assert(!is_nullable() || !(*_null_values).at(chunk_offset), "Can’t return value of column type because it is null.");
+
+  if (_fixed_string) {
+    return std::string(&_fixed_string_vector[chunk_offset * _fixed_string_length], _fixed_string_length);
+  } else {
+    return _values.at(chunk_offset);
+  }
+}
+
+template <>
 void ValueColumn<std::string>::append(const AllTypeVariant& val) {
+
+  if (_fixed_string) {
+    auto string = type_cast<std::string>(val);
+    auto pos = _fixed_string_vector.size();
+
+    _fixed_string_vector.resize(_fixed_string_vector.size() + _fixed_string_length);
+    string.copy(&_fixed_string_vector[pos], _fixed_string_length);
+    if(string.size() < _fixed_string_length) {
+      std::fill(_fixed_string_vector.begin() + pos + string.size(),
+            _fixed_string_vector.begin() + pos + _fixed_string_length,
+            '\0');
+    }
+  }
+
   bool is_null = variant_is_null(val);
 
   if (is_nullable()) {

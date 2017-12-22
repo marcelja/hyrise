@@ -18,20 +18,23 @@ protected:
     // StorageManager::get().add_table("string_table1",
     //                                 load_table("strings_table/string_table.tbl", Chunk::MAX_SIZE));
 
-    ValueColumn<char> vc(10); 
-
     // const auto table = StorageManager::get().get_table("string_table1");
 
     // auto table_wrapper = std::make_shared<TableWrapper>(std::move(table));
     // table_wrapper->execute();
     // auto ex = std::make_shared<opossum::ExportBinary>(table_wrapper, "string_table_out.bin");
     // ex->execute();
-
   }
 };
 
-TEST_F(StringTableTest, SomeRandomTest) {
-  EXPECT_EQ(0u, 0u);
+TEST_F(StringTableTest, StringAppend) {
+  uint8_t string_length = 10;
+
+  ValueColumn<std::string> vc(string_length);
+  vc.append("bla");
+  vc.append("blabla");
+
+  EXPECT_EQ(vc.get(1), "blabla");
 }
 
 
