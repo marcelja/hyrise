@@ -85,7 +85,9 @@ const std::string ValueColumn<std::string>::get(const ChunkOffset chunk_offset) 
   Assert(!is_nullable() || !(*_null_values).at(chunk_offset), "Can’t return value of column type because it is null.");
 
   if (_fixed_string) {
-    return std::string(&_fixed_string_vector[chunk_offset * _fixed_string_length], _fixed_string_length);
+    auto string = std::string(&_fixed_string_vector[chunk_offset * _fixed_string_length], _fixed_string_length);
+    auto end_of_string =  string.find('\0');
+    return end_of_string == std::string::npos ? string : string.substr(0, end_of_string);
   } else {
     return _values.at(chunk_offset);
   }
