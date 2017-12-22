@@ -37,5 +37,14 @@ TEST_F(StringTableTest, StringAppend) {
   EXPECT_EQ(vc.get(1), "blabla");
 }
 
+TEST_F(StringTableTest, LongString) {
+  uint8_t string_length = 2;
+
+  ValueColumn<std::string> vc(string_length);
+  vc.append("bla");
+
+  EXPECT_EQ(vc.get(0), "bl");
+}
+
 
 }  // namespace opossum
