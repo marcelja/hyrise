@@ -95,14 +95,13 @@ const std::string ValueColumn<std::string>::get(const ChunkOffset chunk_offset) 
 
 template <>
 void ValueColumn<std::string>::append(const AllTypeVariant& val) {
-
   if (_fixed_string) {
     auto string = type_cast<std::string>(val);
     auto pos = _fixed_string_vector.size();
 
     _fixed_string_vector.resize(_fixed_string_vector.size() + _fixed_string_length);
     string.copy(&_fixed_string_vector[pos], _fixed_string_length);
-    if(string.size() < _fixed_string_length) {
+    if (string.size() < _fixed_string_length) {
       std::fill(_fixed_string_vector.begin() + pos + string.size(),
             _fixed_string_vector.begin() + pos + _fixed_string_length,
             '\0');
