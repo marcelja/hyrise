@@ -46,5 +46,21 @@ TEST_F(StringTableTest, LongString) {
   EXPECT_EQ(vc.get(0), "bl");
 }
 
+TEST_F(StringTableTest, GetSize) {
+  uint8_t string_length = 4;
+
+  ValueColumn<std::string> vc(string_length);
+  vc.append("bla");
+  vc.append("bla");
+  EXPECT_EQ(vc.size(), 2u);
+}
+
+TEST_F(StringTableTest, SubscriptOperator) {
+  uint8_t string_length = 4;
+
+  ValueColumn<std::string> vc(string_length);
+  vc.append("bla");
+  EXPECT_EQ(type_cast<std::string>(vc[0]), "bla");
+}
 
 }  // namespace opossum

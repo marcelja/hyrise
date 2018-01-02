@@ -78,6 +78,9 @@ void ValueColumn<T>::append(const AllTypeVariant& val) {
   _values.push_back(type_cast<T>(val));
 }
 
+// Our stuff goes here
+
+
 template <>
 const std::string ValueColumn<std::string>::get(const ChunkOffset chunk_offset) const {
   DebugAssert(chunk_offset != INVALID_CHUNK_OFFSET, "Passed chunk offset must be valid.");
@@ -126,6 +129,28 @@ void ValueColumn<std::string>::append(const AllTypeVariant& val) {
 
   _values.push_back(typed_val);
 }
+
+template <>
+const AllTypeVariant ValueColumn<std::string>::operator[](const ChunkOffset chunk_offset) const {
+  DebugAssert(chunk_offset != INVALID_CHUNK_OFFSET, "Passed chunk offset must be valid.");
+  PerformanceWarning("operator[] used");
+
+  Assert(!is_nullable() || !(*_null_values).at(chunk_offset), "Can’t return value of column type because it is null.");
+
+  // Column supports null values and value is null
+  if (is_nullable() && _null_values->at(chunk_offset)) {
+    return NULL_VALUE;
+  }
+
+  if (_fixed_string) {
+    auto string = std::string(&_fixed_string_vector[chunk_offset * _fixed_string_length], _fixed_string_length);
+    auto end_of_string =  string.find('\0');
+    return end_of_string == std::string::npos ? string : string.substr(0, end_of_string);
+  } else {
+    return _values.at(chunk_offset);
+  }
+}
+
 
 template <typename T>
 const pmr_concurrent_vector<T>& ValueColumn<T>::values() const {
