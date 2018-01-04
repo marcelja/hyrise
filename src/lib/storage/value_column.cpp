@@ -78,9 +78,6 @@ void ValueColumn<T>::append(const AllTypeVariant& val) {
   _values.push_back(type_cast<T>(val));
 }
 
-// Our stuff goes here
-
-
 template <>
 const std::string ValueColumn<std::string>::get(const ChunkOffset chunk_offset) const {
   DebugAssert(chunk_offset != INVALID_CHUNK_OFFSET, "Passed chunk offset must be valid.");
@@ -151,6 +148,15 @@ const AllTypeVariant ValueColumn<std::string>::operator[](const ChunkOffset chun
   }
 }
 
+
+template <>
+size_t ValueColumn<std::string>::size() const {
+  if (_fixed_string) {
+    return _fixed_string_vector.size() / _fixed_string_length;
+  } else {
+    return _values.size();
+  }
+}
 
 template <typename T>
 const pmr_concurrent_vector<T>& ValueColumn<T>::values() const {

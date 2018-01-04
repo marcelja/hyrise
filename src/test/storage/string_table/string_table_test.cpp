@@ -53,6 +53,8 @@ TEST_F(StringTableTest, GetSize) {
   vc.append("bla");
   vc.append("bla");
   EXPECT_EQ(vc.size(), 2u);
+  vc.append(std::string{});
+  EXPECT_EQ(vc.size(), 3u);
 }
 
 TEST_F(StringTableTest, SubscriptOperator) {
