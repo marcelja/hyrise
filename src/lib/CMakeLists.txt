@@ -254,6 +254,8 @@ set(
     storage/table.hpp
     storage/value_column.cpp
     storage/value_column.hpp
+    storage/value_vector.cpp
+    storage/value_vector.hpp
     tasks/chunk_compression_task.cpp
     tasks/chunk_compression_task.hpp
     tasks/chunk_metrics_collection_task.cpp
