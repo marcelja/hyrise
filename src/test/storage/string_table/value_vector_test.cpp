@@ -11,6 +11,7 @@
 // #include "storage/value_vector.hpp"
 // #include "types.hpp"
 #include "../lib/storage/value_vector.hpp"
+#include "../lib/fixed_string.hpp"
 
 
 namespace opossum {
@@ -30,6 +31,18 @@ TEST_F(ValueVectorTest, FirstExample) {
 
   ValueVector<int> _values;
   _values.push_back(27);
+
+  char mem[] = {'f', 'o', 'o'};
+  FixedString s(mem, 3);
+  FixedString s2("bar");
+  FixedString s3(mem, 2);
+  FixedString s4(s2);
+  std::cout << s << std::endl;
+  std::cout << s2.string() << std::endl;
+  std::cout << s2 << std::endl;
+  std::cout << s3 << std::endl;
+  std::cout << s3.string() << std::endl;
+  std::cout << s4 << std::endl;
 
   EXPECT_EQ(1, 1);
 }
