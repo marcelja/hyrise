@@ -45,11 +45,11 @@ void ValueVector<T>::push_back(T&& value) {
   _values.push_back(std::forward<T>(value));
 }
 
-// template <typename T>
-// iterator ValueVector<T>::begin() noexcept { return _values.begin(); }
+template <typename T>
+typename ValueVector<T>::iterator ValueVector<T>::begin() noexcept { return _values.begin(); }
 
-// template <typename T>
-// iterator ValueVector<T>::end() noexcept { return _values.end(); }
+template <typename T>
+typename ValueVector<T>::iterator ValueVector<T>::end() noexcept { return _values.end(); }
 
 // template <typename T>
 // T& ValueVector<T>::operator[] (size_t n) { return _values[n]; }
