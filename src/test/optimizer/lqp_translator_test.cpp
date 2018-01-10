@@ -17,6 +17,7 @@
 #include "logical_query_plan/show_tables_node.hpp"
 #include "logical_query_plan/sort_node.hpp"
 #include "logical_query_plan/stored_table_node.hpp"
+#include "logical_query_plan/union_node.hpp"
 #include "operators/aggregate.hpp"
 #include "operators/get_table.hpp"
 #include "operators/join_hash.hpp"
@@ -52,34 +53,34 @@ TEST_F(LQPTranslatorTest, StoredTableNode) {
 
 TEST_F(LQPTranslatorTest, PredicateNodeUnaryScan) {
   const auto stored_table_node = std::make_shared<StoredTableNode>("table_int_float");
-  auto predicate_node = std::make_shared<PredicateNode>(ColumnID{0}, ScanType::OpEquals, 42);
+  auto predicate_node = std::make_shared<PredicateNode>(ColumnID{0}, ScanType::Equals, 42);
   predicate_node->set_left_child(stored_table_node);
   const auto op = LQPTranslator{}.translate_node(predicate_node);
 
   const auto table_scan_op = std::dynamic_pointer_cast<TableScan>(op);
   ASSERT_TRUE(table_scan_op);
   EXPECT_EQ(table_scan_op->left_column_id(), ColumnID{0} /* "a" */);
-  EXPECT_EQ(table_scan_op->scan_type(), ScanType::OpEquals);
+  EXPECT_EQ(table_scan_op->scan_type(), ScanType::Equals);
   EXPECT_EQ(table_scan_op->right_parameter(), AllParameterVariant(42));
 }
 
 TEST_F(LQPTranslatorTest, PredicateNodeBinaryScan) {
   const auto stored_table_node = std::make_shared<StoredTableNode>("table_int_float");
   auto predicate_node =
-      std::make_shared<PredicateNode>(ColumnID{0}, ScanType::OpBetween, AllParameterVariant(42), AllTypeVariant(1337));
+      std::make_shared<PredicateNode>(ColumnID{0}, ScanType::Between, AllParameterVariant(42), AllTypeVariant(1337));
   predicate_node->set_left_child(stored_table_node);
   const auto op = LQPTranslator{}.translate_node(predicate_node);
 
   const auto table_scan_op2 = std::dynamic_pointer_cast<TableScan>(op);
   ASSERT_TRUE(table_scan_op2);
   EXPECT_EQ(table_scan_op2->left_column_id(), ColumnID{0} /* "a" */);
-  EXPECT_EQ(table_scan_op2->scan_type(), ScanType::OpLessThanEquals);
+  EXPECT_EQ(table_scan_op2->scan_type(), ScanType::LessThanEquals);
   EXPECT_EQ(table_scan_op2->right_parameter(), AllParameterVariant(1337));
 
   const auto table_scan_op = std::dynamic_pointer_cast<const TableScan>(table_scan_op2->input_left());
   ASSERT_TRUE(table_scan_op);
   EXPECT_EQ(table_scan_op->left_column_id(), ColumnID{0} /* "a" */);
-  EXPECT_EQ(table_scan_op->scan_type(), ScanType::OpGreaterThanEquals);
+  EXPECT_EQ(table_scan_op->scan_type(), ScanType::GreaterThanEquals);
   EXPECT_EQ(table_scan_op->right_parameter(), AllParameterVariant(42));
 }
 
@@ -113,7 +114,7 @@ TEST_F(LQPTranslatorTest, JoinNode) {
   const auto stored_table_node_left = std::make_shared<StoredTableNode>("table_int_float");
   const auto stored_table_node_right = std::make_shared<StoredTableNode>("table_int_float2");
   auto join_node =
-      std::make_shared<JoinNode>(JoinMode::Outer, std::make_pair(ColumnID{0}, ColumnID{0}), ScanType::OpEquals);
+      std::make_shared<JoinNode>(JoinMode::Outer, std::make_pair(ColumnID{0}, ColumnID{0}), ScanType::Equals);
   join_node->set_left_child(stored_table_node_left);
   join_node->set_right_child(stored_table_node_right);
   const auto op = LQPTranslator{}.translate_node(join_node);
@@ -121,7 +122,7 @@ TEST_F(LQPTranslatorTest, JoinNode) {
   const auto join_op = std::dynamic_pointer_cast<JoinSortMerge>(op);
   ASSERT_TRUE(join_op);
   EXPECT_EQ(join_op->column_ids(), join_node->join_column_ids());
-  EXPECT_EQ(join_op->scan_type(), ScanType::OpEquals);
+  EXPECT_EQ(join_op->scan_type(), ScanType::Equals);
   EXPECT_EQ(join_op->mode(), JoinMode::Outer);
 }
 
@@ -222,16 +223,16 @@ TEST_F(LQPTranslatorTest, AggregateNodeWithArithmetics) {
 
 TEST_F(LQPTranslatorTest, MultipleNodesHierarchy) {
   const auto stored_table_node_left = std::make_shared<StoredTableNode>("table_int_float");
-  auto predicate_node_left = std::make_shared<PredicateNode>(ColumnID{0}, ScanType::OpEquals, AllParameterVariant(42));
+  auto predicate_node_left = std::make_shared<PredicateNode>(ColumnID{0}, ScanType::Equals, AllParameterVariant(42));
   predicate_node_left->set_left_child(stored_table_node_left);
 
   const auto stored_table_node_right = std::make_shared<StoredTableNode>("table_int_float2");
   auto predicate_node_right =
-      std::make_shared<PredicateNode>(ColumnID{1}, ScanType::OpGreaterThan, AllParameterVariant(30.0));
+      std::make_shared<PredicateNode>(ColumnID{1}, ScanType::GreaterThan, AllParameterVariant(30.0));
   predicate_node_right->set_left_child(stored_table_node_right);
 
   auto join_node =
-      std::make_shared<JoinNode>(JoinMode::Inner, std::make_pair(ColumnID{0}, ColumnID{0}), ScanType::OpEquals);
+      std::make_shared<JoinNode>(JoinMode::Inner, std::make_pair(ColumnID{0}, ColumnID{0}), ScanType::Equals);
   join_node->set_left_child(predicate_node_left);
   join_node->set_right_child(predicate_node_right);
 
@@ -242,11 +243,11 @@ TEST_F(LQPTranslatorTest, MultipleNodesHierarchy) {
 
   const auto predicate_op_left = std::dynamic_pointer_cast<const TableScan>(join_op->input_left());
   ASSERT_TRUE(predicate_op_left);
-  EXPECT_EQ(predicate_op_left->scan_type(), ScanType::OpEquals);
+  EXPECT_EQ(predicate_op_left->scan_type(), ScanType::Equals);
 
   const auto predicate_op_right = std::dynamic_pointer_cast<const TableScan>(join_op->input_right());
   ASSERT_TRUE(predicate_op_right);
-  EXPECT_EQ(predicate_op_right->scan_type(), ScanType::OpGreaterThan);
+  EXPECT_EQ(predicate_op_right->scan_type(), ScanType::GreaterThan);
 
   const auto get_table_op_left = std::dynamic_pointer_cast<const GetTable>(predicate_op_left->input_left());
   ASSERT_TRUE(get_table_op_left);
@@ -268,6 +269,55 @@ TEST_F(LQPTranslatorTest, LimitNode) {
   const auto limit_op = std::dynamic_pointer_cast<Limit>(op);
   ASSERT_TRUE(limit_op);
   EXPECT_EQ(limit_op->num_rows(), num_rows);
+}
+
+TEST_F(LQPTranslatorTest, DiamondShapeSimple) {
+  /**
+   * Test that
+   *
+   *    _____union____
+   *   /              \
+   *  predicate_a     predicate_b
+   *  \                /
+   *   \__predicate_c_/
+   *          |
+   *     table_int_float2
+   *
+   * has a diamond shape in the PQP as well. If it wouldn't have it might look like this:
+   *
+   *    _____union____
+   *   /              \
+   *  predicate_a     predicate_b
+   *      |             |
+   *  predicate_c(1)  predicate_c(2)
+   *      |             |
+   * table_int_float2 table_int_float2
+   *
+   * which is still semantically correct, but would mean predicate_c gets executed twice
+   */
+
+  auto table_node = std::make_shared<StoredTableNode>("table_int_float2");
+  auto predicate_node_a = std::make_shared<PredicateNode>(ColumnID{0}, ScanType::Equals, 3);
+  auto predicate_node_b = std::make_shared<PredicateNode>(ColumnID{0}, ScanType::Equals, 4);
+  auto predicate_node_c = std::make_shared<PredicateNode>(ColumnID{1}, ScanType::Equals, 5.0);
+  auto union_node = std::make_shared<UnionNode>(UnionMode::Positions);
+  const auto& lqp = union_node;
+
+  union_node->set_left_child(predicate_node_a);
+  union_node->set_right_child(predicate_node_b);
+  predicate_node_a->set_left_child(predicate_node_c);
+  predicate_node_b->set_left_child(predicate_node_c);
+  predicate_node_c->set_left_child(table_node);
+
+  const auto pqp = LQPTranslator{}.translate_node(lqp);
+
+  ASSERT_NE(pqp, nullptr);
+  ASSERT_NE(pqp->input_left(), nullptr);
+  ASSERT_NE(pqp->input_right(), nullptr);
+  ASSERT_NE(pqp->input_left()->input_left(), nullptr);
+  ASSERT_NE(pqp->input_right()->input_left(), nullptr);
+  EXPECT_EQ(pqp->input_left()->input_left(), pqp->input_right()->input_left());
+  EXPECT_EQ(pqp->input_left()->input_left()->input_left(), pqp->input_right()->input_left()->input_left());
 }
 
 }  // namespace opossum
