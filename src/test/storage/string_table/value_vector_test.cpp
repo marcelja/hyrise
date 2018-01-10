@@ -53,4 +53,15 @@ TEST_F(ValueVectorTest, asdfasdfsalkasdfljkafsdjkldf) {
   EXPECT_EQ(str1.string(), "abc");
 }
 
+TEST_F(ValueVectorTest, comparestrings) {
+
+  std::vector<char> test123 {'a', 'b', 'c', 'f'};
+  std::vector<char> test456 {'b', 'b', 'c', 'f'};
+
+  auto str1 = FixedString(&test123[0], 3);
+  auto str2 = FixedString(&test456[0], 4);
+
+  EXPECT_TRUE(str1 < str2);
+}
+
 }  // namespace opossum
