@@ -33,15 +33,17 @@ ValueVector<T>::ValueVector(uint8_t fixed_string_length) {
 //   // _values(std::move(values));
 // }
 
-// template <typename T>
-// void ValueVector<T>::push_back(const T& value) {
-//   _values.push_back(std::forward<const T>(value));
-// }
+template <typename T>
+void ValueVector<T>::push_back(const T& value) {
+  std::cout<<"const push back";
+  _values.push_back(std::forward<const T>(value));
+}
 
-// template <typename T>
-// void ValueVector<T>::push_back(T&& value) {
-//   _values.push_back(std::forward<T>(value));
-// }
+template <typename T>
+void ValueVector<T>::push_back(T&& value) {
+  std::cout<<"lkjsadflkjasfd push back";
+  _values.push_back(std::forward<T>(value));
+}
 
 // template <typename T>
 // iterator ValueVector<T>::begin() noexcept { return _values.begin(); }

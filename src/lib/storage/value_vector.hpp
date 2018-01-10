@@ -20,13 +20,9 @@ class ValueVector {
   //   _values(std::move(values));
   // };
 
-  void push_back(const T& value) {
-    _values.push_back(std::forward<const T>(value));
-  };
+  void push_back(const T& value);
 
-  void push_back(T&& value) {
-    _values.push_back(std::forward<T>(value));
-  };
+  void push_back(T&& value);
 
  protected:
   pmr_vector<T> _values;
