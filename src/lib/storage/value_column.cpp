@@ -11,6 +11,7 @@
 #include "type_cast.hpp"
 #include "utils/assert.hpp"
 #include "utils/performance_warning.hpp"
+#include "value_vector.hpp"
 
 namespace opossum {
 
@@ -86,7 +87,7 @@ const std::string ValueColumn<std::string>::get(const ChunkOffset chunk_offset) 
 
   if (_fixed_string) {
     auto string = std::string(&_fixed_string_vector[chunk_offset * _fixed_string_length], _fixed_string_length);
-    auto end_of_string =  string.find('\0');
+    auto end_of_string = string.find('\0');
     return end_of_string == std::string::npos ? string : string.substr(0, end_of_string);
   } else {
     return _values.at(chunk_offset);
@@ -103,8 +104,7 @@ void ValueColumn<std::string>::append(const AllTypeVariant& val) {
     string.copy(&_fixed_string_vector[pos], _fixed_string_length);
     if (string.size() < _fixed_string_length) {
       std::fill(_fixed_string_vector.begin() + pos + string.size(),
-            _fixed_string_vector.begin() + pos + _fixed_string_length,
-            '\0');
+                _fixed_string_vector.begin() + pos + _fixed_string_length, '\0');
     }
   }
 
@@ -141,13 +141,12 @@ const AllTypeVariant ValueColumn<std::string>::operator[](const ChunkOffset chun
 
   if (_fixed_string) {
     auto string = std::string(&_fixed_string_vector[chunk_offset * _fixed_string_length], _fixed_string_length);
-    auto end_of_string =  string.find('\0');
+    auto end_of_string = string.find('\0');
     return end_of_string == std::string::npos ? string : string.substr(0, end_of_string);
   } else {
     return _values.at(chunk_offset);
   }
 }
-
 
 template <>
 size_t ValueColumn<std::string>::size() const {
