@@ -12,6 +12,8 @@ namespace opossum {
 template <typename T>
 class ValueVector {
  public:
+  using iterator = typename std::vector<T>::iterator;
+
   explicit ValueVector();
 
   explicit ValueVector(uint8_t fixed_string_length);
@@ -20,13 +22,18 @@ class ValueVector {
   //   _values(std::move(values));
   // };
 
-  void push_back(const T& value) {
-    _values.push_back(std::forward<const T>(value));
-  };
+  void push_back(const T& value);
 
-  void push_back(T&& value) {
-    _values.push_back(std::forward<T>(value));
-  };
+  void push_back(T&& value);
+
+  iterator begin() noexcept;
+
+  iterator end() noexcept;
+
+T& operator[] (size_t n);
+
+const T& operator[] (size_t n) const;
+
 
  protected:
   pmr_vector<T> _values;

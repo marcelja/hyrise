@@ -36,7 +36,7 @@ TEST_F(ValueVectorTest, FirstExample) {
   FixedString s(mem, 3);
   FixedString s2("bar");
   FixedString s3(mem, 2);
-  FixedString s4(s2);
+  FixedString s4(s2);default
   std::cout << s << std::endl;
   std::cout << s2.string() << std::endl;
   std::cout << s2 << std::endl;
