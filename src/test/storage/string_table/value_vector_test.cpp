@@ -3,13 +3,15 @@
 #include "../../base_test.hpp"
 #include "gtest/gtest.h"
 
-#include "import_export/binary.hpp"
-#include "operators/export_binary.hpp"
-#include "operators/table_scan.hpp"
-#include "operators/table_wrapper.hpp"
-#include "storage/storage_manager.hpp"
-#include "storage/value_vector.hpp"
-#include "types.hpp"
+// #include "import_export/binary.hpp"
+// #include "operators/export_binary.hpp"
+// #include "operators/table_scan.hpp"
+// #include "operators/table_wrapper.hpp"
+// #include "storage/storage_manager.hpp"
+// #include "storage/value_vector.hpp"
+// #include "types.hpp"
+#include "../lib/storage/value_vector.hpp"
+
 
 namespace opossum {
 

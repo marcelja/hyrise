@@ -12,13 +12,9 @@ namespace opossum {
 template <typename T>
 class ValueVector {
  public:
-  explicit ValueVector() {
-    _fixed_string_length = 0;
-  };
+  explicit ValueVector();
 
-  explicit ValueVector(uint8_t fixed_string_length) {
-    _fixed_string_length = fixed_string_length;
-  };
+  explicit ValueVector(uint8_t fixed_string_length);
 
   // void copy_values(pmr_concurrent_vector<T> values) {
   //   _values(std::move(values));
