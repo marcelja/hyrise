@@ -11,6 +11,7 @@
 // #include "storage/value_vector.hpp"
 // #include "types.hpp"
 #include "../lib/storage/value_vector.hpp"
+#include "../lib/fixed_string.hpp"
 
 
 namespace opossum {
@@ -32,6 +33,24 @@ TEST_F(ValueVectorTest, FirstExample) {
   _values.push_back(27);
 
   EXPECT_EQ(1, 1);
+}
+
+TEST_F(ValueVectorTest, asdfasdfsadf) {
+
+  auto str1 = FixedString(std::string("askjjklasfkl"));
+  std::cout << str1.size();
+
+  EXPECT_EQ(str1.size(), size_t(12));
+}
+
+TEST_F(ValueVectorTest, asdfasdfsalkasdfljkafsdjkldf) {
+
+  std::vector<char> test123 {'a', 'b', 'c', 'f'};
+
+  auto str1 = FixedString(&test123[0], 3);
+  std::cout << str1.string();
+
+  EXPECT_EQ(str1.string(), "abc");
 }
 
 }  // namespace opossum

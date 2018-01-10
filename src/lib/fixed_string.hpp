@@ -78,6 +78,6 @@ private:
     };
 };
 
-std::ostream &operator<<(std::ostream &os, FixedString const &s) { return os << s.string(); }
+// std::ostream &operator<<(std::ostream &os, FixedString const &s) { return os << s.string(); }
 
 } // namespace opossum
