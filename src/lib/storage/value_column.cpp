@@ -11,19 +11,12 @@
 #include "type_cast.hpp"
 #include "utils/assert.hpp"
 #include "utils/performance_warning.hpp"
-#include "value_vector.hpp"
 
 namespace opossum {
 
 template <typename T>
 ValueColumn<T>::ValueColumn(bool nullable) {
   if (nullable) _null_values = pmr_concurrent_vector<bool>();
-}
-
-template <typename T>
-ValueColumn<T>::ValueColumn(uint8_t fixed_string_length, bool nullable) {
-  _fixed_string_length = fixed_string_length;
-  _fixed_string = true;
 }
 
 template <typename T>
@@ -80,34 +73,7 @@ void ValueColumn<T>::append(const AllTypeVariant& val) {
 }
 
 template <>
-const std::string ValueColumn<std::string>::get(const ChunkOffset chunk_offset) const {
-  DebugAssert(chunk_offset != INVALID_CHUNK_OFFSET, "Passed chunk offset must be valid.");
-
-  Assert(!is_nullable() || !(*_null_values).at(chunk_offset), "Can’t return value of column type because it is null.");
-
-  if (_fixed_string) {
-    auto string = std::string(&_fixed_string_vector[chunk_offset * _fixed_string_length], _fixed_string_length);
-    auto end_of_string = string.find('\0');
-    return end_of_string == std::string::npos ? string : string.substr(0, end_of_string);
-  } else {
-    return _values.at(chunk_offset);
-  }
-}
-
-template <>
 void ValueColumn<std::string>::append(const AllTypeVariant& val) {
-  if (_fixed_string) {
-    auto string = type_cast<std::string>(val);
-    auto pos = _fixed_string_vector.size();
-
-    _fixed_string_vector.resize(_fixed_string_vector.size() + _fixed_string_length);
-    string.copy(&_fixed_string_vector[pos], _fixed_string_length);
-    if (string.size() < _fixed_string_length) {
-      std::fill(_fixed_string_vector.begin() + pos + string.size(),
-                _fixed_string_vector.begin() + pos + _fixed_string_length, '\0');
-    }
-  }
-
   bool is_null = variant_is_null(val);
 
   if (is_nullable()) {
@@ -125,36 +91,6 @@ void ValueColumn<std::string>::append(const AllTypeVariant& val) {
   Assert((typed_val.length() <= std::numeric_limits<StringLength>::max()), "String value is too long to append!");
 
   _values.push_back(typed_val);
-}
-
-template <>
-const AllTypeVariant ValueColumn<std::string>::operator[](const ChunkOffset chunk_offset) const {
-  DebugAssert(chunk_offset != INVALID_CHUNK_OFFSET, "Passed chunk offset must be valid.");
-  PerformanceWarning("operator[] used");
-
-  Assert(!is_nullable() || !(*_null_values).at(chunk_offset), "Can’t return value of column type because it is null.");
-
-  // Column supports null values and value is null
-  if (is_nullable() && _null_values->at(chunk_offset)) {
-    return NULL_VALUE;
-  }
-
-  if (_fixed_string) {
-    auto string = std::string(&_fixed_string_vector[chunk_offset * _fixed_string_length], _fixed_string_length);
-    auto end_of_string = string.find('\0');
-    return end_of_string == std::string::npos ? string : string.substr(0, end_of_string);
-  } else {
-    return _values.at(chunk_offset);
-  }
-}
-
-template <>
-size_t ValueColumn<std::string>::size() const {
-  if (_fixed_string) {
-    return _fixed_string_vector.size() / _fixed_string_length;
-  } else {
-    return _values.size();
-  }
 }
 
 template <typename T>

@@ -15,7 +15,6 @@ template <typename T>
 class ValueColumn : public BaseValueColumn {
  public:
   explicit ValueColumn(bool nullable = false);
-  explicit ValueColumn(uint8_t fixed_string_length, bool nullable = false);
   explicit ValueColumn(const PolymorphicAllocator<T>& alloc, bool nullable = false);
 
   // Create a ValueColumn with the given values.
@@ -66,9 +65,6 @@ class ValueColumn : public BaseValueColumn {
 
  protected:
   pmr_concurrent_vector<T> _values;
-  std::vector<char> _fixed_string_vector;
-  uint8_t _fixed_string_length;
-  bool _fixed_string = false;
 
   // While a ValueColumn knows if it is nullable or not by looking at this optional, a DictionaryColumn does not.
   // For this reason, we need to store the nullable information separately in the table's definition.
