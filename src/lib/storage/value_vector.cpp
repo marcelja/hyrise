@@ -60,6 +60,11 @@ const T& ValueVector<T>::operator[](size_t n) const {
   return _values[n];
 }
 
+template <typename T>
+size_t ValueVector<T>::vector_size() const {
+  return _values.size();
+}
+
 void ValueVector<FixedString>::push_back(const FixedString& value) {
   push_back(std::forward<FixedString>((FixedString&)value));
 }
@@ -88,6 +93,8 @@ FixedString ValueVector<FixedString>::operator[](size_t n) {
 const FixedString ValueVector<FixedString>::operator[](size_t n) const {
   return {FixedString((char*)&_vector[n * _string_length], _string_length)};
 }
+
+size_t ValueVector<FixedString>::vector_size() const { return _vector.size(); }
 
 EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueVector);
 
