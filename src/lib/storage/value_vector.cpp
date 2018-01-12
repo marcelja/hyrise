@@ -32,13 +32,11 @@ ValueVector<T>::ValueVector(uint8_t fixed_string_length) {
 
 template <typename T>
 void ValueVector<T>::push_back(const T& value) {
-  std::cout<<"const push back";
   _values.push_back(std::forward<const T>(value));
 }
 
 template <typename T>
 void ValueVector<T>::push_back(T&& value) {
-  std::cout<<"lkjsadflkjasfd push back";
   _values.push_back(std::forward<T>(value));
 }
 
@@ -48,11 +46,11 @@ typename ValueVector<T>::iterator ValueVector<T>::begin() noexcept { return _val
 template <typename T>
 typename ValueVector<T>::iterator ValueVector<T>::end() noexcept { return _values.end(); }
 
-// template <typename T>
-// T& ValueVector<T>::operator[] (size_t n) { return _values[n]; }
+template <typename T>
+T& ValueVector<T>::operator[] (size_t n) { return _values[n]; }
 
-// template <typename T>
-// const T& ValueVector<T>::operator[] (size_t n) const { return _values[n]; }
+template <typename T>
+const T& ValueVector<T>::operator[] (size_t n) const { return _values[n]; }
 
 EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueVector);
 

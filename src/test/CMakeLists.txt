@@ -15,6 +15,7 @@ set(
     import_export/csv_meta_test.cpp
     lib/all_parameter_variant_test.cpp
     lib/all_type_variant_test.cpp
+    lib/fixed_string_test.cpp
     operators/aggregate_test.cpp
     operators/delete_test.cpp
     operators/difference_test.cpp
@@ -101,7 +102,7 @@ set(
     storage/variable_length_key_store_test.cpp
     storage/variable_length_key_test.cpp
     storage/string_table/string_table_test.cpp
-    storage/string_table/value_vector_test.cpp
+    storage/value_vector_test.cpp
     tasks/chunk_compression_task_test.cpp
     tasks/operator_task_test.cpp
     utils/cuckoo_hashtable_test.cpp

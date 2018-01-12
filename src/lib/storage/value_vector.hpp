@@ -30,9 +30,9 @@ class ValueVector {
 
   iterator end() noexcept;
 
-T& operator[] (size_t n);
+  T& operator[] (size_t n);
 
-const T& operator[] (size_t n) const;
+  const T& operator[] (size_t n) const;
 
 
  protected:
