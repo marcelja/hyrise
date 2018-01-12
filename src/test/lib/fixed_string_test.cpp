@@ -38,7 +38,6 @@ TEST_F(FixedStringTest, Constructors) {
 }
 
 TEST_F(FixedStringTest, CompareStrings) {
-
   std::vector<char> a {'a', 'b', 'c', 'f'};
   std::vector<char> b {'b', 'b', 'c', 'f'};
 

@@ -13,7 +13,7 @@
 namespace opossum {
 
 class StringTableTest : public BaseTest {
-protected:
+ protected:
   void SetUp() override {
     // StorageManager::get().add_table("string_table1",
     //                                 load_table("strings_table/string_table.tbl", Chunk::MAX_SIZE));
