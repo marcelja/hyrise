@@ -12,7 +12,7 @@ namespace opossum {
 template <typename T>
 class ValueVector {
  public:
-  using iterator = typename std::vector<T>::iterator;
+  using iterator = typename pmr_vector<T>::iterator;
 
   explicit ValueVector();
 

@@ -14,9 +14,6 @@
 
 namespace opossum {
 
-// template <typename T>
-// using iterator = typename std::vector<T>::iterator;
-
 template <typename T>
 ValueVector<T>::ValueVector() {
   _fixed_string_length = 0;

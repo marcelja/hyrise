@@ -27,42 +27,42 @@ protected:
   }
 };
 
-TEST_F(StringTableTest, StringAppend) {
-  uint8_t string_length = 10;
+// TEST_F(StringTableTest, StringAppend) {
+//   uint8_t string_length = 10;
 
-  ValueColumn<std::string> vc(string_length);
-  vc.append("bla");
-  vc.append("blabla");
+//   ValueColumn<std::string> vc(string_length);
+//   vc.append("bla");
+//   vc.append("blabla");
 
-  EXPECT_EQ(vc.get(1), "blabla");
-}
+//   EXPECT_EQ(vc.get(1), "blabla");
+// }
 
-TEST_F(StringTableTest, LongString) {
-  uint8_t string_length = 2;
+// TEST_F(StringTableTest, LongString) {
+//   uint8_t string_length = 2;
 
-  ValueColumn<std::string> vc(string_length);
-  vc.append("bla");
+//   ValueColumn<std::string> vc(string_length);
+//   vc.append("bla");
 
-  EXPECT_EQ(vc.get(0), "bl");
-}
+//   EXPECT_EQ(vc.get(0), "bl");
+// }
 
-TEST_F(StringTableTest, GetSize) {
-  uint8_t string_length = 4;
+// TEST_F(StringTableTest, GetSize) {
+//   uint8_t string_length = 4;
 
-  ValueColumn<std::string> vc(string_length);
-  vc.append("bla");
-  vc.append("bla");
-  EXPECT_EQ(vc.size(), 2u);
-  vc.append(std::string{});
-  EXPECT_EQ(vc.size(), 3u);
-}
+//   ValueColumn<std::string> vc(string_length);
+//   vc.append("bla");
+//   vc.append("bla");
+//   EXPECT_EQ(vc.size(), 2u);
+//   vc.append(std::string{});
+//   EXPECT_EQ(vc.size(), 3u);
+// }
 
-TEST_F(StringTableTest, SubscriptOperator) {
-  uint8_t string_length = 4;
+// TEST_F(StringTableTest, SubscriptOperator) {
+//   uint8_t string_length = 4;
 
-  ValueColumn<std::string> vc(string_length);
-  vc.append("bla");
-  EXPECT_EQ(type_cast<std::string>(vc[0]), "bla");
-}
+//   ValueColumn<std::string> vc(string_length);
+//   vc.append("bla");
+//   EXPECT_EQ(type_cast<std::string>(vc[0]), "bla");
+// }
 
 }  // namespace opossum
