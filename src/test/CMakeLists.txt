@@ -15,6 +15,7 @@ set(
     import_export/csv_meta_test.cpp
     lib/all_parameter_variant_test.cpp
     lib/all_type_variant_test.cpp
+    lib/fixed_string_test.cpp
     operators/aggregate_test.cpp
     operators/delete_test.cpp
     operators/difference_test.cpp
