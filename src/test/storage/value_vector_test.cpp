@@ -22,10 +22,20 @@ TEST_F(ValueVectorTest, SubscriptOperator) {
 
 TEST_F(ValueVectorTest, SubscriptOperatorConst) {
   auto valuevector = ValueVector<std::string>();
-  const auto str1 = "const";
-  valuevector.push_back(str1);
+  valuevector.push_back("const");
+  const auto& const_value_vector = valuevector;
 
-  EXPECT_EQ(valuevector[0], "const");
+  EXPECT_EQ(const_value_vector[0], "const");
+}
+
+TEST_F(ValueVectorTest, PushBack) {
+  auto valuevector = ValueVector<int>();
+  valuevector.push_back(0);
+  auto number = 1;
+  valuevector.push_back(number);
+
+  EXPECT_EQ(valuevector[0], 0);
+  EXPECT_EQ(valuevector[1], 1);
 }
 
 TEST_F(ValueVectorTest, Iterator) {
