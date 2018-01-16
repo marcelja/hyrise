@@ -1,7 +1,10 @@
 #include <chrono>
 #include <iostream>
+#include <fstream>
+#include <string>
 
 #include "../lib/storage/value_vector.hpp"
+
 
 void benchmark() {
   opossum::ValueVector<std::string> a;
@@ -63,4 +66,47 @@ void benchmark() {
   }
 }
 
-int main() { benchmark(); }
+void value_vector_from_file() {
+  // std::string path = "../../strings_table";
+  // for (auto & p : fs::directory_iterator(path))
+  //   std::cout << p << std::endl;
+
+  std::vector<opossum::ValueVector<opossum::FixedString>> value_vectors = {
+    opossum::ValueVector<opossum::FixedString>(1),
+    opossum::ValueVector<opossum::FixedString>(3),
+    opossum::ValueVector<opossum::FixedString>(7),
+    opossum::ValueVector<opossum::FixedString>(15),
+    opossum::ValueVector<opossum::FixedString>(31),
+    opossum::ValueVector<opossum::FixedString>(63),
+    opossum::ValueVector<opossum::FixedString>(127),
+    opossum::ValueVector<opossum::FixedString>(255)
+  };
+
+  std::string line;
+  std::ifstream string_table_file("strings_table/string_table.tbl");
+  if (string_table_file.is_open()) {
+    // Skip first 2 header lines
+    std::getline(string_table_file, line);
+    std::getline(string_table_file, line);
+
+    while (std::getline(string_table_file, line)) {
+      size_t pos = 0, found;
+      int index = 0;
+      while((found = line.find_first_of('|', pos)) != std::string::npos) {
+        value_vectors[index].push_back(opossum::FixedString(line.substr(pos, found - pos)));
+        pos = found+1;
+        index++;
+      }
+      value_vectors[index].push_back(opossum::FixedString(line.substr(pos)));
+    }
+    string_table_file.close();
+  }
+  else {
+    std::cout << "Unable to open file" << std::endl;
+  }
+}
+
+int main() {
+  // benchmark();
+  value_vector_from_file();
+}
