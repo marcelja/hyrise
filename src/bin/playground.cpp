@@ -2,9 +2,44 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
 #include "../lib/storage/value_vector.hpp"
 
+
+void print_vector_memory(const opossum::ValueVector<opossum::FixedString>& vector, std::string compiler) {
+  uint8_t string_length = vector[0].size();
+
+  std::cout << "Memory consumption: \t" << int(sizeof(opossum::ValueVector<opossum::FixedString>)) + int(vector.capacity()) << " bytes" << std::endl;
+  std::cout << "Memory consumption(size): \t" << int(sizeof(opossum::ValueVector<opossum::FixedString>)) + int(vector.size()) * string_length << " bytes" << std::endl;
+}
+
+void print_vector_memory(const opossum::ValueVector<std::string>& vector, std::string compiler) {
+  uint8_t string_length = vector[0].size();
+  uint64_t size = 0;
+  uint64_t size_size = 0;
+
+  if (compiler == "gcc") {
+    if (string_length <= 16) {
+      size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.capacity()) * 17;
+      size_size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.size()) * 17;
+    } else {
+      size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.capacity()) * (uint64_t(sizeof(std::string)) + string_length);
+      size_size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.size()) * (uint64_t(sizeof(std::string)) + string_length);
+    }
+
+  } else if (compiler == "clang") {
+    if (string_length <= 22) {
+      size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.capacity()) * 23;
+      size_size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.size()) * 23;
+    } else {
+      size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.capacity()) * (uint64_t(sizeof(std::string)) + string_length);
+      size_size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.size()) * (uint64_t(sizeof(std::string)) + string_length);
+    }
+  }
+  std::cout << "Memory consumption: \t" << size << " bytes" << std::endl;
+  std::cout << "Memory consumption(size): \t" << size_size << " bytes" << std::endl;
+}
 
 void benchmark() {
   opossum::ValueVector<std::string> a;
@@ -21,8 +56,10 @@ void benchmark() {
       auto t2 = std::chrono::high_resolution_clock::now();
       std::cout << "inserting " << inserts << " values into opossum::ValueVector<std::string>: "
                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
-      std::cout << "sizeof: " << sizeof(std::string) * a.vector_size() << std::endl;
+      std::cout << "sizeof: " << sizeof(std::string) * a.size() << std::endl;
     }
+    print_vector_memory(a, "clang");
+    // std::cin.ignore();
 
     {
       auto t1 = std::chrono::high_resolution_clock::now();
@@ -30,8 +67,10 @@ void benchmark() {
       auto t2 = std::chrono::high_resolution_clock::now();
       std::cout << "inserting " << inserts << " values into opossum::ValueVector<opossum::FixedString>: "
                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
-      std::cout << "sizeof: " << sizeof(char) * b.vector_size() << std::endl;
+      std::cout << "sizeof: " << sizeof(char) * b.size() << std::endl;
     }
+    print_vector_memory(b, "clang");
+    // std::cin.ignore();
 
     {
       auto t1 = std::chrono::high_resolution_clock::now();
@@ -41,6 +80,7 @@ void benchmark() {
                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
       std::cout << "sizeof: " << sizeof(std::string) * c.size() << std::endl;
     }
+
   }
   for(int run = 0; run < 2; ++run) {
     {
@@ -107,6 +147,6 @@ void value_vector_from_file() {
 }
 
 int main() {
-  // benchmark();
-  value_vector_from_file();
+  benchmark();
+  // value_vector_from_file();
 }

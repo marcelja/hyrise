@@ -61,8 +61,13 @@ const T& ValueVector<T>::operator[](size_t n) const {
 }
 
 template <typename T>
-size_t ValueVector<T>::vector_size() const {
+size_t ValueVector<T>::size() const {
   return _values.size();
+}
+
+template <typename T>
+size_t ValueVector<T>::capacity() const {
+  return _values.capacity();
 }
 
 void ValueVector<FixedString>::push_back(const FixedString& value) {
@@ -94,7 +99,9 @@ const FixedString ValueVector<FixedString>::operator[](size_t n) const {
   return {FixedString((char*)&_vector[n * _string_length], _string_length)};
 }
 
-size_t ValueVector<FixedString>::vector_size() const { return _vector.size(); }
+size_t ValueVector<FixedString>::size() const { return _vector.size() / _string_length; }
+
+size_t ValueVector<FixedString>::capacity() const { return _vector.capacity(); }
 
 EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueVector);
 

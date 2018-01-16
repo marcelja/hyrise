@@ -35,7 +35,9 @@ class ValueVector {
 
   const T& operator[](size_t n) const;
 
-  size_t vector_size() const;
+  size_t size() const;
+
+  size_t capacity() const;
 
  protected:
   pmr_vector<T> _values;
@@ -87,7 +89,9 @@ class ValueVector<FixedString> {
 
   const FixedString operator[](size_t n) const;
 
-  size_t vector_size() const;
+  size_t size() const;
+
+  size_t capacity() const;
 
  private:
   size_t _string_length;
