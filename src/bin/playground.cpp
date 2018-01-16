@@ -8,36 +8,36 @@
 
 
 void print_vector_memory(const opossum::ValueVector<opossum::FixedString>& vector, std::string compiler) {
-  uint8_t string_length = vector[0].size();
+  uint64_t string_length = vector[0].size();
 
-  std::cout << "Memory consumption: \t" << int(sizeof(opossum::ValueVector<opossum::FixedString>)) + int(vector.capacity()) << " bytes" << std::endl;
-  std::cout << "Memory consumption(size): \t" << int(sizeof(opossum::ValueVector<opossum::FixedString>)) + int(vector.size()) * string_length << " bytes" << std::endl;
+  std::cout << "Memory consumption: \t\t" << (sizeof(opossum::ValueVector<opossum::FixedString>) + int(vector.capacity())) / 1000 << " bytes" << std::endl;
+  std::cout << "Memory consumption(size): \t" << (sizeof(opossum::ValueVector<opossum::FixedString>) + int(vector.size()) * string_length) / 1000 << " bytes" << std::endl;
 }
 
 void print_vector_memory(const opossum::ValueVector<std::string>& vector, std::string compiler) {
-  uint8_t string_length = vector[0].size();
+  uint64_t string_length = vector[0].size();
   uint64_t size = 0;
   uint64_t size_size = 0;
 
   if (compiler == "gcc") {
     if (string_length <= 16) {
-      size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.capacity()) * 17;
-      size_size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.size()) * 17;
+      size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.capacity()) * 17) / 1000;
+      size_size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.size()) * 17) / 1000;
     } else {
-      size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.capacity()) * (uint64_t(sizeof(std::string)) + string_length);
-      size_size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.size()) * (uint64_t(sizeof(std::string)) + string_length);
+      size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.capacity()) * (sizeof(std::string) + string_length)) / 1000;
+      size_size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
     }
 
   } else if (compiler == "clang") {
     if (string_length <= 22) {
-      size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.capacity()) * 23;
-      size_size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.size()) * 23;
+      size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.capacity()) * 23) / 1000;
+      size_size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.size()) * 23) / 1000;
     } else {
-      size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.capacity()) * (uint64_t(sizeof(std::string)) + string_length);
-      size_size = uint64_t(sizeof(opossum::ValueVector<std::string>)) + uint64_t(vector.size()) * (uint64_t(sizeof(std::string)) + string_length);
+      size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.capacity()) * (sizeof(std::string) + string_length)) / 1000;
+      size_size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
     }
   }
-  std::cout << "Memory consumption: \t" << size << " bytes" << std::endl;
+  std::cout << "Memory consumption: \t\t" << size << " bytes" << std::endl;
   std::cout << "Memory consumption(size): \t" << size_size << " bytes" << std::endl;
 }
 
@@ -144,9 +144,58 @@ void value_vector_from_file() {
   else {
     std::cout << "Unable to open file" << std::endl;
   }
+
+  for (auto& vv : value_vectors) {
+    print_vector_memory(vv, "clang");
+  }
+}
+
+void value_vector_from_file_stdstr() {
+  // std::string path = "../../strings_table";
+  // for (auto & p : fs::directory_iterator(path))
+  //   std::cout << p << std::endl;
+
+  std::vector<opossum::ValueVector<std::string>> value_vectors = {
+    opossum::ValueVector<std::string>(),
+    opossum::ValueVector<std::string>(),
+    opossum::ValueVector<std::string>(),
+    opossum::ValueVector<std::string>(),
+    opossum::ValueVector<std::string>(),
+    opossum::ValueVector<std::string>(),
+    opossum::ValueVector<std::string>(),
+    opossum::ValueVector<std::string>()
+  };
+
+  std::string line;
+  std::ifstream string_table_file("strings_table/string_table.tbl");
+  if (string_table_file.is_open()) {
+    // Skip first 2 header lines
+    std::getline(string_table_file, line);
+    std::getline(string_table_file, line);
+
+    while (std::getline(string_table_file, line)) {
+      size_t pos = 0, found;
+      int index = 0;
+      while((found = line.find_first_of('|', pos)) != std::string::npos) {
+        value_vectors[index].push_back(line.substr(pos, found - pos));
+        pos = found+1;
+        index++;
+      }
+      value_vectors[index].push_back(line.substr(pos));
+    }
+    string_table_file.close();
+  }
+  else {
+    std::cout << "Unable to open file" << std::endl;
+  }
+
+  for (auto& vv : value_vectors) {
+    print_vector_memory(vv, "clang");
+  }
 }
 
 int main() {
-  benchmark();
-  // value_vector_from_file();
+  // benchmark();
+  value_vector_from_file();
+  // value_vector_from_file_stdstr();
 }
