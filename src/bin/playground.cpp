@@ -10,8 +10,8 @@
 void print_vector_memory(const opossum::ValueVector<opossum::FixedString>& vector, std::string compiler) {
   uint64_t string_length = vector[0].size();
 
-  std::cout << "Memory consumption: \t\t" << (sizeof(opossum::ValueVector<opossum::FixedString>) + int(vector.capacity())) / 1000 << " bytes" << std::endl;
-  std::cout << "Memory consumption(size): \t" << (sizeof(opossum::ValueVector<opossum::FixedString>) + int(vector.size()) * string_length) / 1000 << " bytes" << std::endl;
+  std::cout << "Memory consumption: \t\t" << (sizeof(opossum::ValueVector<opossum::FixedString>) + int(vector.capacity())) / 1000 << " kilobytes" << std::endl;
+  std::cout << "Memory consumption(size): \t" << (sizeof(opossum::ValueVector<opossum::FixedString>) + int(vector.size()) * string_length) / 1000 << " kilobytes" << std::endl;
 }
 
 void print_vector_memory(const opossum::ValueVector<std::string>& vector, std::string compiler) {
@@ -37,8 +37,8 @@ void print_vector_memory(const opossum::ValueVector<std::string>& vector, std::s
       size_size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
     }
   }
-  std::cout << "Memory consumption: \t\t" << size << " bytes" << std::endl;
-  std::cout << "Memory consumption(size): \t" << size_size << " bytes" << std::endl;
+  std::cout << "Memory consumption: \t\t" << size << " kilobytes" << std::endl;
+  std::cout << "Memory consumption(size): \t" << size_size << " kilobytes" << std::endl;
 }
 
 void benchmark() {
