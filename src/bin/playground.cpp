@@ -10,7 +10,7 @@ void benchmark() {
 
   std::string insert_me{"blablabla"};
   size_t inserts = 1000000;
-  // size_t searches = 10000;
+  size_t searches = 10000;
   for (int run = 0; run < 2; ++run) {
     {
       auto t1 = std::chrono::high_resolution_clock::now();
@@ -39,28 +39,28 @@ void benchmark() {
       std::cout << "sizeof: " << sizeof(std::string) * c.size() << std::endl;
     }
   }
-  // for(int run = 0; run < 2; ++run) {
-  //   {
-  //   auto t1 = std::chrono::high_resolution_clock::now();
-  //   for(size_t i = 0; i < searches; ++i) std::lower_bound(a.begin(), a.end(), insert_me);
-  //   auto t2 = std::chrono::high_resolution_clock::now();
-  //   std::cout << "binary search for " << searches << " values in opossum::ValueVector<std::string>: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
-  //   }
+  for(int run = 0; run < 2; ++run) {
+    {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for(size_t i = 0; i < searches; ++i) std::lower_bound(a.begin(), a.end(), insert_me);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::cout << "binary search for " << searches << " values in opossum::ValueVector<std::string>: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+    }
 
-  //   {
-  //   auto t1 = std::chrono::high_resolution_clock::now();
-  //   for(size_t i = 0; i < searches; ++i) std::lower_bound(b.begin(), b.end(), opossum::FixedString(insert_me));
-  //   auto t2 = std::chrono::high_resolution_clock::now();
-  //   std::cout << "binary search for " << searches << " values in opossum::ValueVector<opossum::FixedString>: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
-  //   }
+    {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for(size_t i = 0; i < searches; ++i) std::lower_bound(b.begin(), b.end(), opossum::FixedString(insert_me));
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::cout << "binary search for " << searches << " values in opossum::ValueVector<opossum::FixedString>: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+    }
 
-  //   {
-  //   auto t1 = std::chrono::high_resolution_clock::now();
-  //   for(size_t i = 0; i < searches; ++i) std::lower_bound(c.begin(), c.end(), insert_me);
-  //   auto t2 = std::chrono::high_resolution_clock::now();
-  //   std::cout << "binary search for " << searches << " values in std::vector<std::string>:      " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
-  //   }
-  // }
+    {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for(size_t i = 0; i < searches; ++i) std::lower_bound(c.begin(), c.end(), insert_me);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::cout << "binary search for " << searches << " values in std::vector<std::string>:      " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+    }
+  }
 }
 
 int main() { benchmark(); }

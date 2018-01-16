@@ -67,7 +67,9 @@ class ValueVector<FixedString> {
     using facade = boost::iterator_facade<iterator, FixedString, std::random_access_iterator_tag, FixedString>;
     friend class boost::iterator_core_access;
     bool equal(iterator const& other) const { return this->_pos == other._pos; }
-    typename facade::difference_type distance_to(iterator const& other) const { return other._pos - this->_pos; }
+    typename facade::difference_type distance_to(iterator const& other) const {
+      return (int64_t(other._pos) - int64_t(this->_pos)) / int64_t(_string_length);
+    }
     void advance(typename facade::difference_type n) { _pos += n * _string_length; }
     void increment() { _pos += _string_length; }
     FixedString dereference() const { return FixedString((char*)&_vector[_pos], _string_length); }
