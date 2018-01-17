@@ -145,8 +145,6 @@ void value_vector_from_file() {
     std::cout << "Unable to open file" << std::endl;
   }
 
-  std::sort(value_vectors[0].begin(), value_vectors[0].end());
-
   for (auto& vv : value_vectors) {
     print_vector_memory(vv, "clang");
   }
@@ -196,8 +194,19 @@ void value_vector_from_file_stdstr() {
   }
 }
 
+void sort_swap() {
+  opossum::ValueVector<opossum::FixedString> a(10);
+  a.push_back(opossum::FixedString("abcie"));
+  a.push_back(opossum::FixedString("aaaaaaaa"));
+
+  std::swap(a.begin(), a.end());
+  std::sort(a.begin(), a.end());
+}
+
+
 int main() {
   // benchmark();
-  value_vector_from_file();
+  // value_vector_from_file();
   // value_vector_from_file_stdstr();
+  sort_swap();
 }
