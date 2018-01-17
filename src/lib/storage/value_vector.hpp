@@ -74,6 +74,7 @@ class ValueVector<FixedString> {
     }
     void advance(typename facade::difference_type n) { _pos += n * _string_length; }
     void increment() { _pos += _string_length; }
+    void decrement() { _pos -= _string_length; }
     FixedString dereference() const { return FixedString((char*)&_vector[_pos], _string_length); }
 
     const size_t _string_length;

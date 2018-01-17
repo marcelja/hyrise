@@ -145,6 +145,8 @@ void value_vector_from_file() {
     std::cout << "Unable to open file" << std::endl;
   }
 
+  std::sort(value_vectors[0].begin(), value_vectors[0].end());
+
   for (auto& vv : value_vectors) {
     print_vector_memory(vv, "clang");
   }
