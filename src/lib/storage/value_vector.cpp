@@ -91,6 +91,15 @@ ValueVector<FixedString>::iterator ValueVector<FixedString>::end() noexcept {
   return iterator(_string_length, _vector, _vector.size());
 }
 
+typedef boost::reverse_iterator<ValueVector<FixedString>::iterator> reverse_iterator;
+reverse_iterator ValueVector<FixedString>::rbegin() noexcept {
+  return reverse_iterator(end());
+}
+
+reverse_iterator ValueVector<FixedString>::rend() noexcept {
+  return reverse_iterator(begin());
+}
+
 FixedString ValueVector<FixedString>::operator[](size_t n) {
   return {FixedString(&_vector[n * _string_length], _string_length)};
 }

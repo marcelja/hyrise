@@ -198,9 +198,20 @@ void sort_swap() {
   opossum::ValueVector<opossum::FixedString> a(10);
   a.push_back(opossum::FixedString("abcie"));
   a.push_back(opossum::FixedString("aaaaaaaa"));
+  a.push_back(opossum::FixedString("sigt"));
+  a.push_back(opossum::FixedString("3295629"));
 
-  std::swap(a.begin(), a.end());
-  std::sort(a.begin(), a.end());
+  for (auto i = a.begin(); i != a.end(); ++i)
+  {
+    std::cout << *i << std::endl;
+  }
+  std::cout << "rev" << std::endl;
+  for (auto i = a.rbegin(); i != a.rend(); ++i)
+  {
+    std::cout << *i << std::endl;
+  }
+  // std::swap(a.begin(), a.end());
+  // std::sort(a.begin(), a.end());
 }
 
 

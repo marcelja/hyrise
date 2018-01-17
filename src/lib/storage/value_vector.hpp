@@ -86,6 +86,11 @@ class ValueVector<FixedString> {
 
   iterator end() noexcept;
 
+typedef boost::reverse_iterator<iterator> reverse_iterator;
+  reverse_iterator rbegin() noexcept;
+
+  reverse_iterator rend() noexcept;
+
   FixedString operator[](size_t n);
 
   const FixedString operator[](size_t n) const;
