@@ -20,6 +20,8 @@ class FixedString {
 
   FixedString(FixedString &other) : _is_reference(true), fixed(other.fixed) {}
 
+  FixedString(const FixedString &other) : _is_reference(true), fixed(other.fixed) {}
+
   size_t copy(char *s, size_t len, size_t pos = 0) const {
     if (_is_reference) {
       auto copied_length = len < fixed._string_length - pos ? len : fixed._string_length - pos;
@@ -67,6 +69,8 @@ class FixedString {
   friend std::ostream &operator<<(std::ostream &os, const FixedString &obj) {
     return os << obj.string();
   }
+
+  void swap(FixedString& other);
 
  private:
   struct Fixed {
