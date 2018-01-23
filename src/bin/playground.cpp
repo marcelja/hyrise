@@ -7,6 +7,16 @@
 #include "../lib/storage/value_vector.hpp"
 
 
+namespace std
+{
+    template<>
+    void swap(opossum::FixedString& lha, opossum::FixedString& rhs)
+    {
+      // std::cout << "123123123";
+      lha.swap(rhs);
+    }
+}
+
 void print_vector_memory(const opossum::ValueVector<opossum::FixedString>& vector, std::string compiler) {
   uint64_t string_length = vector[0].size();
 
@@ -210,7 +220,13 @@ void sort_swap() {
   {
     std::cout << *i << std::endl;
   }
-  // std::swap(a.begin(), a.end());
+
+
+  opossum::FixedString abc("123");
+  opossum::FixedString def("456");
+
+  // abc.swap(def);
+  std::swap(abc, def);
   // std::sort(a.begin(), a.end());
 }
 
