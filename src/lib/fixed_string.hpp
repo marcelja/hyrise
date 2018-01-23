@@ -70,7 +70,7 @@ class FixedString {
     return os << obj.string();
   }
 
-  void swap(FixedString& other);
+  void swap(const FixedString& other) const;
 
  private:
   struct Fixed {

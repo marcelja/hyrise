@@ -6,45 +6,40 @@
 
 #include "../lib/storage/value_vector.hpp"
 
+namespace opossum {
 
-namespace std
-{
-    template<>
-    void swap(opossum::FixedString& lha, opossum::FixedString& rhs)
-    {
-      // std::cout << "123123123";
-      lha.swap(rhs);
-    }
+void swap(const FixedString lha, const FixedString rhs) {
+  lha.swap(rhs);
 }
 
-void print_vector_memory(const opossum::ValueVector<opossum::FixedString>& vector, std::string compiler) {
+void print_vector_memory(const ValueVector<FixedString>& vector, std::string compiler) {
   uint64_t string_length = vector[0].size();
 
-  std::cout << "Memory consumption: \t\t" << (sizeof(opossum::ValueVector<opossum::FixedString>) + int(vector.capacity())) / 1000 << " kilobytes" << std::endl;
-  std::cout << "Memory consumption(size): \t" << (sizeof(opossum::ValueVector<opossum::FixedString>) + int(vector.size()) * string_length) / 1000 << " kilobytes" << std::endl;
+  std::cout << "Memory consumption: \t\t" << (sizeof(ValueVector<FixedString>) + int(vector.capacity())) / 1000 << " kilobytes" << std::endl;
+  std::cout << "Memory consumption(size): \t" << (sizeof(ValueVector<FixedString>) + int(vector.size()) * string_length) / 1000 << " kilobytes" << std::endl;
 }
 
-void print_vector_memory(const opossum::ValueVector<std::string>& vector, std::string compiler) {
+void print_vector_memory(const ValueVector<std::string>& vector, std::string compiler) {
   uint64_t string_length = vector[0].size();
   uint64_t size = 0;
   uint64_t size_size = 0;
 
   if (compiler == "gcc") {
     if (string_length <= 16) {
-      size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.capacity()) * 17) / 1000;
-      size_size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.size()) * 17) / 1000;
+      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.capacity()) * 17) / 1000;
+      size_size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * 17) / 1000;
     } else {
-      size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.capacity()) * (sizeof(std::string) + string_length)) / 1000;
-      size_size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
+      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.capacity()) * (sizeof(std::string) + string_length)) / 1000;
+      size_size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
     }
 
   } else if (compiler == "clang") {
     if (string_length <= 22) {
-      size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.capacity()) * 23) / 1000;
-      size_size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.size()) * 23) / 1000;
+      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.capacity()) * 23) / 1000;
+      size_size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * 23) / 1000;
     } else {
-      size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.capacity()) * (sizeof(std::string) + string_length)) / 1000;
-      size_size = (sizeof(opossum::ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
+      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.capacity()) * (sizeof(std::string) + string_length)) / 1000;
+      size_size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
     }
   }
   std::cout << "Memory consumption: \t\t" << size << " kilobytes" << std::endl;
@@ -52,8 +47,8 @@ void print_vector_memory(const opossum::ValueVector<std::string>& vector, std::s
 }
 
 void benchmark() {
-  opossum::ValueVector<std::string> a;
-  opossum::ValueVector<opossum::FixedString> b(10);
+  ValueVector<std::string> a;
+  ValueVector<FixedString> b(10);
   std::vector<std::string> c;
 
   std::string insert_me{"blablabla"};
@@ -64,7 +59,7 @@ void benchmark() {
       auto t1 = std::chrono::high_resolution_clock::now();
       for (size_t i = 0; i < inserts; ++i) a.push_back(insert_me);
       auto t2 = std::chrono::high_resolution_clock::now();
-      std::cout << "inserting " << inserts << " values into opossum::ValueVector<std::string>: "
+      std::cout << "inserting " << inserts << " values into ValueVector<std::string>: "
                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
       std::cout << "sizeof: " << sizeof(std::string) * a.size() << std::endl;
     }
@@ -73,9 +68,9 @@ void benchmark() {
 
     {
       auto t1 = std::chrono::high_resolution_clock::now();
-      for (size_t i = 0; i < inserts; ++i) b.push_back(opossum::FixedString(insert_me));
+      for (size_t i = 0; i < inserts; ++i) b.push_back(FixedString(insert_me));
       auto t2 = std::chrono::high_resolution_clock::now();
-      std::cout << "inserting " << inserts << " values into opossum::ValueVector<opossum::FixedString>: "
+      std::cout << "inserting " << inserts << " values into ValueVector<FixedString>: "
                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
       std::cout << "sizeof: " << sizeof(char) * b.size() << std::endl;
     }
@@ -97,14 +92,14 @@ void benchmark() {
     auto t1 = std::chrono::high_resolution_clock::now();
     for(size_t i = 0; i < searches; ++i) std::lower_bound(a.begin(), a.end(), insert_me);
     auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "binary search for " << searches << " values in opossum::ValueVector<std::string>: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+    std::cout << "binary search for " << searches << " values in ValueVector<std::string>: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
     }
 
     {
     auto t1 = std::chrono::high_resolution_clock::now();
-    for(size_t i = 0; i < searches; ++i) std::lower_bound(b.begin(), b.end(), opossum::FixedString(insert_me));
+    for(size_t i = 0; i < searches; ++i) std::lower_bound(b.begin(), b.end(), FixedString(insert_me));
     auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "binary search for " << searches << " values in opossum::ValueVector<opossum::FixedString>: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+    std::cout << "binary search for " << searches << " values in ValueVector<FixedString>: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
     }
 
     {
@@ -121,15 +116,15 @@ void value_vector_from_file() {
   // for (auto & p : fs::directory_iterator(path))
   //   std::cout << p << std::endl;
 
-  std::vector<opossum::ValueVector<opossum::FixedString>> value_vectors = {
-    opossum::ValueVector<opossum::FixedString>(1),
-    opossum::ValueVector<opossum::FixedString>(3),
-    opossum::ValueVector<opossum::FixedString>(7),
-    opossum::ValueVector<opossum::FixedString>(15),
-    opossum::ValueVector<opossum::FixedString>(31),
-    opossum::ValueVector<opossum::FixedString>(63),
-    opossum::ValueVector<opossum::FixedString>(127),
-    opossum::ValueVector<opossum::FixedString>(255)
+  std::vector<ValueVector<FixedString>> value_vectors = {
+    ValueVector<FixedString>(1),
+    ValueVector<FixedString>(3),
+    ValueVector<FixedString>(7),
+    ValueVector<FixedString>(15),
+    ValueVector<FixedString>(31),
+    ValueVector<FixedString>(63),
+    ValueVector<FixedString>(127),
+    ValueVector<FixedString>(255)
   };
 
   std::string line;
@@ -143,11 +138,11 @@ void value_vector_from_file() {
       size_t pos = 0, found;
       int index = 0;
       while((found = line.find_first_of('|', pos)) != std::string::npos) {
-        value_vectors[index].push_back(opossum::FixedString(line.substr(pos, found - pos)));
+        value_vectors[index].push_back(FixedString(line.substr(pos, found - pos)));
         pos = found+1;
         index++;
       }
-      value_vectors[index].push_back(opossum::FixedString(line.substr(pos)));
+      value_vectors[index].push_back(FixedString(line.substr(pos)));
     }
     string_table_file.close();
   }
@@ -165,15 +160,15 @@ void value_vector_from_file_stdstr() {
   // for (auto & p : fs::directory_iterator(path))
   //   std::cout << p << std::endl;
 
-  std::vector<opossum::ValueVector<std::string>> value_vectors = {
-    opossum::ValueVector<std::string>(),
-    opossum::ValueVector<std::string>(),
-    opossum::ValueVector<std::string>(),
-    opossum::ValueVector<std::string>(),
-    opossum::ValueVector<std::string>(),
-    opossum::ValueVector<std::string>(),
-    opossum::ValueVector<std::string>(),
-    opossum::ValueVector<std::string>()
+  std::vector<ValueVector<std::string>> value_vectors = {
+    ValueVector<std::string>(),
+    ValueVector<std::string>(),
+    ValueVector<std::string>(),
+    ValueVector<std::string>(),
+    ValueVector<std::string>(),
+    ValueVector<std::string>(),
+    ValueVector<std::string>(),
+    ValueVector<std::string>()
   };
 
   std::string line;
@@ -205,35 +200,41 @@ void value_vector_from_file_stdstr() {
 }
 
 void sort_swap() {
-  opossum::ValueVector<opossum::FixedString> a(10);
-  a.push_back(opossum::FixedString("abcie"));
-  a.push_back(opossum::FixedString("aaaaaaaa"));
-  a.push_back(opossum::FixedString("sigt"));
-  a.push_back(opossum::FixedString("3295629"));
+  ValueVector<FixedString> a(10);
+  a.push_back(FixedString("abcie"));
+  a.push_back(FixedString("aaaaaaaa"));
+  a.push_back(FixedString("sigt"));
+  a.push_back(FixedString("3295629"));
+
+  auto it1 = a.begin();
+  auto it2 = a.begin();
+  ++it2;
+  std::iter_swap(it1, it2);
 
   for (auto i = a.begin(); i != a.end(); ++i)
   {
     std::cout << *i << std::endl;
   }
+  std::cout << std::endl;
+
+  std::sort(a.begin(), a.end());
+  for (auto i = a.begin(); i != a.end(); ++i)
+  {
+    std::cout << *i << std::endl;
+  }
+
+  std::cout << std::endl;
   std::cout << "rev" << std::endl;
   for (auto i = a.rbegin(); i != a.rend(); ++i)
   {
     std::cout << *i << std::endl;
   }
-
-
-  opossum::FixedString abc("123");
-  opossum::FixedString def("456");
-
-  // abc.swap(def);
-  std::swap(abc, def);
-  // std::sort(a.begin(), a.end());
 }
 
-
+}
 int main() {
   // benchmark();
   // value_vector_from_file();
   // value_vector_from_file_stdstr();
-  sort_swap();
+  opossum::sort_swap();
 }
