@@ -4,6 +4,7 @@ set(
     all_parameter_variant.cpp
     all_parameter_variant.hpp
     all_type_variant.hpp
+    fixed_string.cpp
     fixed_string.hpp
     concurrency/commit_context.cpp
     concurrency/commit_context.hpp
