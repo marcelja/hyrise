@@ -223,21 +223,21 @@ void sort_swap() {
   std::iter_swap(it1, it2);
 
 
-  // std::sort(a.begin(), a.end());
-  // std::cout << "Sorted:" << std::endl << std::endl;
-  // for (auto i = a.begin(); i != a.end(); ++i)
-  // {
-  //   std::cout << *i << std::endl;
-  // }
+  std::sort(a.begin(), a.end());
+  std::cout << "Sorted:" << std::endl << std::endl;
+  for (auto i = a.begin(); i != a.end(); ++i)
+  {
+    std::cout << *i << std::endl;
+  }
 
-  // std::cout << std::endl;
-  // std::cout << "Reverse:" << std::endl << std::endl;
-  // for (auto i = a.rbegin(); i != a.rend(); ++i)
-  // {
-  //   std::cout << *i << std::endl;
-  // }
+  std::cout << std::endl;
+  std::cout << "Reverse:" << std::endl << std::endl;
+  for (auto i = a.rbegin(); i != a.rend(); ++i)
+  {
+    std::cout << *i << std::endl;
+  }
 
-  // std::cout << std::endl;
+  std::cout << std::endl;
 
 
   a.erase(std::unique(a.begin(), a.end()), a.end());
