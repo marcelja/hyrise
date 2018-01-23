@@ -99,6 +99,8 @@ typedef boost::reverse_iterator<iterator> reverse_iterator;
 
   size_t capacity() const;
 
+  void erase(const iterator start, const iterator end);
+
  private:
   size_t _string_length;
   std::vector<char> _vector;

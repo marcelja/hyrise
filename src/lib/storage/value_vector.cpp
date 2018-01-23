@@ -112,6 +112,12 @@ size_t ValueVector<FixedString>::size() const { return _vector.size() / _string_
 
 size_t ValueVector<FixedString>::capacity() const { return _vector.capacity(); }
 
+void ValueVector<FixedString>::erase(const iterator start, const iterator end) {
+    auto it = _vector.begin();
+    std::advance(it, _vector.size() - std::distance(start, end) * _string_length);
+    _vector.erase(it, _vector.end());
+}
+
 EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueVector);
 
 }  // namespace opossum

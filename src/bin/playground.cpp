@@ -201,17 +201,13 @@ void value_vector_from_file_stdstr() {
 
 void sort_swap() {
   ValueVector<FixedString> a(10);
+  a.push_back(FixedString("aaaaaaaa"));
+  a.push_back(FixedString("aaaaaaaa"));
+  a.push_back(FixedString("aaaaaaaa"));
   a.push_back(FixedString("abcie"));
-  a.push_back(FixedString("aaaaaaaa"));
-  a.push_back(FixedString("aaaaaaaa"));
-  a.push_back(FixedString("aaaaaaaa"));
+  a.push_back(FixedString("sigt"));
   a.push_back(FixedString("sigt"));
   a.push_back(FixedString("3295629"));
-
-  auto it1 = a.begin();
-  auto it2 = a.begin();
-  ++it2;
-  std::iter_swap(it1, it2);
 
   std::cout << "Original:" << std::endl << std::endl;
   for (auto i = a.begin(); i != a.end(); ++i)
@@ -220,25 +216,32 @@ void sort_swap() {
   }
   std::cout << std::endl;
 
-  std::sort(a.begin(), a.end());
-  std::cout << "Sorted:" << std::endl << std::endl;
-  for (auto i = a.begin(); i != a.end(); ++i)
-  {
-    std::cout << *i << std::endl;
-  }
+  auto it1 = a.begin();
+  auto it2 = a.begin();
+  ++it2;
+  std::iter_swap(it1, it2);
 
-  std::cout << std::endl;
-  std::cout << "Reverse:" << std::endl << std::endl;
-  for (auto i = a.rbegin(); i != a.rend(); ++i)
-  {
-    std::cout << *i << std::endl;
-  }
 
-  std::cout << std::endl;
+  // std::sort(a.begin(), a.end());
+  // std::cout << "Sorted:" << std::endl << std::endl;
+  // for (auto i = a.begin(); i != a.end(); ++i)
+  // {
+  //   std::cout << *i << std::endl;
+  // }
 
-  std::unique(a.begin(), a.end()), a.end();
+  // std::cout << std::endl;
+  // std::cout << "Reverse:" << std::endl << std::endl;
+  // for (auto i = a.rbegin(); i != a.rend(); ++i)
+  // {
+  //   std::cout << *i << std::endl;
+  // }
 
-  std::cout << "Unique:" << std::endl << std::endl;
+  // std::cout << std::endl;
+
+
+  a.erase(std::unique(a.begin(), a.end()), a.end());
+
+  std::cout << "Unique + erase:" << std::endl << std::endl;
 
   for (auto i = a.begin(); i != a.end(); ++i)
   {
