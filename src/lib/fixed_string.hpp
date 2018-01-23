@@ -12,84 +12,67 @@ namespace opossum {
 
 class FixedString {
  public:
-  explicit FixedString(const std::string &string) : _is_reference(false), _stdstring(string) {}
+  FixedString(const std::string &string) : _mem(new char[0]{}), _string_length(string.size()) {
+    std::memcpy(_mem, string.c_str(), _string_length);
+  }
 
-  FixedString(char *mem, size_t string_length) : _is_reference(true), fixed({mem, string_length}) {}
+  FixedString(char *mem, size_t string_length) : _mem(mem), _string_length(string_length) {}
 
   ~FixedString() {}
 
-  FixedString(FixedString &other) : _is_reference(true), fixed(other.fixed) {}
+  FixedString(FixedString &other) : _mem(new char[0]{}), _string_length(other._string_length) {
+    std::memcpy(_mem, other._mem, _string_length);
+  }
 
-  FixedString(const FixedString &other) : _is_reference(true), fixed(other.fixed) {}
+  FixedString(const FixedString &other) : _mem(new char[0]{}), _string_length(other._string_length) {
+    std::memcpy(_mem, other._mem, _string_length);
+  }
 
   size_t copy(char *s, size_t len, size_t pos = 0) const {
-    if (_is_reference) {
-      auto copied_length = len < fixed._string_length - pos ? len : fixed._string_length - pos;
-      std::memcpy(s, fixed._mem + pos, copied_length);
-      return copied_length;
-    } else {
-      return _stdstring.copy(s, len, pos);
-    }
+    auto copied_length = len < _string_length - pos ? len : _string_length - pos;
+    std::memcpy(s, _mem + pos, copied_length);
+    return copied_length;
   }
 
   size_t size() const {
-    if (_is_reference) {
-      return fixed._string_length;
-    } else {
-      return _stdstring.size();
-    }
+    return _string_length;
   }
 
   std::string string() const {
     // I didn't include an operator std::string on purpose. That led to expensive, unexpected comparisons.
-    if (_is_reference) return std::string(fixed._mem, fixed._string_length);
-    return _stdstring;
+    return std::string(_mem, _string_length);
   }
 
   FixedString &operator=(const FixedString &other) {
-    if (_is_reference) {
-      auto copied_length = other.size() < fixed._string_length ? other.size() : fixed._string_length;
-      other.copy(fixed._mem, copied_length, 0);
-      if (copied_length < fixed._string_length) {
-        memset(fixed._mem + copied_length, '\0', fixed._string_length - copied_length);
-      }
-    } else {
-      _stdstring = other._stdstring;
+    auto copied_length = other.size() < _string_length ? other.size() : _string_length;
+    other.copy(_mem, copied_length, 0);
+    if (copied_length < _string_length) {
+      memset(_mem + copied_length, '\0', _string_length - copied_length);
     }
     return *this;
   }
 
   bool operator<(const FixedString &other) const {
-    const char *this_mem = _is_reference ? fixed._mem : _stdstring.c_str();
-    const char *other_mem = other._is_reference ? other.fixed._mem : other._stdstring.c_str();
-    return memcmp(this_mem, other_mem, fixed._string_length) < 0;
-    // TODO(gruppe3): This does not deal with non-reference strings that are shorter than _string_length
+    const char *this_mem = _mem;
+    const char *other_mem = other._mem;
+    return memcmp(this_mem, other_mem, _string_length) < 0;
   }
 
   bool operator==(const FixedString &other) const {
-    const char *this_mem = _is_reference ? fixed._mem : _stdstring.c_str();
-    const char *other_mem = other._is_reference ? other.fixed._mem : other._stdstring.c_str();
-    return memcmp(this_mem, other_mem, fixed._string_length) == 0;
+    const char *this_mem = _mem;
+    const char *other_mem = other._mem;
+    return memcmp(this_mem, other_mem, _string_length) == 0;
   }
 
   friend std::ostream &operator<<(std::ostream &os, const FixedString &obj) {
     return os << obj.string();
   }
 
-  void swap(const FixedString& other) const;
+  void swap(const FixedString &other) const;
 
  private:
-  struct Fixed {
-    char *const _mem;
-    const size_t _string_length;
-    // TODO(gruppe3): can we provide this for the other constructor, too?
-  };
-
-  const bool _is_reference;
-  union {
-    std::string _stdstring;
-    Fixed fixed;
-  };
+  char *const _mem;
+  const size_t _string_length;
 };
 
 }  // namespace opossum

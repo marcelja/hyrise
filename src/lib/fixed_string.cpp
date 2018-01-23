@@ -6,10 +6,10 @@
 
 namespace opossum {
 
-void FixedString::swap(const FixedString& other) const {
-  const char* temp = string().c_str();
-  std::memcpy(fixed._mem, other.fixed._mem, fixed._string_length);
-  std::memcpy(other.fixed._mem, temp, fixed._string_length);
+void FixedString::swap(const FixedString &other) const {
+  const char *temp = string().c_str();
+  std::memcpy(_mem, other._mem, _string_length);
+  std::memcpy(other._mem, temp, _string_length);
 }
 
 }  // namespace opossum
