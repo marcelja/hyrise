@@ -66,6 +66,12 @@ class FixedString {
     // TODO(gruppe3): This does not deal with non-reference strings that are shorter than _string_length
   }
 
+  bool operator==(const FixedString &other) const {
+    const char *this_mem = _is_reference ? fixed._mem : _stdstring.c_str();
+    const char *other_mem = other._is_reference ? other.fixed._mem : other._stdstring.c_str();
+    return memcmp(this_mem, other_mem, fixed._string_length) == 0;
+  }
+
   friend std::ostream &operator<<(std::ostream &os, const FixedString &obj) {
     return os << obj.string();
   }

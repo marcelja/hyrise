@@ -203,6 +203,8 @@ void sort_swap() {
   ValueVector<FixedString> a(10);
   a.push_back(FixedString("abcie"));
   a.push_back(FixedString("aaaaaaaa"));
+  a.push_back(FixedString("aaaaaaaa"));
+  a.push_back(FixedString("aaaaaaaa"));
   a.push_back(FixedString("sigt"));
   a.push_back(FixedString("3295629"));
 
@@ -211,6 +213,7 @@ void sort_swap() {
   ++it2;
   std::iter_swap(it1, it2);
 
+  std::cout << "Original:" << std::endl << std::endl;
   for (auto i = a.begin(); i != a.end(); ++i)
   {
     std::cout << *i << std::endl;
@@ -218,17 +221,30 @@ void sort_swap() {
   std::cout << std::endl;
 
   std::sort(a.begin(), a.end());
+  std::cout << "Sorted:" << std::endl << std::endl;
   for (auto i = a.begin(); i != a.end(); ++i)
   {
     std::cout << *i << std::endl;
   }
 
   std::cout << std::endl;
-  std::cout << "rev" << std::endl;
+  std::cout << "Reverse:" << std::endl << std::endl;
   for (auto i = a.rbegin(); i != a.rend(); ++i)
   {
     std::cout << *i << std::endl;
   }
+
+  std::cout << std::endl;
+
+  std::unique(a.begin(), a.end()), a.end();
+
+  std::cout << "Unique:" << std::endl << std::endl;
+
+  for (auto i = a.begin(); i != a.end(); ++i)
+  {
+    std::cout << *i << std::endl;
+  }
+
 }
 
 }
