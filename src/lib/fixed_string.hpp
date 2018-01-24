@@ -12,19 +12,24 @@ namespace opossum {
 
 class FixedString {
  public:
-  FixedString(const std::string &string) : _mem(new char[0]{}), _string_length(string.size()) {
-    std::memcpy(_mem, string.c_str(), _string_length);
+  FixedString(const std::string &string) : _mem((char*)string.c_str()), _string_length(string.size()), _delete(false) {
   }
 
-  FixedString(char *mem, size_t string_length) : _mem(mem), _string_length(string_length) {}
+  FixedString(char *mem, size_t string_length) : _mem(mem), _string_length(string_length), _delete(false) {}
 
-  ~FixedString() {}
+  ~FixedString() {
+    if (_delete) {
+      delete [] _mem;
+      // std::memcpy(_mem, "ffffffffff", _string_length);
+      // std::cout << string();
+    }
+  }
 
-  FixedString(FixedString &other) : _mem(new char[0]{}), _string_length(other._string_length) {
+  FixedString(FixedString &other) : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
     std::memcpy(_mem, other._mem, _string_length);
   }
 
-  FixedString(const FixedString &other) : _mem(new char[0]{}), _string_length(other._string_length) {
+  FixedString(const FixedString &other) : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
     std::memcpy(_mem, other._mem, _string_length);
   }
 
@@ -73,6 +78,7 @@ class FixedString {
  private:
   char *const _mem;
   const size_t _string_length;
+  const bool _delete;
 };
 
 }  // namespace opossum
