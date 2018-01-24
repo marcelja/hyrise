@@ -54,6 +54,8 @@ class ValueVector<FixedString> {
 
   void push_back(FixedString&& string);
 
+  void push_back(const std::string& string) { push_back(FixedString(string)); }
+
   class iterator : public boost::iterator_facade<iterator, FixedString, std::random_access_iterator_tag, FixedString> {
    public:
     iterator(size_t string_length, const std::vector<char>& vector, size_t pos = 0)
@@ -86,7 +88,7 @@ class ValueVector<FixedString> {
 
   iterator end() noexcept;
 
-typedef boost::reverse_iterator<iterator> reverse_iterator;
+  typedef boost::reverse_iterator<iterator> reverse_iterator;
   reverse_iterator rbegin() noexcept;
 
   reverse_iterator rend() noexcept;
