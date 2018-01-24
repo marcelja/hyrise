@@ -29,62 +29,61 @@ void print_vector_memory(const ValueVector<std::string>& vector, std::string com
     if (string_length <= 16) {
       size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * 17) / 1000;
     } else {
-      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) /
-             1000;
+      size =
+          (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
     }
   } else if (compiler == "clang") {
     if (string_length <= 22) {
       size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * 23) / 1000;
     } else {
-      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) /
-             1000;
+      size =
+          (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
     }
   }
-  std::cout << "Memory consumption: \t\t" << size << " kilobytes" << std::endl;
+  std::cout << "Memory consumption: \t" << size << " kilobytes" << std::endl;
 }
 
 void benchmark() {
-   ValueVector<std::string> a;
-   ValueVector<FixedString> b(10);
-   std::vector<std::string> c;
-  
-   std::string insert_me{"blablabla"};
-   size_t inserts = 100000;
-     {
-       auto t1 = std::chrono::high_resolution_clock::now();
-       for (size_t i = 0; i < inserts; ++i) a.push_back(insert_me);
-       auto t2 = std::chrono::high_resolution_clock::now();
-       std::cout << "inserting " << inserts << " values into ValueVector<std::string>: "
-                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
-     }
-     print_vector_memory(a, "clang");
-     // std::cin.ignore();
-  
-     {
-       auto t1 = std::chrono::high_resolution_clock::now();
-       for (size_t i = 0; i < inserts; ++i) b.push_back(FixedString(insert_me));
-       auto t2 = std::chrono::high_resolution_clock::now();
-       std::cout << "inserting " << inserts << " values into ValueVector<FixedString>: "
-                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
-     }
-     print_vector_memory(b, "clang");
-     // std::cin.ignore();
-  
-     {
-       auto t1 = std::chrono::high_resolution_clock::now();
-       for (size_t i = 0; i < inserts; ++i) c.push_back(insert_me);
-       auto t2 = std::chrono::high_resolution_clock::now();
-       std::cout << "inserting " << inserts << " values into std::vector<std::string>:      "
-                 << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
-     }
+  ValueVector<std::string> a;
+  ValueVector<FixedString> b(10);
+  std::vector<std::string> c;
 
+  std::string insert_me{"blablabla"};
+  size_t inserts = 100000;
+  {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < inserts; ++i) a.push_back(insert_me);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::cout << "inserting " << inserts << " values into ValueVector<std::string>: "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+  }
+  print_vector_memory(a, "clang");
+  // std::cin.ignore();
+
+  {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < inserts; ++i) b.push_back(FixedString(insert_me));
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::cout << "inserting " << inserts << " values into ValueVector<FixedString>: "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+  }
+  print_vector_memory(b, "clang");
+  // std::cin.ignore();
+
+  {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < inserts; ++i) c.push_back(insert_me);
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::cout << "inserting " << inserts << " values into std::vector<std::string>:      "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+  }
 }
 
 template <typename T>
-void read_file(std::vector<ValueVector<T>> value_vectors) {
+void read_file(std::vector<ValueVector<T>> value_vectors, std::vector<std::vector<std::string>>& search_values) {
   std::string line;
-  // size_t search_counter = 0;
-  // size_t searches = 10000;
+  size_t search_counter = 0;
+  size_t searches = 100;
 
   std::ifstream string_table_file("strings_table/string_table.tbl");
   if (string_table_file.is_open()) {
@@ -96,13 +95,13 @@ void read_file(std::vector<ValueVector<T>> value_vectors) {
       size_t pos = 0, found;
       int index = 0;
       while ((found = line.find_first_of('|', pos)) != std::string::npos) {
-        // if (search_counter < searches) search_values[index].push_back(line.substr(pos, found - pos));
+        if (search_counter < searches) search_values[index].push_back(line.substr(pos, found - pos));
         value_vectors[index].push_back(line.substr(pos, found - pos));
         pos = found + 1;
         index++;
       }
       value_vectors[index].push_back(line.substr(pos));
-      // if (search_counter < searches) search_values[index].push_back(line.substr(pos, found - pos));
+      if (search_counter < searches) search_values[index].push_back(line.substr(pos, found - pos));
     }
     string_table_file.close();
   } else {
@@ -114,24 +113,57 @@ void read_file(std::vector<ValueVector<T>> value_vectors) {
   }
 }
 
+template <typename T>
+void benchmark_search(std::vector<ValueVector<T>> value_vectors, std::vector<std::vector<std::string>>& search_values) {
+  for (size_t i = 0; i < value_vectors.size(); ++i) {
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for (auto& sv : search_values[i]) {
+      std::lower_bound(value_vectors[i].begin(), value_vectors[i].end(), T(sv));
+    }
+    auto t2 = std::chrono::high_resolution_clock::now();
+    std::cout << "lower_bound for index: " << i << " "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+  }
+}
+
+template <typename T>
+void sort_value_vectors(std::vector<ValueVector<T>> value_vectors) {
+  for (auto vv : value_vectors) {
+    std::sort(vv.begin(), vv.end());
+  }
+}
+
 void value_vectors_from_file() {
   std::vector<ValueVector<FixedString>> value_vectors = {ValueVector<FixedString>(1),   ValueVector<FixedString>(3),
                                                          ValueVector<FixedString>(7),   ValueVector<FixedString>(15),
                                                          ValueVector<FixedString>(31),  ValueVector<FixedString>(63),
                                                          ValueVector<FixedString>(127), ValueVector<FixedString>(255)};
-  read_file(value_vectors);
+  std::vector<std::vector<std::string>> search_values;
+  for (auto& v : value_vectors) {
+    v.size();
+    search_values.push_back(std::vector<std::string>());
+  }
+  read_file(value_vectors, search_values);
+  sort_value_vectors(value_vectors);
+  benchmark_search(value_vectors, search_values);
 
   std::vector<ValueVector<std::string>> value_vectors_std = {
       ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(),
       ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>()};
-  read_file(value_vectors_std);
-
+  std::vector<std::vector<std::string>> search_values2;
+  for (auto& v : value_vectors) {
+    v.size();
+    search_values2.push_back(std::vector<std::string>());
+  }
+  read_file(value_vectors_std, search_values2);
+  sort_value_vectors(value_vectors_std);
+  benchmark_search(value_vectors_std, search_values);
 }
 
 template <typename T>
 void print_vector(ValueVector<T>& vec) {
   for (auto v : vec) {
-    std::cout << v << std::endl; 
+    std::cout << v << std::endl;
   }
   std::cout << std::endl;
 }
@@ -157,7 +189,6 @@ void sort_swap() {
   a.erase(std::unique(a.begin(), a.end()), a.end());
   std::cout << "Unique + erase:" << std::endl << std::endl;
   print_vector(a);
-
 }
 
 int main() {
@@ -166,5 +197,4 @@ int main() {
   sort_swap();
   benchmark();
   value_vectors_from_file();
-
 }
