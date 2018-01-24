@@ -16,15 +16,20 @@ class FixedString {
     std::memcpy(_mem, string.c_str(), _string_length);
   }
 
-  FixedString(char *mem, size_t string_length) : _mem(mem), _string_length(string_length) {}
+  FixedString(char *mem, size_t string_length) : _mem(mem), _string_length(string_length) {
+  }
 
   ~FixedString() {}
 
-  FixedString(FixedString &other) : _mem(new char[0]{}), _string_length(other._string_length) {
+  // copy constructor
+  FixedString(const FixedString &other) : _mem(new char[0]{}), _string_length(other._string_length) {
+    std::cout << "FixedString::copy constructor" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
-  FixedString(const FixedString &other) : _mem(new char[0]{}), _string_length(other._string_length) {
+  // move constructor
+  FixedString(const FixedString &&other) : _mem(new char[0]{}), _string_length(other._string_length) {
+    std::cout << "FixedString::move constructor" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
