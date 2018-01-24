@@ -69,4 +69,51 @@ TEST_F(ValueVectorTest, IteratorFixedString) {
   EXPECT_EQ(valuevector[0].string(), "abcde");
 }
 
+TEST_F(ValueVectorTest, ReverseIteratorFixedString) {
+  auto valuevector = ValueVector<FixedString>(4u);
+  valuevector.push_back(FixedString("str1"));
+  valuevector.push_back(FixedString("str2"));
+  valuevector.push_back(FixedString("str3"));
+
+  auto last_value = valuevector.rbegin();
+  auto first_value = valuevector.rend();
+  --first_value;
+
+  EXPECT_EQ(last_value->string(), "str3");
+  EXPECT_EQ(first_value->string(), "str1");
+
+  for (auto it = valuevector.rbegin(); it != valuevector.rend(); ++it) {
+    *it = FixedString("abcde");
+  }
+
+  EXPECT_EQ(valuevector[0].string(), "abcd");
+  EXPECT_EQ(valuevector[1].string(), "abcd");
+  EXPECT_EQ(valuevector[2].string(), "abcd");
+}
+
+TEST_F(ValueVectorTest, SizeFixedString) {
+  auto valuevector = ValueVector<FixedString>(4u);
+  valuevector.push_back(FixedString("str1"));
+  valuevector.push_back(FixedString("str2"));
+  valuevector.push_back(FixedString("str3"));
+
+  EXPECT_EQ(valuevector.size(), 3u);
+
+}
+
+TEST_F(ValueVectorTest, EraseFixedString) {
+  auto valuevector = ValueVector<FixedString>(4u);
+  valuevector.push_back(FixedString("str1"));
+  valuevector.push_back(FixedString("str2"));
+  valuevector.push_back(FixedString("str3"));
+
+  auto it = valuevector.begin();
+  ++it;
+
+  valuevector.erase(it, valuevector.end());
+
+  EXPECT_EQ(valuevector.size(), 1u);
+  EXPECT_EQ(valuevector[0].string(), "str1");
+}
+
 }  // namespace opossum
