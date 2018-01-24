@@ -11,6 +11,10 @@ namespace opossum {
 void swap(const FixedString lha, const FixedString rhs) {
   lha.swap(rhs);
 }
+}
+
+using namespace opossum;
+
 
 void print_vector_memory(const ValueVector<FixedString>& vector, std::string compiler) {
   uint64_t string_length = vector[0].size();
@@ -112,47 +116,59 @@ void benchmark() {
 }
 
 void value_vector_from_file() {
-  // std::string path = "../../strings_table";
-  // for (auto & p : fs::directory_iterator(path))
-  //   std::cout << p << std::endl;
+ std::vector<ValueVector<FixedString>> value_vectors = {
+   ValueVector<FixedString>(1),
+   ValueVector<FixedString>(3),
+   ValueVector<FixedString>(7),
+   ValueVector<FixedString>(15),
+   ValueVector<FixedString>(31),
+   ValueVector<FixedString>(63),
+   ValueVector<FixedString>(127),
+   ValueVector<FixedString>(255)
+ }; 
 
-//  std::vector<ValueVector<FixedString>> value_vectors = {
-//    ValueVector<FixedString>(1),
-//    ValueVector<FixedString>(3),
-//    ValueVector<FixedString>(7),
-//    ValueVector<FixedString>(15),
-//    ValueVector<FixedString>(31),
-//    ValueVector<FixedString>(63),
-//    ValueVector<FixedString>(127),
-//    ValueVector<FixedString>(255)
-//  };
-//
-//  std::string line;
-//  std::ifstream string_table_file("strings_table/string_table.tbl");
-//  if (string_table_file.is_open()) {
-//    // Skip first 2 header lines
-//    std::getline(string_table_file, line);
-//    std::getline(string_table_file, line);
-//
-//    while (std::getline(string_table_file, line)) {
-//      size_t pos = 0, found;
-//      int index = 0;
-//      while((found = line.find_first_of('|', pos)) != std::string::npos) {
-//        value_vectors[index].push_back(FixedString(line.substr(pos, found - pos)));
-//        pos = found+1;
-//        index++;
-//      }
-//      value_vectors[index].push_back(FixedString(line.substr(pos)));
-//    }
-//    string_table_file.close();
-//  }
-//  else {
-//    std::cout << "Unable to open file" << std::endl;
-//  }
-//
-//  for (auto& vv : value_vectors) {
-//    print_vector_memory(vv, "clang");
-//  }
+ // std::vector<std::vector<std::string>> search_values = {
+ //   std::vector<std::string>(),
+ //   std::vector<std::string>(),
+ //   std::vector<std::string>(),
+ //   std::vector<std::string>(),
+ //   std::vector<std::string>(),
+ //   std::vector<std::string>(),
+ //   std::vector<std::string>(),
+ //   std::vector<std::string>()
+ // };
+
+ std::string line;
+ // size_t search_counter = 0;
+ // size_t searches = 10000;
+
+ std::ifstream string_table_file("strings_table/string_table.tbl");
+ if (string_table_file.is_open()) {
+   // Skip first 2 header lines
+   std::getline(string_table_file, line);
+   std::getline(string_table_file, line);
+
+   while (std::getline(string_table_file, line)) {
+     size_t pos = 0, found;
+     int index = 0;
+     while((found = line.find_first_of('|', pos)) != std::string::npos) {
+       // if (search_counter < searches) search_values[index].push_back(line.substr(pos, found - pos));
+       value_vectors[index].push_back(FixedString(line.substr(pos, found - pos)));
+       pos = found+1;
+       index++;
+     }
+     value_vectors[index].push_back(FixedString(line.substr(pos)));
+     // if (search_counter < searches) search_values[index].push_back(line.substr(pos, found - pos));
+   }
+   string_table_file.close();
+ }
+ else {
+   std::cout << "Unable to open file" << std::endl;
+ }
+
+ for (auto& vv : value_vectors) {
+   print_vector_memory(vv, "clang");
+ }
 }
 
 void value_vector_from_file_stdstr() {
@@ -251,10 +267,9 @@ void sort_swap() {
 
 }
 
-}
 int main() {
   // benchmark();
-  // value_vector_from_file();
+  value_vector_from_file();
   // value_vector_from_file_stdstr();
-  opossum::sort_swap();
+  // sort_swap();
 }
