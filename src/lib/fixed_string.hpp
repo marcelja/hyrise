@@ -26,10 +26,18 @@ class FixedString {
   }
 
   FixedString(FixedString &other) : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
+    std::cout << "FixedString::copy constructor" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
+  // copy constructor
   FixedString(const FixedString &other) : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
+    std::memcpy(_mem, other._mem, _string_length);
+  }
+
+  // move constructor
+  FixedString(const FixedString &&other) : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
+    std::cout << "FixedString::move constructor" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
