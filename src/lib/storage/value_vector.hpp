@@ -15,18 +15,15 @@ class ValueVector {
  public:
   using iterator = typename pmr_vector<T>::iterator;
   using const_iterator = typename pmr_vector<T>::const_iterator;
+  using reverse_iterator = typename pmr_vector<T>::reverse_iterator;
 
   ValueVector();
 
   ValueVector(iterator begin, iterator end);
 
   ValueVector(const_iterator cbegin, const_iterator cend);
-
-  // explicit ValueVector(uint8_t fixed_string_length);
-
-  // void copy_values(pmr_concurrent_vector<T> values) {
-  //   _values(std::move(values));
-  // };
+  
+  ValueVector(const ValueVector &&other) : _values(other._values) {}
 
   void push_back(const T& value);
 
@@ -37,6 +34,10 @@ class ValueVector {
   iterator begin() noexcept;
 
   iterator end() noexcept;
+
+  reverse_iterator rbegin() noexcept;
+
+  reverse_iterator rend() noexcept;
 
   const_iterator cbegin() noexcept;
 
@@ -50,16 +51,20 @@ class ValueVector {
 
   size_t capacity() const;
 
+  void shrink_to_fit();
+
+  PolymorphicAllocator<T> get_allocator();
+
  protected:
   pmr_vector<T> _values;
-  // std::vector<char> _fixed_string_vector;
-  // uint8_t _fixed_string_length;
 };
 
 template <>
 class ValueVector<FixedString> {
  public:
   explicit ValueVector(size_t string_length) : _string_length(string_length) {}
+
+  ValueVector(const ValueVector &&other) : _string_length(other._string_length), _vector(other._vector) {}
 
   void push_back(const FixedString& value);
 
@@ -119,6 +124,10 @@ class ValueVector<FixedString> {
   size_t capacity() const;
 
   void erase(const iterator start, const iterator end);
+
+  void shrink_to_fit();
+
+  PolymorphicAllocator<FixedString> get_allocator();
 
  private:
   size_t _string_length;
