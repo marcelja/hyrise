@@ -41,6 +41,11 @@ void ValueVector<T>::push_back(T&& value) {
 }
 
 template <typename T>
+T& ValueVector<T>::at(const ChunkOffset chunk_offset) {
+  return _values.at(chunk_offset);
+}
+
+template <typename T>
 typename ValueVector<T>::iterator ValueVector<T>::begin() noexcept {
   return _values.begin();
 }
@@ -48,6 +53,16 @@ typename ValueVector<T>::iterator ValueVector<T>::begin() noexcept {
 template <typename T>
 typename ValueVector<T>::iterator ValueVector<T>::end() noexcept {
   return _values.end();
+}
+
+template <typename T>
+typename ValueVector<T>::const_iterator ValueVector<T>::cbegin() noexcept {
+  return _values.cbegin();
+}
+
+template <typename T>
+typename ValueVector<T>::const_iterator ValueVector<T>::cend() noexcept {
+  return _values.cend();
 }
 
 template <typename T>
@@ -83,11 +98,23 @@ void ValueVector<FixedString>::push_back(FixedString&& string) {
   }
 }
 
+FixedString ValueVector<FixedString>::at(const ChunkOffset chunk_offset) {
+  return FixedString((char*)&_vector.at(chunk_offset * _string_length), _string_length);
+}
+
 ValueVector<FixedString>::iterator ValueVector<FixedString>::begin() noexcept {
   return iterator(_string_length, _vector, 0);
 }
 
 ValueVector<FixedString>::iterator ValueVector<FixedString>::end() noexcept {
+  return iterator(_string_length, _vector, _vector.size());
+}
+
+ValueVector<FixedString>::iterator ValueVector<FixedString>::cbegin() noexcept {
+  return iterator(_string_length, _vector, 0);
+}
+
+ValueVector<FixedString>::iterator ValueVector<FixedString>::cend() noexcept {
   return iterator(_string_length, _vector, _vector.size());
 }
 

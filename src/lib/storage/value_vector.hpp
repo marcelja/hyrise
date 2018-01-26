@@ -14,6 +14,7 @@ template <typename T>
 class ValueVector {
  public:
   using iterator = typename pmr_vector<T>::iterator;
+  using const_iterator = typename pmr_vector<T>::const_iterator;
 
   ValueVector();
 
@@ -27,9 +28,15 @@ class ValueVector {
 
   void push_back(T&& value);
 
+  T& at(const ChunkOffset chunk_offset);
+
   iterator begin() noexcept;
 
   iterator end() noexcept;
+
+  const_iterator cbegin() noexcept;
+
+  const_iterator cend() noexcept;
 
   T& operator[](size_t n);
 
@@ -55,6 +62,8 @@ class ValueVector<FixedString> {
   void push_back(FixedString&& string);
 
   void push_back(const std::string& string) { push_back(FixedString(string)); }
+
+  FixedString at(const ChunkOffset chunk_offset);
 
   class iterator : public boost::iterator_facade<iterator, FixedString, std::random_access_iterator_tag, FixedString> {
    public:
@@ -87,6 +96,10 @@ class ValueVector<FixedString> {
   iterator begin() noexcept;
 
   iterator end() noexcept;
+
+  iterator cbegin() noexcept;
+
+  iterator cend() noexcept;
 
   typedef boost::reverse_iterator<iterator> reverse_iterator;
   reverse_iterator rbegin() noexcept;
