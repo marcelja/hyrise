@@ -56,6 +56,16 @@ typename ValueVector<T>::iterator ValueVector<T>::end() noexcept {
 }
 
 template <typename T>
+typename ValueVector<T>::reverse_iterator ValueVector<T>::rbegin() noexcept {
+  return _values.rbegin();
+}
+
+template <typename T>
+typename ValueVector<T>::reverse_iterator ValueVector<T>::rend() noexcept {
+  return _values.rend();
+}
+
+template <typename T>
 typename ValueVector<T>::const_iterator ValueVector<T>::cbegin() noexcept {
   return _values.cbegin();
 }

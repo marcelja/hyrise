@@ -15,6 +15,7 @@ class ValueVector {
  public:
   using iterator = typename pmr_vector<T>::iterator;
   using const_iterator = typename pmr_vector<T>::const_iterator;
+  using reverse_iterator = typename pmr_vector<T>::reverse_iterator;
 
   ValueVector();
 
@@ -33,6 +34,10 @@ class ValueVector {
   iterator begin() noexcept;
 
   iterator end() noexcept;
+
+  reverse_iterator rbegin() noexcept;
+
+  reverse_iterator rend() noexcept;
 
   const_iterator cbegin() noexcept;
 
@@ -117,7 +122,7 @@ class ValueVector<FixedString> {
   size_t capacity() const;
 
   void erase(const iterator start, const iterator end);
-  
+
   void shrink_to_fit();
 
  private:
