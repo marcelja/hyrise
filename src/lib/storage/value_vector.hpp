@@ -64,6 +64,10 @@ class ValueVector<FixedString> {
  public:
   explicit ValueVector(size_t string_length) : _string_length(string_length) {}
 
+  ValueVector(pmr_vector<FixedString>::iterator begin, pmr_vector<FixedString>::iterator end, size_t string_length);
+
+  ValueVector(pmr_vector<FixedString>::const_iterator cbegin, pmr_vector<FixedString>::const_iterator cend, size_t string_length);
+
   ValueVector(const ValueVector &&other) : _string_length(other._string_length), _vector(other._vector) {}
 
   void push_back(const FixedString& value);

@@ -132,4 +132,15 @@ TEST_F(ValueVectorTest, ConstIteratorConstructor) {
   EXPECT_EQ(v2.size(), 3u);
 }
 
+TEST_F(ValueVectorTest, FixedStringIteratorConstructors) {
+  std::vector<FixedString> v1 = {FixedString("abc"), FixedString("def"), FixedString("ghi")};
+  auto v2 = ValueVector<FixedString>{v1.begin(), v1.end(), 3};
+  auto v3 = ValueVector<FixedString>{v1.cbegin(), v1.cend(), 3};
+
+  EXPECT_EQ(v2[0].string(), "abc");
+  EXPECT_EQ(v2.size(), 3u);
+  EXPECT_EQ(v3[2].string(), "ghi");
+  EXPECT_EQ(v3.size(), 3u);
+}
+
 }  // namespace opossum

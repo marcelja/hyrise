@@ -110,7 +110,23 @@ PolymorphicAllocator<T> ValueVector<T>::get_allocator() {
 }
 
 
+
 // Implementation of ValueVector<FixedString> starts here
+
+
+ValueVector<FixedString>::ValueVector(pmr_vector<FixedString>::iterator begin, pmr_vector<FixedString>::iterator end, size_t string_length) : _string_length(string_length) {
+  while (begin != end) {
+    push_back(*begin);
+    ++begin;
+  }
+}
+
+ValueVector<FixedString>::ValueVector(pmr_vector<FixedString>::const_iterator cbegin, pmr_vector<FixedString>::const_iterator cend, size_t string_length) : _string_length(string_length) {
+  while (cbegin != cend) {
+    push_back(*cbegin);
+    ++cbegin;
+  }
+}
 
 void ValueVector<FixedString>::push_back(const FixedString& value) {
   push_back(std::forward<FixedString>((FixedString&)value));
