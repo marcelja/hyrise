@@ -100,6 +100,8 @@ void ValueVector<T>::shrink_to_fit() {
   _values.shrink_to_fit();
 }
 
+// Implementation of ValueVector<FixedString> starts here
+
 void ValueVector<FixedString>::push_back(const FixedString& value) {
   push_back(std::forward<FixedString>((FixedString&)value));
 }

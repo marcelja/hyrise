@@ -18,12 +18,8 @@ class ValueVector {
   using reverse_iterator = typename pmr_vector<T>::reverse_iterator;
 
   ValueVector();
-
-  // explicit ValueVector(uint8_t fixed_string_length);
-
-  // void copy_values(pmr_concurrent_vector<T> values) {
-  //   _values(std::move(values));
-  // };
+  
+  ValueVector(const ValueVector &&other) : _values(other._values) {}
 
   void push_back(const T& value);
 
@@ -55,14 +51,14 @@ class ValueVector {
 
  protected:
   pmr_vector<T> _values;
-  // std::vector<char> _fixed_string_vector;
-  // uint8_t _fixed_string_length;
 };
 
 template <>
 class ValueVector<FixedString> {
  public:
   explicit ValueVector(size_t string_length) : _string_length(string_length) {}
+
+  ValueVector(const ValueVector &&other) : _string_length(other._string_length), _vector(other._vector) {}
 
   void push_back(const FixedString& value);
 
