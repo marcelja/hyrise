@@ -18,6 +18,10 @@ class ValueVector {
 
   ValueVector();
 
+  ValueVector(iterator begin, iterator end);
+
+  ValueVector(const_iterator cbegin, const_iterator cend);
+
   // explicit ValueVector(uint8_t fixed_string_length);
 
   // void copy_values(pmr_concurrent_vector<T> values) {

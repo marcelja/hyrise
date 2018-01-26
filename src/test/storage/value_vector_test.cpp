@@ -116,4 +116,20 @@ TEST_F(ValueVectorTest, EraseFixedString) {
   EXPECT_EQ(valuevector[0].string(), "str1");
 }
 
+TEST_F(ValueVectorTest, IteratorConstructor) {
+  std::vector<std::string> v1 = {"abc", "def", "ghi"};
+  auto v2 = ValueVector<std::string>{v1.begin(), v1.end()};
+
+  EXPECT_EQ(v2[2], "ghi");
+  EXPECT_EQ(v2.size(), 3u);
+}
+
+TEST_F(ValueVectorTest, ConstIteratorConstructor) {
+  std::vector<std::string> v1 = {"abc", "def", "ghi"};
+  auto v2 = ValueVector<std::string>{v1.cbegin(), v1.cend()};
+
+  EXPECT_EQ(v2[0], "abc");
+  EXPECT_EQ(v2.size(), 3u);
+}
+
 }  // namespace opossum

@@ -19,6 +19,23 @@ ValueVector<T>::ValueVector() {
   // _fixed_string_length = 0;
 }
 
+template <typename T>
+ValueVector<T>::ValueVector(iterator begin, iterator end) {
+  while (begin != end) {
+    push_back(*begin);
+    ++begin;
+  }
+}
+
+template <typename T>
+ValueVector<T>::ValueVector(const_iterator cbegin, const_iterator cend) {
+  while (cbegin != cend) {
+    push_back(*cbegin);
+    ++cbegin;
+  }
+}
+
+
 // template <typename T>
 // ValueVector<T>::ValueVector(uint8_t fixed_string_length) {
 //   _fixed_string_length = 77;
