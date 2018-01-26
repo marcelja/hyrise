@@ -85,6 +85,11 @@ size_t ValueVector<T>::capacity() const {
   return _values.capacity();
 }
 
+template <typename T>
+void ValueVector<T>::shrink_to_fit() {
+  _values.shrink_to_fit();
+}
+
 void ValueVector<FixedString>::push_back(const FixedString& value) {
   push_back(std::forward<FixedString>((FixedString&)value));
 }
@@ -143,6 +148,10 @@ void ValueVector<FixedString>::erase(const iterator start, const iterator end) {
     auto it = _vector.begin();
     std::advance(it, _vector.size() - std::distance(start, end) * _string_length);
     _vector.erase(it, _vector.end());
+}
+
+void ValueVector<FixedString>::shrink_to_fit() {
+  _vector.shrink_to_fit();
 }
 
 EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueVector);

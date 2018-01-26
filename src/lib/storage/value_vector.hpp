@@ -46,6 +46,8 @@ class ValueVector {
 
   size_t capacity() const;
 
+  void shrink_to_fit();
+
  protected:
   pmr_vector<T> _values;
   // std::vector<char> _fixed_string_vector;
@@ -115,6 +117,8 @@ class ValueVector<FixedString> {
   size_t capacity() const;
 
   void erase(const iterator start, const iterator end);
+  
+  void shrink_to_fit();
 
  private:
   size_t _string_length;
