@@ -49,6 +49,8 @@ class ValueVector {
 
   void shrink_to_fit();
 
+  PolymorphicAllocator<T> get_allocator();
+
  protected:
   pmr_vector<T> _values;
 };
@@ -120,6 +122,8 @@ class ValueVector<FixedString> {
   void erase(const iterator start, const iterator end);
 
   void shrink_to_fit();
+
+  PolymorphicAllocator<FixedString> get_allocator();
 
  private:
   size_t _string_length;

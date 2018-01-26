@@ -100,6 +100,12 @@ void ValueVector<T>::shrink_to_fit() {
   _values.shrink_to_fit();
 }
 
+template <typename T>
+PolymorphicAllocator<T> ValueVector<T>::get_allocator() {
+  return _values.get_allocator();
+}
+
+
 // Implementation of ValueVector<FixedString> starts here
 
 void ValueVector<FixedString>::push_back(const FixedString& value) {
@@ -164,6 +170,10 @@ void ValueVector<FixedString>::erase(const iterator start, const iterator end) {
 
 void ValueVector<FixedString>::shrink_to_fit() {
   _vector.shrink_to_fit();
+}
+
+PolymorphicAllocator<FixedString> ValueVector<FixedString>::get_allocator() {
+  return _vector.get_allocator();
 }
 
 EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueVector);
