@@ -67,7 +67,7 @@ class ValueVector<FixedString> {
 
   class iterator : public boost::iterator_facade<iterator, FixedString, std::random_access_iterator_tag, FixedString> {
    public:
-    iterator(size_t string_length, const std::vector<char>& vector, size_t pos = 0)
+    iterator(size_t string_length, const pmr_vector<char>& vector, size_t pos = 0)
         : _string_length(string_length), _vector(vector), _pos(pos) {}
     iterator& operator=(const iterator& other) {
       if (_string_length != other._string_length || _vector != other._vector)
@@ -89,7 +89,7 @@ class ValueVector<FixedString> {
     FixedString dereference() const { return FixedString((char*)&_vector[_pos], _string_length); }
 
     const size_t _string_length;
-    const std::vector<char>& _vector;
+    const pmr_vector<char>& _vector;
     size_t _pos;
   };
 
@@ -118,7 +118,7 @@ class ValueVector<FixedString> {
 
  private:
   size_t _string_length;
-  std::vector<char> _vector;
+  pmr_vector<char> _vector;
 };
 
 }  // namespace opossum
