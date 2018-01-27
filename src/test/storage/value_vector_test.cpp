@@ -50,11 +50,27 @@ TEST_F(ValueVectorTest, Iterator) {
   EXPECT_EQ(valuevector[0], "abc");
 }
 
+TEST_F(ValueVectorTest, PushFixedString) {
+  auto valuevector = ValueVector<FixedString>(3u);
+  valuevector.push_back(FixedString("abc"));
+  const auto const_fs = FixedString("cde");
+  valuevector.push_back(const_fs);
+
+  EXPECT_EQ(valuevector[0].string(), "abc");
+}
+
 TEST_F(ValueVectorTest, SubscriptOperatorFixedString) {
   auto valuevector = ValueVector<FixedString>(3u);
   valuevector.push_back(FixedString("abc"));
 
   EXPECT_EQ(valuevector[0].string(), "abc");
+}
+
+TEST_F(ValueVectorTest, AtOperatorFixedString) {
+  auto valuevector = ValueVector<FixedString>(3u);
+  valuevector.push_back(FixedString("abc"));
+
+  EXPECT_EQ(valuevector.at(0).string(), "abc");
 }
 
 TEST_F(ValueVectorTest, IteratorFixedString) {
@@ -98,7 +114,6 @@ TEST_F(ValueVectorTest, SizeFixedString) {
   valuevector.push_back(FixedString("str3"));
 
   EXPECT_EQ(valuevector.size(), 3u);
-
 }
 
 TEST_F(ValueVectorTest, EraseFixedString) {
@@ -107,6 +122,8 @@ TEST_F(ValueVectorTest, EraseFixedString) {
   valuevector.push_back(FixedString("str2"));
   valuevector.push_back(FixedString("str3"));
 
+  EXPECT_EQ(valuevector.size(), 3u);
+
   auto it = valuevector.begin();
   ++it;
 
@@ -114,6 +131,37 @@ TEST_F(ValueVectorTest, EraseFixedString) {
 
   EXPECT_EQ(valuevector.size(), 1u);
   EXPECT_EQ(valuevector[0].string(), "str1");
+}
+
+TEST_F(ValueVectorTest, ShrinkFixedString) {
+  auto valuevector = ValueVector<FixedString>(4u);
+  valuevector.push_back(FixedString("str1"));
+  valuevector.push_back(FixedString("str2"));
+  valuevector.push_back(FixedString("str3"));
+
+  auto it = valuevector.begin();
+  ++it;
+
+  valuevector.shrink_to_fit();
+
+  EXPECT_EQ(valuevector.size(), 3u);
+  EXPECT_EQ(valuevector.capacity(), 12u);
+
+  valuevector.erase(it, valuevector.end());
+
+  EXPECT_EQ(valuevector.size(), 1u);
+
+  valuevector.shrink_to_fit();
+
+  EXPECT_EQ(valuevector.capacity(), 4u);
+}
+
+TEST_F(ValueVectorTest, ConstValueVectorFixedString) {
+  auto valuevector = ValueVector<FixedString>(4u);
+  valuevector.push_back(FixedString("str1"));
+  const auto& valuevector2 = ValueVector<FixedString>(std::move(valuevector));
+  const auto fixed = valuevector2[0];
+  EXPECT_EQ(fixed.string(), "str1");
 }
 
 TEST_F(ValueVectorTest, IteratorConstructor) {
