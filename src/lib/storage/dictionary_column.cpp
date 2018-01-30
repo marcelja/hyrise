@@ -11,16 +11,17 @@
 #include "utils/assert.hpp"
 #include "utils/performance_warning.hpp"
 #include "value_column.hpp"
+#include "value_vector.hpp"
 
 namespace opossum {
 
 template <typename T>
-DictionaryColumn<T>::DictionaryColumn(pmr_vector<T>&& dictionary,
+DictionaryColumn<T>::DictionaryColumn(ValueVector<T>&& dictionary,
                                       const std::shared_ptr<BaseAttributeVector>& attribute_vector)
-    : _dictionary(std::make_shared<pmr_vector<T>>(std::move(dictionary))), _attribute_vector(attribute_vector) {}
+    : _dictionary(std::make_shared<ValueVector<T>>(std::move(dictionary))), _attribute_vector(attribute_vector) {}
 
 template <typename T>
-DictionaryColumn<T>::DictionaryColumn(const std::shared_ptr<pmr_vector<T>>& dictionary,
+DictionaryColumn<T>::DictionaryColumn(const std::shared_ptr<ValueVector<T>>& dictionary,
                                       const std::shared_ptr<BaseAttributeVector>& attribute_vector)
     : _dictionary(dictionary), _attribute_vector(attribute_vector) {}
 
@@ -61,7 +62,7 @@ void DictionaryColumn<T>::append(const AllTypeVariant&) {
 }
 
 template <typename T>
-std::shared_ptr<const pmr_vector<T>> DictionaryColumn<T>::dictionary() const {
+std::shared_ptr<const ValueVector<T>> DictionaryColumn<T>::dictionary() const {
   return _dictionary;
 }
 
@@ -137,9 +138,10 @@ void DictionaryColumn<T>::visit(ColumnVisitable& visitable, std::shared_ptr<Colu
 template <typename T>
 std::shared_ptr<BaseColumn> DictionaryColumn<T>::copy_using_allocator(const PolymorphicAllocator<size_t>& alloc) const {
   const auto new_attribute_vector = _attribute_vector->copy_using_allocator(alloc);
-  const pmr_vector<T> new_dictionary(*_dictionary, alloc);
+  const ValueVector<T> new_dictionary{};
+  // const ValueVector<T> new_dictionary(*_dictionary, alloc);
   return std::allocate_shared<DictionaryColumn<T>>(
-      alloc, std::allocate_shared<pmr_vector<T>>(alloc, std::move(new_dictionary)), new_attribute_vector);
+      alloc, std::allocate_shared<ValueVector<T>>(alloc, std::move(new_dictionary)), new_attribute_vector);
 }
 
 EXPLICITLY_INSTANTIATE_DATA_TYPES(DictionaryColumn);
