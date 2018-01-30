@@ -15,8 +15,7 @@
 namespace opossum {
 
 template <typename T>
-ValueVector<T>::ValueVector() {
-}
+ValueVector<T>::ValueVector() {}
 
 template <typename T>
 ValueVector<T>::ValueVector(iterator begin, iterator end) {
@@ -27,7 +26,24 @@ ValueVector<T>::ValueVector(iterator begin, iterator end) {
 }
 
 template <typename T>
+ValueVector<T>::ValueVector(typename std::vector<T>::iterator begin, typename std::vector<T>::iterator end) {
+  while (begin != end) {
+    push_back(*begin);
+    ++begin;
+  }
+}
+
+template <typename T>
 ValueVector<T>::ValueVector(const_iterator cbegin, const_iterator cend) {
+  while (cbegin != cend) {
+    push_back(*cbegin);
+    ++cbegin;
+  }
+}
+
+template <typename T>
+ValueVector<T>::ValueVector(typename std::vector<T>::const_iterator cbegin,
+                            typename std::vector<T>::const_iterator cend) {
   while (cbegin != cend) {
     push_back(*cbegin);
     ++cbegin;
@@ -109,19 +125,38 @@ PolymorphicAllocator<T> ValueVector<T>::get_allocator() {
   return _values.get_allocator();
 }
 
-
-
 // Implementation of ValueVector<FixedString> starts here
 
-
-ValueVector<FixedString>::ValueVector(pmr_vector<FixedString>::iterator begin, pmr_vector<FixedString>::iterator end, size_t string_length) : _string_length(string_length) {
+ValueVector<FixedString>::ValueVector(typename std::vector<FixedString>::iterator begin,
+                                      typename std::vector<FixedString>::iterator end, size_t string_length)
+    : _string_length(string_length) {
   while (begin != end) {
     push_back(*begin);
     ++begin;
   }
 }
 
-ValueVector<FixedString>::ValueVector(pmr_vector<FixedString>::const_iterator cbegin, pmr_vector<FixedString>::const_iterator cend, size_t string_length) : _string_length(string_length) {
+ValueVector<FixedString>::ValueVector(pmr_vector<FixedString>::iterator begin, pmr_vector<FixedString>::iterator end,
+                                      size_t string_length)
+    : _string_length(string_length) {
+  while (begin != end) {
+    push_back(*begin);
+    ++begin;
+  }
+}
+
+ValueVector<FixedString>::ValueVector(pmr_vector<FixedString>::const_iterator cbegin,
+                                      pmr_vector<FixedString>::const_iterator cend, size_t string_length)
+    : _string_length(string_length) {
+  while (cbegin != cend) {
+    push_back(*cbegin);
+    ++cbegin;
+  }
+}
+
+ValueVector<FixedString>::ValueVector(typename std::vector<FixedString>::const_iterator cbegin,
+                                      typename std::vector<FixedString>::const_iterator cend, size_t string_length)
+    : _string_length(string_length) {
   while (cbegin != cend) {
     push_back(*cbegin);
     ++cbegin;
@@ -162,13 +197,9 @@ ValueVector<FixedString>::iterator ValueVector<FixedString>::cend() noexcept {
 }
 
 typedef boost::reverse_iterator<ValueVector<FixedString>::iterator> reverse_iterator;
-reverse_iterator ValueVector<FixedString>::rbegin() noexcept {
-  return reverse_iterator(end());
-}
+reverse_iterator ValueVector<FixedString>::rbegin() noexcept { return reverse_iterator(end()); }
 
-reverse_iterator ValueVector<FixedString>::rend() noexcept {
-  return reverse_iterator(begin());
-}
+reverse_iterator ValueVector<FixedString>::rend() noexcept { return reverse_iterator(begin()); }
 
 FixedString ValueVector<FixedString>::operator[](size_t n) {
   return {FixedString(&_vector[n * _string_length], _string_length)};
@@ -183,18 +214,14 @@ size_t ValueVector<FixedString>::size() const { return _vector.size() / _string_
 size_t ValueVector<FixedString>::capacity() const { return _vector.capacity(); }
 
 void ValueVector<FixedString>::erase(const iterator start, const iterator end) {
-    auto it = _vector.begin();
-    std::advance(it, _vector.size() - std::distance(start, end) * _string_length);
-    _vector.erase(it, _vector.end());
+  auto it = _vector.begin();
+  std::advance(it, _vector.size() - std::distance(start, end) * _string_length);
+  _vector.erase(it, _vector.end());
 }
 
-void ValueVector<FixedString>::shrink_to_fit() {
-  _vector.shrink_to_fit();
-}
+void ValueVector<FixedString>::shrink_to_fit() { _vector.shrink_to_fit(); }
 
-PolymorphicAllocator<FixedString> ValueVector<FixedString>::get_allocator() {
-  return _vector.get_allocator();
-}
+PolymorphicAllocator<FixedString> ValueVector<FixedString>::get_allocator() { return _vector.get_allocator(); }
 
 EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueVector);
 
