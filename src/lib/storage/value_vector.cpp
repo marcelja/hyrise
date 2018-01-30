@@ -18,54 +18,65 @@ template <typename T>
 ValueVector<T>::ValueVector() {}
 
 template <typename T>
-ValueVector<T>::ValueVector(iterator begin, iterator end) {
-  while (begin != end) {
-    push_back(*begin);
-    ++begin;
-  }
+ValueVector<T>::ValueVector(const size_t& elements) {
+  _values.reserve(elements);
 }
 
 template <typename T>
-ValueVector<T>::ValueVector(typename std::vector<T>::iterator begin, typename std::vector<T>::iterator end) {
-  while (begin != end) {
-    push_back(*begin);
-    ++begin;
-  }
+template< class Iter >
+ValueVector<T>::ValueVector(Iter first, Iter last){
+  std::cout << "const auto&&& const ++it;";
 }
 
-template <typename T>
-ValueVector<T>::ValueVector(typename pmr_concurrent_vector<T>::iterator begin, typename pmr_concurrent_vector<T>::iterator end) {
-  while (begin != end) {
-    push_back(*begin);
-    ++begin;
-  }
-}
 
-template <typename T>
-ValueVector<T>::ValueVector(const_iterator cbegin, const_iterator cend) {
-  while (cbegin != cend) {
-    push_back(*cbegin);
-    ++cbegin;
-  }
-}
+// ValueVector<T>::ValueVector(iterator begin, iterator end) {
+//   while (begin != end) {
+//     push_back(*begin);
+//     ++begin;
+//   }
+// }
 
-template <typename T>
-ValueVector<T>::ValueVector(typename std::vector<T>::const_iterator cbegin,
-                            typename std::vector<T>::const_iterator cend) {
-  while (cbegin != cend) {
-    push_back(*cbegin);
-    ++cbegin;
-  }
-}
+// template <typename T>
+// ValueVector<T>::ValueVector(typename std::vector<T>::iterator begin, typename std::vector<T>::iterator end) {
+//   while (begin != end) {
+//     push_back(*begin);
+//     ++begin;
+//   }
+// }
 
-template <typename T>
-ValueVector<T>::ValueVector(typename pmr_concurrent_vector<T>::const_iterator cbegin,
-                            typename pmr_concurrent_vector<T>::const_iterator cend) {
-  while (cbegin != cend) {
-    push_back(*cbegin);
-    ++cbegin;
-  }
-}
+// template <typename T>
+// ValueVector<T>::ValueVector(typename pmr_concurrent_vector<T>::iterator begin, typename pmr_concurrent_vector<T>::iterator end) {
+//   while (begin != end) {
+//     push_back(*begin);
+//     ++begin;
+//   }
+// }
+
+// template <typename T>
+// ValueVector<T>::ValueVector(const_iterator cbegin, const_iterator cend) {
+//   while (cbegin != cend) {
+//     push_back(*cbegin);
+//     ++cbegin;
+//   }
+// }
+
+// template <typename T>
+// ValueVector<T>::ValueVector(typename std::vector<T>::const_iterator cbegin,
+//                             typename std::vector<T>::const_iterator cend) {
+//   while (cbegin != cend) {
+//     push_back(*cbegin);
+//     ++cbegin;
+//   }
+// }
+
+// template <typename T>
+// ValueVector<T>::ValueVector(typename pmr_concurrent_vector<T>::const_iterator cbegin,
+//                             typename pmr_concurrent_vector<T>::const_iterator cend) {
+//   while (cbegin != cend) {
+//     push_back(*cbegin);
+//     ++cbegin;
+//   }
+// }
 
 template <typename T>
 void ValueVector<T>::push_back(const T& value) {

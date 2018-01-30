@@ -18,22 +18,26 @@ class ValueVector {
   using reverse_iterator = typename pmr_vector<T>::reverse_iterator;
 
   ValueVector();
+template< class Iter >
+  ValueVector(Iter begin, Iter end);
 
-  ValueVector(typename std::vector<T>::iterator begin, typename std::vector<T>::iterator end);
+  ValueVector(const size_t& elements);
 
-  ValueVector(typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end);
+  // ValueVector(typename std::vector<T>::iterator begin, typename std::vector<T>::iterator end);
 
-  ValueVector(typename pmr_concurrent_vector<T>::iterator begin, typename pmr_concurrent_vector<T>::iterator end);
+  // ValueVector(typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end);
 
-  ValueVector(typename pmr_concurrent_vector<T>::const_iterator begin, typename pmr_concurrent_vector<T>::const_iterator end);
+  // ValueVector(typename pmr_concurrent_vector<T>::iterator begin, typename pmr_concurrent_vector<T>::iterator end);
 
-  ValueVector(iterator begin, iterator end);
+  // ValueVector(typename pmr_concurrent_vector<T>::const_iterator begin, typename pmr_concurrent_vector<T>::const_iterator end);
 
-  ValueVector(const_iterator cbegin, const_iterator cend);
+  // ValueVector(iterator begin, iterator end);
 
-  ValueVector(const ValueVector&& other) : _values(other._values) {}
+  // ValueVector(const_iterator cbegin, const_iterator cend);
 
-  ValueVector(const ValueVector& other) : _values(other._values) {}
+  // ValueVector(const ValueVector&& other) : _values(other._values) {}
+
+  // ValueVector(const ValueVector& other) : _values(other._values) {}
 
   void push_back(const T& value);
 

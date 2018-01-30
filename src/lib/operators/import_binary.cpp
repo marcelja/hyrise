@@ -28,33 +28,33 @@ ImportBinary::ImportBinary(const std::string& filename, const std::optional<std:
 const std::string ImportBinary::name() const { return "ImportBinary"; }
 
 template <typename T>
-ValueVector<T> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
-  ValueVector<T> values(count);
+pmr_vector<T> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
+  pmr_vector<T> values(count);
   file.read(reinterpret_cast<char*>(values.data()), values.size() * sizeof(T));
   return values;
 }
 
 // specialized implementation for string values
 template <>
-ValueVector<std::string> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
+pmr_vector<std::string> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
   return _read_string_values(file, count);
 }
 
 // specialized implementation for bool values
 template <>
-ValueVector<bool> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
-  ValueVector<BoolAsByteType> readable_bools(count);
+pmr_vector<bool> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
+  pmr_vector<BoolAsByteType> readable_bools(count);
   file.read(reinterpret_cast<char*>(readable_bools.data()), readable_bools.size() * sizeof(BoolAsByteType));
-  return ValueVector<bool>(readable_bools.begin(), readable_bools.end());
+  return pmr_vector<bool>(readable_bools.begin(), readable_bools.end());
 }
 
 template <typename T>
-ValueVector<std::string> ImportBinary::_read_string_values(std::ifstream& file, const size_t count) {
+pmr_vector<std::string> ImportBinary::_read_string_values(std::ifstream& file, const size_t count) {
   const auto string_lengths = _read_values<T>(file, count);
   const auto total_length = std::accumulate(string_lengths.cbegin(), string_lengths.cend(), static_cast<size_t>(0));
   const auto buffer = _read_values<char>(file, total_length);
 
-  ValueVector<std::string> values(count);
+  pmr_vector<std::string> values(count);
   size_t start = 0;
 
   for (size_t i = 0; i < count; ++i) {
