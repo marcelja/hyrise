@@ -94,17 +94,17 @@ void ValueColumn<std::string>::append(const AllTypeVariant& val) {
 }
 
 template <typename T>
-const pmr_concurrent_vector<T>& ValueColumn<T>::values() const {
+const ValueVector<T>& ValueColumn<T>::values() const {
   return _values;
 }
 
 template <typename T>
-pmr_concurrent_vector<T>& ValueColumn<T>::values() {
+ValueVector<T>& ValueColumn<T>::values() {
   return _values;
 }
 
 template <typename T>
-const pmr_concurrent_vector<std::optional<T>> ValueColumn<T>::materialize_values() const {
+const ValueVector<std::optional<T>> ValueColumn<T>::materialize_values() const {
   pmr_concurrent_vector<std::optional<T>> values(_values.size(), std::nullopt, _values.get_allocator());
 
   for (ChunkOffset chunk_offset = 0; chunk_offset < _values.size(); ++chunk_offset) {

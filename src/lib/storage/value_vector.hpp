@@ -19,6 +19,10 @@ class ValueVector {
 
   ValueVector();
 
+  ValueVector(const PolymorphicAllocator<T>& alloc) : _values(alloc) {}
+
+  ValueVector(pmr_concurrent_vector<T>&& values);
+
   ValueVector(typename std::vector<T>::iterator begin, typename std::vector<T>::iterator end);
 
   ValueVector(typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end);
@@ -69,6 +73,12 @@ template <>
 class ValueVector<FixedString> {
  public:
   explicit ValueVector(size_t string_length) : _string_length(string_length) {}
+
+  ValueVector(const PolymorphicAllocator<FixedString>& alloc) {
+    std::cout << "valuevector construnctor(alloc) not yet implemented" << std::endl;
+  }
+
+  ValueVector(pmr_concurrent_vector<FixedString>&& values);
 
   ValueVector(typename std::vector<FixedString>::iterator begin, typename std::vector<FixedString>::iterator end,
               size_t string_length);

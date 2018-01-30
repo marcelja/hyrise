@@ -9,6 +9,7 @@
 #include "import_export/binary.hpp"
 #include "storage/fitted_attribute_vector.hpp"
 #include "storage/reference_column.hpp"
+#include "storage/value_vector.hpp"
 
 #include "constant_mappings.hpp"
 #include "resolve_type.hpp"
@@ -20,6 +21,11 @@ namespace {
 // Writes the content of the vector to the ofstream
 template <typename T, typename Alloc>
 void _export_values(std::ofstream& ofstream, const std::vector<T, Alloc>& values);
+
+template <typename T>
+void _export_values(std::ofstream& ofstream, const opossum::ValueVector<T>& values) {
+  std::cout << "Why? I don't want to implement this method :(" << std::endl;
+};
 
 /* Writes the given strings to the ofstream. First an array of string lengths is written. After that the string are
  * written without any gaps between them.
