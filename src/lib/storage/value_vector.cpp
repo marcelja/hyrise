@@ -34,6 +34,14 @@ ValueVector<T>::ValueVector(typename std::vector<T>::iterator begin, typename st
 }
 
 template <typename T>
+ValueVector<T>::ValueVector(typename pmr_concurrent_vector<T>::iterator begin, typename pmr_concurrent_vector<T>::iterator end) {
+  while (begin != end) {
+    push_back(*begin);
+    ++begin;
+  }
+}
+
+template <typename T>
 ValueVector<T>::ValueVector(const_iterator cbegin, const_iterator cend) {
   while (cbegin != cend) {
     push_back(*cbegin);
@@ -44,6 +52,15 @@ ValueVector<T>::ValueVector(const_iterator cbegin, const_iterator cend) {
 template <typename T>
 ValueVector<T>::ValueVector(typename std::vector<T>::const_iterator cbegin,
                             typename std::vector<T>::const_iterator cend) {
+  while (cbegin != cend) {
+    push_back(*cbegin);
+    ++cbegin;
+  }
+}
+
+template <typename T>
+ValueVector<T>::ValueVector(typename pmr_concurrent_vector<T>::const_iterator cbegin,
+                            typename pmr_concurrent_vector<T>::const_iterator cend) {
   while (cbegin != cend) {
     push_back(*cbegin);
     ++cbegin;

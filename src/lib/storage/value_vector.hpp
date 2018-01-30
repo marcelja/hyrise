@@ -23,6 +23,10 @@ class ValueVector {
 
   ValueVector(typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end);
 
+  ValueVector(typename pmr_concurrent_vector<T>::iterator begin, typename pmr_concurrent_vector<T>::iterator end);
+
+  ValueVector(typename pmr_concurrent_vector<T>::const_iterator begin, typename pmr_concurrent_vector<T>::const_iterator end);
+
   ValueVector(iterator begin, iterator end);
 
   ValueVector(const_iterator cbegin, const_iterator cend);

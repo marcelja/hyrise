@@ -9,6 +9,7 @@
 #include "import_export/binary.hpp"
 #include "storage/fitted_attribute_vector.hpp"
 #include "storage/reference_column.hpp"
+#include "storage/value_vector.hpp"
 
 #include "constant_mappings.hpp"
 #include "resolve_type.hpp"
@@ -61,14 +62,19 @@ void _export_values(std::ofstream& ofstream, const std::vector<T, Alloc>& values
 }
 
 // specialized implementation for string values
-template <>
-void _export_values(std::ofstream& ofstream, const opossum::pmr_vector<std::string>& values) {
-  _export_string_values(ofstream, values);
-}
+// template <>
+// void _export_values(std::ofstream& ofstream, const opossum::pmr_vector<std::string>& values) {
+//   _export_string_values(ofstream, values);
+// }
 template <>
 void _export_values(std::ofstream& ofstream, const std::vector<std::string>& values) {
   _export_string_values(ofstream, values);
 }
+
+// template <>
+// void _export_values(std::ofstream& ofstream, const opossum::ValueVector<std::string>& values) {
+//   _export_string_values(ofstream, values);
+// }
 
 // specialized implementation for bool values
 template <>
@@ -76,6 +82,11 @@ void _export_values(std::ofstream& ofstream, const std::vector<bool>& values) {
   // Cast to fixed-size format used in binary file
   const auto writable_bools = std::vector<opossum::BoolAsByteType>(values.begin(), values.end());
   _export_values(ofstream, writable_bools);
+}
+
+template <typename T>
+void _export_values(std::ofstream& ofstream, const opossum::ValueVector<T>& values) {
+  std::cout << "iuh";
 }
 
 template <typename T>

@@ -6,6 +6,7 @@
 #include "iterables.hpp"
 #include "storage/base_attribute_vector.hpp"
 #include "storage/dictionary_column.hpp"
+#include "storage/value_vector.hpp"
 
 namespace opossum {
 
@@ -34,7 +35,7 @@ class DictionaryColumnIterable : public IndexableIterable<DictionaryColumnIterab
  private:
   class Iterator : public BaseIterator<Iterator, NullableColumnValue<T>> {
    public:
-    using Dictionary = pmr_vector<T>;
+    using Dictionary = ValueVector<T>;
 
    public:
     explicit Iterator(const Dictionary& dictionary, const BaseAttributeVector& attribute_vector,
