@@ -133,6 +133,11 @@ size_t ValueVector<T>::capacity() const {
 }
 
 template <typename T>
+void ValueVector<T>::erase(const_iterator start, const_iterator end) {
+  _values.erase(start, end);
+}
+
+template <typename T>
 void ValueVector<T>::shrink_to_fit() {
   _values.shrink_to_fit();
 }

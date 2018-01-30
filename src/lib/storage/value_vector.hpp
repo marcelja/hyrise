@@ -63,6 +63,8 @@ class ValueVector {
 
   void shrink_to_fit();
 
+  void erase(const_iterator start, const_iterator end);
+
   PolymorphicAllocator<T> get_allocator();
 
  protected:
