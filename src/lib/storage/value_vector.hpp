@@ -49,6 +49,10 @@ class ValueVector {
 
   const_iterator cend() noexcept;
 
+  const_iterator begin() const noexcept;
+
+  const_iterator end() const noexcept;
+
   T& operator[](size_t n);
 
   const T& operator[](size_t n) const;
@@ -128,6 +132,10 @@ class ValueVector<FixedString> {
   iterator cbegin() noexcept;
 
   iterator cend() noexcept;
+
+  iterator begin() const noexcept;
+
+  iterator end() const noexcept;
 
   typedef boost::reverse_iterator<iterator> reverse_iterator;
   reverse_iterator rbegin() noexcept;
