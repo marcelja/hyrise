@@ -13,6 +13,16 @@ void swap(const FixedString lha, const FixedString rhs) { lha.swap(rhs); }
 
 using namespace opossum;
 
+
+void clear_cache() {
+  std::vector<int> clear = std::vector<int>();
+  clear.resize(500 * 1000 * 1000, 42);
+  for (uint i = 0; i < clear.size(); i++) {
+    clear[i] += 1;
+  }
+  clear.resize(0);
+}
+
 void print_vector_memory(const ValueVector<FixedString>& vector, std::string compiler) {
   uint64_t string_length = vector[0].size();
 
@@ -43,7 +53,7 @@ void print_vector_memory(const ValueVector<std::string>& vector, std::string com
   std::cout << "Memory consumption: \t" << size << " kilobytes" << std::endl;
 }
 
-void benchmark() {
+void benchmark_m() {
   ValueVector<std::string> a;
   ValueVector<FixedString> b(10);
   std::vector<std::string> c;
@@ -116,13 +126,14 @@ void read_file(std::vector<ValueVector<T>> value_vectors, std::vector<std::vecto
 template <typename T>
 void benchmark_search(std::vector<ValueVector<T>> value_vectors, std::vector<std::vector<std::string>>& search_values) {
   for (size_t i = 0; i < value_vectors.size(); ++i) {
+    clear_cache();
     auto t1 = std::chrono::high_resolution_clock::now();
     for (auto& sv : search_values[i]) {
       std::lower_bound(value_vectors[i].begin(), value_vectors[i].end(), T(sv));
     }
     auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "lower_bound for index: " << i << " "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+    std::cout << "lower_bound for index (string_length is " << value_vectors[i][0].size() << ") : " << i << " "
+              << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() << " us" << std::endl;
   }
 }
 
@@ -145,6 +156,7 @@ void value_vectors_from_file() {
   }
   read_file(value_vectors, search_values);
   sort_value_vectors(value_vectors);
+  std::cout << "FixedString search" << std::endl;
   benchmark_search(value_vectors, search_values);
 
   std::vector<ValueVector<std::string>> value_vectors_std = {
@@ -157,6 +169,8 @@ void value_vectors_from_file() {
   }
   read_file(value_vectors_std, search_values2);
   sort_value_vectors(value_vectors_std);
+  
+  std::cout << "std::string search" << std::endl;
   benchmark_search(value_vectors_std, search_values);
 }
 
@@ -195,6 +209,6 @@ int main() {
   // value_vector_from_file();
   // value_vector_from_file_stdstr();
   sort_swap();
-  benchmark();
+  benchmark_m();
   value_vectors_from_file();
 }

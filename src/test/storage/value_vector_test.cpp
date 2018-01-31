@@ -50,6 +50,17 @@ TEST_F(ValueVectorTest, Iterator) {
   EXPECT_EQ(valuevector[0], "abc");
 }
 
+TEST_F(ValueVectorTest, ForEachReference) {
+  std::vector<std::string> v1 = {"abc", "def", "ghi"};
+  const auto v2 = ValueVector<std::string>{v1.begin(), v1.end()};
+
+  for(const auto& fs : v2) {
+    EXPECT_NE(fs, "NULL");
+  }
+}
+
+
+
 TEST_F(ValueVectorTest, PushFixedString) {
   auto valuevector = ValueVector<FixedString>(3u);
   valuevector.push_back(FixedString("abc"));
@@ -189,6 +200,15 @@ TEST_F(ValueVectorTest, FixedStringIteratorConstructors) {
   EXPECT_EQ(v2.size(), 3u);
   EXPECT_EQ(v3[2].string(), "ghi");
   EXPECT_EQ(v3.size(), 3u);
+}
+
+TEST_F(ValueVectorTest, FixedStringForEachReference) {
+  std::vector<FixedString> v1 = {FixedString("abc"), FixedString("def"), FixedString("ghi")};
+  const auto v2 = ValueVector<FixedString>{v1.begin(), v1.end(), 3};
+
+  for(const auto& fs : v2) {
+    EXPECT_NE(fs.string(), "NULL");
+  }
 }
 
 }  // namespace opossum
