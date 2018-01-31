@@ -90,7 +90,7 @@ void benchmark_m() {
 }
 
 template <typename T>
-void read_file(std::vector<ValueVector<T>> value_vectors, std::vector<std::vector<std::string>>& search_values) {
+void read_file(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vector<std::string>>& search_values) {
   std::string line;
   size_t search_counter = 0;
   size_t searches = 100;
@@ -112,6 +112,7 @@ void read_file(std::vector<ValueVector<T>> value_vectors, std::vector<std::vecto
       }
       value_vectors[index].push_back(line.substr(pos));
       if (search_counter < searches) search_values[index].push_back(line.substr(pos, found - pos));
+      search_counter++;
     }
     string_table_file.close();
   } else {
@@ -132,13 +133,13 @@ void benchmark_search(std::vector<ValueVector<T>> value_vectors, std::vector<std
       std::lower_bound(value_vectors[i].begin(), value_vectors[i].end(), T(sv));
     }
     auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "lower_bound for index (string_length is " << value_vectors[i][0].size() << ") : " << i << " "
-              << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() << " us" << std::endl;
+    std::cout << "lower_bound for index " << i << " (string_length is " << value_vectors[i][0].size() << ") : " << i << " "
+              << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() << "us" << std::endl;
   }
 }
 
 template <typename T>
-void sort_value_vectors(std::vector<ValueVector<T>> value_vectors) {
+void sort_value_vectors(std::vector<ValueVector<T>>& value_vectors) {
   for (auto vv : value_vectors) {
     std::sort(vv.begin(), vv.end());
   }
