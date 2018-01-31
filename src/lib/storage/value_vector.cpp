@@ -18,39 +18,6 @@ template <typename T>
 ValueVector<T>::ValueVector() {}
 
 template <typename T>
-ValueVector<T>::ValueVector(iterator begin, iterator end) {
-  while (begin != end) {
-    push_back(*begin);
-    ++begin;
-  }
-}
-
-template <typename T>
-ValueVector<T>::ValueVector(typename std::vector<T>::iterator begin, typename std::vector<T>::iterator end) {
-  while (begin != end) {
-    push_back(*begin);
-    ++begin;
-  }
-}
-
-template <typename T>
-ValueVector<T>::ValueVector(const_iterator cbegin, const_iterator cend) {
-  while (cbegin != cend) {
-    push_back(*cbegin);
-    ++cbegin;
-  }
-}
-
-template <typename T>
-ValueVector<T>::ValueVector(typename std::vector<T>::const_iterator cbegin,
-                            typename std::vector<T>::const_iterator cend) {
-  while (cbegin != cend) {
-    push_back(*cbegin);
-    ++cbegin;
-  }
-}
-
-template <typename T>
 void ValueVector<T>::push_back(const T& value) {
   _values.push_back(std::forward<const T>(value));
 }
@@ -127,41 +94,10 @@ PolymorphicAllocator<T> ValueVector<T>::get_allocator() {
 
 // Implementation of ValueVector<FixedString> starts here
 
-ValueVector<FixedString>::ValueVector(typename std::vector<FixedString>::iterator begin,
-                                      typename std::vector<FixedString>::iterator end, size_t string_length)
-    : _string_length(string_length) {
-  while (begin != end) {
-    push_back(*begin);
-    ++begin;
-  }
-}
 
-ValueVector<FixedString>::ValueVector(pmr_vector<FixedString>::iterator begin, pmr_vector<FixedString>::iterator end,
-                                      size_t string_length)
-    : _string_length(string_length) {
-  while (begin != end) {
-    push_back(*begin);
-    ++begin;
-  }
-}
 
-ValueVector<FixedString>::ValueVector(pmr_vector<FixedString>::const_iterator cbegin,
-                                      pmr_vector<FixedString>::const_iterator cend, size_t string_length)
-    : _string_length(string_length) {
-  while (cbegin != cend) {
-    push_back(*cbegin);
-    ++cbegin;
-  }
-}
 
-ValueVector<FixedString>::ValueVector(typename std::vector<FixedString>::const_iterator cbegin,
-                                      typename std::vector<FixedString>::const_iterator cend, size_t string_length)
-    : _string_length(string_length) {
-  while (cbegin != cend) {
-    push_back(*cbegin);
-    ++cbegin;
-  }
-}
+
 
 void ValueVector<FixedString>::push_back(const FixedString& value) {
   push_back(std::forward<FixedString>((FixedString&)value));

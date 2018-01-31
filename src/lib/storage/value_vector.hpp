@@ -19,13 +19,13 @@ class ValueVector {
 
   ValueVector();
 
-  ValueVector(typename std::vector<T>::iterator begin, typename std::vector<T>::iterator end);
-
-  ValueVector(typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end);
-
-  ValueVector(iterator begin, iterator end);
-
-  ValueVector(const_iterator cbegin, const_iterator cend);
+  template< class Iter >
+  ValueVector(Iter first, Iter last) {
+    while (first != last) {
+      push_back(*first);
+      ++first;
+    }
+  }
 
   ValueVector(const ValueVector&& other) : _values(other._values) {}
 
@@ -70,16 +70,13 @@ class ValueVector<FixedString> {
  public:
   explicit ValueVector(size_t string_length) : _string_length(string_length) {}
 
-  ValueVector(typename std::vector<FixedString>::iterator begin, typename std::vector<FixedString>::iterator end,
-              size_t string_length);
-
-  ValueVector(pmr_vector<FixedString>::iterator begin, pmr_vector<FixedString>::iterator end, size_t string_length);
-
-  ValueVector(pmr_vector<FixedString>::const_iterator cbegin, pmr_vector<FixedString>::const_iterator cend,
-              size_t string_length);
-
-  ValueVector(typename std::vector<FixedString>::const_iterator cbegin,
-              typename std::vector<FixedString>::const_iterator cend, size_t string_length);
+  template< class Iter >
+  ValueVector(Iter first, Iter last, size_t string_length) : _string_length(string_length) {
+    while (first != last) {
+      push_back(*first);
+      ++first;
+    }
+  }
 
   ValueVector(const ValueVector&& other) : _string_length(other._string_length), _vector(other._vector) {}
 
