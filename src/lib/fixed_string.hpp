@@ -19,6 +19,7 @@ class FixedString {
 
   ~FixedString() {
     if (_delete) {
+      std::cout << "FixedString::delete destructor" << std::endl;
       delete [] _mem;
       // std::memcpy(_mem, "ffffffffff", _string_length);
       // std::cout << string();
@@ -32,6 +33,7 @@ class FixedString {
 
   // copy constructor
   FixedString(const FixedString &other) : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
+    std::cout << "FixedString::copy constructor 2" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
@@ -54,6 +56,13 @@ class FixedString {
   std::string string() const {
     // I didn't include an operator std::string on purpose. That led to expensive, unexpected comparisons.
     return std::string(_mem, _string_length);
+  }
+
+  const std::vector<char> char_vector() const {
+    // std::cout << "_mem adr: " << &_mem[0] << std::endl;
+    // std::cout << "_mem adr: " << &_mem[0] + _string_length << std::endl;
+    // std::cout << "_mem adr: " << &_mem << std::endl;
+    return std::vector<char>(&_mem[0], &_mem[0] + _string_length);
   }
 
   FixedString &operator=(const FixedString &other) {
