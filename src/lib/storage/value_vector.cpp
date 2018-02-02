@@ -113,12 +113,12 @@ void ValueVector<FixedString>::push_back(const FixedString& value) {
   push_back(std::forward<FixedString>((FixedString&)value));
 }
 
-void ValueVector<FixedString>::push_back(FixedString&& string) {
+void ValueVector<FixedString>::push_back(FixedString&& fixed_string) {
   auto pos = _vector.size();
   _vector.resize(_vector.size() + _string_length);
-  string.copy(&_vector[pos], _string_length);
-  if (string.size() < _string_length) {
-    std::fill(_vector.begin() + pos + string.size(), _vector.begin() + pos + _string_length, '\0');
+  fixed_string.copy(&_vector[pos], _string_length);
+  if (fixed_string.size() < _string_length) {
+    std::fill(_vector.begin() + pos + fixed_string.size(), _vector.begin() + pos + _string_length, '\0');
   }
 }
 

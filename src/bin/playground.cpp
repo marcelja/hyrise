@@ -125,7 +125,7 @@ void read_file(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vect
 }
 
 template <typename T>
-void benchmark_search(std::vector<ValueVector<T>> value_vectors, std::vector<std::vector<std::string>>& search_values) {
+void benchmark_search(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vector<std::string>>& search_values) {
   for (size_t i = 0; i < value_vectors.size(); ++i) {
     clear_cache();
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -140,9 +140,12 @@ void benchmark_search(std::vector<ValueVector<T>> value_vectors, std::vector<std
 
 template <typename T>
 void sort_value_vectors(std::vector<ValueVector<T>>& value_vectors) {
+  std::cout << "213489774812937803241" << std::endl;
   for (auto vv : value_vectors) {
+    std::cout << "sorting " << vv[0] << std::endl;
     std::sort(vv.begin(), vv.end());
   }
+  std::cout << "213984328" << std::endl;
 }
 
 void value_vectors_from_file() {
@@ -156,6 +159,7 @@ void value_vectors_from_file() {
     search_values.push_back(std::vector<std::string>());
   }
   read_file(value_vectors, search_values);
+  std::cout << "start sorting" << value_vectors[0][0] << std::endl;
   sort_value_vectors(value_vectors);
   std::cout << "FixedString search" << std::endl;
   benchmark_search(value_vectors, search_values);
@@ -204,12 +208,27 @@ void sort_swap() {
   a.erase(std::unique(a.begin(), a.end()), a.end());
   std::cout << "Unique + erase:" << std::endl << std::endl;
   print_vector(a);
+
+  std::cout << "adfs" << std::endl;
+
+  // ValueVector<FixedString> b(10);
+  // b.push_back(FixedString("aaaaaaaa"));
+  // b.push_back(FixedString("bbbbbbbb"));
+
+  // FixedString d(*b.begin());
+
+  // b[0] = d;
+
+  // std::cout << "begin; " << *b.begin() << std::endl;
+  auto cde = std::string("asdfcc");
+  auto b = FixedString("123");
+  std::cout << "c; " << b << std::endl;
 }
 
 int main() {
   // value_vector_from_file();
   // value_vector_from_file_stdstr();
   sort_swap();
-  benchmark_m();
+  // benchmark_m();
   value_vectors_from_file();
 }

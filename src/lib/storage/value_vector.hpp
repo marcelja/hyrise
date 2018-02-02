@@ -88,7 +88,7 @@ class ValueVector<FixedString> {
 
   void push_back(const FixedString& value);
 
-  void push_back(FixedString&& string);
+  void push_back(FixedString&& fixed_string);
 
   void push_back(const std::string& string) { push_back(FixedString(string)); }
 
