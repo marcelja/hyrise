@@ -19,7 +19,7 @@ class FixedString {
 
   ~FixedString() {
     if (_delete) {
-      std::cout << "FixedString::delete destructor" << std::endl;
+//      std::cout << "FixedString::delete destructor" << std::endl;
       delete [] _mem;
       // std::memcpy(_mem, "ffffffffff", _string_length);
       // std::cout << string();
@@ -39,7 +39,7 @@ class FixedString {
 
   // move constructor
   FixedString(const FixedString &&other) : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    std::cout << "FixedString::move constructor" << std::endl;
+//    std::cout << "FixedString::move constructor" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
