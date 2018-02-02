@@ -132,10 +132,10 @@ void sort_std_vectors(std::vector<std::vector<T>> &value_vectors) {
 }
 
 void value_vectors_from_file() {
-  std::vector<ValueVector<FixedString>> value_vectors = {ValueVector<FixedString>(1), ValueVector<FixedString>(3),
-                                                         ValueVector<FixedString>(7), ValueVector<FixedString>(15),
-                                                         ValueVector<FixedString>(31), ValueVector<FixedString>(63),
-                                                         ValueVector<FixedString>(127), ValueVector<FixedString>(255)};
+  std::vector<ValueVector<FixedString>> value_vectors = {ValueVector<FixedString>(1, 100000), ValueVector<FixedString>(3, 100000),
+                                                         ValueVector<FixedString>(7, 100000), ValueVector<FixedString>(15, 100000),
+                                                         ValueVector<FixedString>(31, 100000), ValueVector<FixedString>(63, 100000),
+                                                         ValueVector<FixedString>(127, 100000), ValueVector<FixedString>(255, 100000)};
 
   std::vector<pmr_vector<std::string>> std_vectors = {pmr_vector<std::string>(), pmr_vector<std::string>(),
                                                       pmr_vector<std::string>(), pmr_vector<std::string>(),
@@ -152,20 +152,19 @@ void value_vectors_from_file() {
 
   // init value - and std vectors
 //  clear_cache();
-  auto t2 = std::chrono::high_resolution_clock::now();
-  std::cout << "std::vector read ";
-  read_file_std(std_vectors);
-  auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - t2).count();
-  std::cout << "finished in: " << duration2 << " ms" << std::endl;
-
-
   auto t = std::chrono::high_resolution_clock::now();
   std::cout << "ValueVector read ";
   read_file(value_vectors, search_values);
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - t).count();
   std::cout << "finished in: " << duration << " ms" << std::endl;
 
-  std::cout << "valuevector+fixedstring is : " << (duration / duration2) * 100 << "% slower" << std::endl;
+  auto t2 = std::chrono::high_resolution_clock::now();
+  std::cout << "std::vector read ";
+  read_file_std(std_vectors);
+  auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - t2).count();
+  std::cout << "finished in: " << duration2 << " ms" << std::endl;
+
+  std::cout << "valuevector+fixedstring is : " << (duration2 / duration) * 100 << "% faster" << std::endl;
 //  clear_cache();
 
 
@@ -200,5 +199,9 @@ void print_vector(ValueVector<T> &vec) {
 }
 
 int main() {
+  value_vectors_from_file();
+  value_vectors_from_file();
+  value_vectors_from_file();
+  value_vectors_from_file();
   value_vectors_from_file();
 }

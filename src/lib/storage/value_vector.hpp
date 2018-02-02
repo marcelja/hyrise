@@ -74,6 +74,10 @@ class ValueVector<FixedString> {
  public:
   explicit ValueVector(size_t string_length) : _string_length(string_length) {}
 
+  explicit ValueVector(size_t string_length, size_t capacity) : _string_length(string_length) {
+    _vector.reserve(capacity * string_length);
+  }
+
   template< class Iter >
   ValueVector(Iter first, Iter last, size_t string_length) : _string_length(string_length) {
     while (first != last) {
@@ -90,7 +94,7 @@ class ValueVector<FixedString> {
 
   void push_back(FixedString&& string);
 
-  void push_back(const std::string& string) { push_back(FixedString(string)); }
+  void push_back(const std::string& string);
 
   FixedString at(const ChunkOffset chunk_offset);
 

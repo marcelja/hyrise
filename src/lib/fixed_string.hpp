@@ -12,7 +12,7 @@ namespace opossum {
 
 class FixedString {
  public:
-  FixedString(const std::string &string) : _mem((char*)string.c_str()), _string_length(string.size()), _delete(false) {
+  FixedString(const std::string_view &string) : _mem((char*)string.data()), _string_length(string.size()), _delete(false) {
   }
 
   FixedString(char *mem, size_t string_length) : _mem(mem), _string_length(string_length), _delete(false) {}
