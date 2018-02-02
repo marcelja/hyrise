@@ -36,18 +36,18 @@ void print_vector_memory(const ValueVector<std::string>& vector, std::string com
   uint64_t size = 0;
 
   if (compiler == "gcc") {
-    if (string_length <= 16) {
-      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * 17) / 1000;
+    if (string_length <= 15) {
+      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * sizeof(std::string)) / 1000;
     } else {
       size =
-          (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
+          (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length + 1)) / 1000;
     }
   } else if (compiler == "clang") {
     if (string_length <= 22) {
-      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * 23) / 1000;
+      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * sizeof(std::string)) / 1000;
     } else {
       size =
-          (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length)) / 1000;
+          (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + 32)) / 1000;
     }
   }
   std::cout << "Memory consumption: \t" << size << " kilobytes" << std::endl;
@@ -207,10 +207,57 @@ void sort_swap() {
   print_vector(a);
 }
 
+std::string gen_random(const int len) {
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    std::string str = "";
+
+    for (int i = 0; i < len; ++i) {
+        str += alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+
+    return str;
+}
+
+void memory_test() {
+  std::cout << gen_random(10) << std::endl;
+  std::cout << gen_random(10) << std::endl;
+  std::cout << gen_random(10) << std::endl;
+  std::cout << gen_random(10) << std::endl;
+  // ValueVector<FixedString> vec(10);
+  // int inserts = 100000000;
+  // vec.reserve(inserts);
+  // for (int i = 0; i < inserts; i++) {
+  //   vec.push_back(gen_random(10));
+  // }
+
+  // print_vector_memory(vec, "clang");
+  // print_vector_memory(vec, "gcc");
+
+
+  ValueVector<std::string> vec;
+  int inserts = 100000000;
+  vec.reserve(inserts);
+  for (int i = 0; i < inserts; i++) {
+    vec.push_back(gen_random(30));
+  }
+
+  print_vector_memory(vec, "clang");
+  print_vector_memory(vec, "gcc");
+  std::cin.ignore();
+  std::cout << vec.size() << std::endl;
+
+
+}
+
 int main() {
   // value_vector_from_file();
   // value_vector_from_file_stdstr();
-  sort_swap();
-  benchmark_m();
-  value_vectors_from_file();
+  // sort_swap();
+  // benchmark_m();
+  // value_vectors_from_file();
+  memory_test();
 }

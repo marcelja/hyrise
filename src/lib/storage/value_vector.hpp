@@ -61,6 +61,10 @@ class ValueVector {
 
   size_t capacity() const;
 
+  void reserve(size_t n) {
+    _values.reserve(n);
+  }
+
   void shrink_to_fit();
 
   PolymorphicAllocator<T> get_allocator();
@@ -150,6 +154,10 @@ class ValueVector<FixedString> {
   void erase(const iterator start, const iterator end);
 
   void shrink_to_fit();
+
+  void reserve(size_t n) {
+    _vector.reserve(n * _string_length);
+  }
 
   PolymorphicAllocator<FixedString> get_allocator();
 
