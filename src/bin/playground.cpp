@@ -1,6 +1,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -12,7 +13,6 @@ void swap(const FixedString lha, const FixedString rhs) { lha.swap(rhs); }
 }
 
 using namespace opossum;
-
 
 void clear_cache() {
   std::vector<int> clear = std::vector<int>();
@@ -103,7 +103,7 @@ void read_file(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vect
 
     while (std::getline(string_table_file, line)) {
       size_t pos = 0, found;
-      int index = 0;
+      uint64_t index = 0;
       while ((found = line.find_first_of('|', pos)) != std::string::npos) {
         if (search_counter < searches) search_values[index].push_back(line.substr(pos, found - pos));
         value_vectors[index].push_back(line.substr(pos, found - pos));
@@ -125,16 +125,21 @@ void read_file(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vect
 }
 
 template <typename T>
-void benchmark_search(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vector<std::string>>& search_values) {
+void benchmark_search(std::vector<ValueVector<T>>& value_vectors,
+                      std::vector<std::vector<std::string>>& search_values) {
   for (size_t i = 0; i < value_vectors.size(); ++i) {
-    clear_cache();
-    auto t1 = std::chrono::high_resolution_clock::now();
+    std::vector<uint64_t> times;
     for (auto& sv : search_values[i]) {
+      clear_cache();
+      auto t1 = std::chrono::high_resolution_clock::now();
       std::lower_bound(value_vectors[i].begin(), value_vectors[i].end(), T(sv));
+
+      auto t2 = std::chrono::high_resolution_clock::now();
+      times.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count());
     }
-    auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "lower_bound for index " << i << " (string_length is " << value_vectors[i][0].size() << ") : " << i << " "
-              << std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count() << "us" << std::endl;
+    auto sum_of_elems = std::accumulate(times.begin(), times.end(), 0);
+    std::cout << "lower_bound for index " << i << " (string_length is " << value_vectors[i][0].size()
+              << ") : " << sum_of_elems / times.size() << " ns" << std::endl;
   }
 }
 
@@ -142,11 +147,12 @@ template <typename T>
 void sort_value_vectors(std::vector<ValueVector<T>>& value_vectors) {
   for (auto vv : value_vectors) {
     std::sort(vv.begin(), vv.end());
-    std::cout << "sorted: " << vv[0] << ", " << vv[vv.size() - 1 ] << std::endl;
+    std::cout << "sorted: " << vv[0] << ", " << vv[vv.size() - 1] << std::endl;
   }
 }
 
-void value_vectors_from_file() {
+void value_vectors_from_file_old() {
+  // includes sorting of FixedString column
   std::vector<ValueVector<FixedString>> value_vectors = {ValueVector<FixedString>(1),   ValueVector<FixedString>(3),
                                                          ValueVector<FixedString>(7),   ValueVector<FixedString>(15),
                                                          ValueVector<FixedString>(31),  ValueVector<FixedString>(63),
@@ -171,9 +177,45 @@ void value_vectors_from_file() {
   }
   read_file(value_vectors_std, search_values2);
   sort_value_vectors(value_vectors_std);
-  
+
   std::cout << "std::string search" << std::endl;
   benchmark_search(value_vectors_std, search_values);
+}
+
+void value_vectors_from_file() {
+  // std::vector<ValueVector<FixedString>> value_vectors = {ValueVector<FixedString>(1),   ValueVector<FixedString>(3),
+  //                                                        ValueVector<FixedString>(7),   ValueVector<FixedString>(15),
+  //                                                        ValueVector<FixedString>(31),  ValueVector<FixedString>(63),
+  //                                                        ValueVector<FixedString>(127), ValueVector<FixedString>(255)};
+  std::vector<ValueVector<FixedString>> value_vectors;
+
+  std::vector<std::vector<std::string>> search_values;
+  for (auto i = 0; i < 8; i++) {
+    search_values.push_back(std::vector<std::string>());
+  }
+  // read_file(value_vectors, search_values);
+
+  std::vector<ValueVector<std::string>> value_vectors_std = {
+      ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(),
+      ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>()};
+  std::vector<std::vector<std::string>> search_values2;
+  for (auto& v : value_vectors) {
+    v.size();
+    search_values2.push_back(std::vector<std::string>());
+  }
+  read_file(value_vectors_std, search_values);
+
+  sort_value_vectors(value_vectors_std);
+  std::cout << "std::string search" << std::endl;
+  benchmark_search(value_vectors_std, search_values);
+
+  // sort_value_vectors(value_vectors);
+
+  for (const auto& vvs : value_vectors_std) {
+    value_vectors.push_back(ValueVector<FixedString>(vvs.begin(), vvs.end(), vvs[0].size()));
+  }
+  std::cout << "FixedString search" << std::endl;
+  benchmark_search(value_vectors, search_values);
 }
 
 template <typename T>
