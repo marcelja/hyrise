@@ -125,7 +125,7 @@ void read_file(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vect
 }
 
 template <typename T>
-void benchmark_search(std::vector<ValueVector<T>> value_vectors, std::vector<std::vector<std::string>>& search_values) {
+void benchmark_search(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vector<std::string>>& search_values) {
   for (size_t i = 0; i < value_vectors.size(); ++i) {
     clear_cache();
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -142,6 +142,7 @@ template <typename T>
 void sort_value_vectors(std::vector<ValueVector<T>>& value_vectors) {
   for (auto vv : value_vectors) {
     std::sort(vv.begin(), vv.end());
+    std::cout << "sorted: " << vv[0] << ", " << vv[vv.size() - 1 ] << std::endl;
   }
 }
 
