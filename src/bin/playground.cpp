@@ -130,7 +130,7 @@ void benchmark_search(std::vector<ValueVector<T>>& value_vectors,
   for (size_t i = 0; i < value_vectors.size(); ++i) {
     std::vector<uint64_t> times;
     for (auto& sv : search_values[i]) {
-      clear_cache();
+      // clear_cache();
       auto t1 = std::chrono::high_resolution_clock::now();
       std::lower_bound(value_vectors[i].begin(), value_vectors[i].end(), T(sv));
 
@@ -295,11 +295,129 @@ void memory_test() {
 
 }
 
+void single_char() {
+  auto elems = 2000000000;
+
+  std::vector<char> chari;
+  auto t1 = std::chrono::high_resolution_clock::now();
+
+  for (auto i = 0; i < elems; i++){
+      chari.push_back('A');
+  }
+  auto t2 = std::chrono::high_resolution_clock::now();
+  std::cout << "inserting in std::vector<char>: "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+
+
+  pmr_vector<char> pmr;
+  auto t11 = std::chrono::high_resolution_clock::now();
+
+  for (auto i = 0; i < elems; i++){
+      pmr.push_back('A');
+  }
+  auto t21 = std::chrono::high_resolution_clock::now();
+  std::cout << "inserting pmr_vector<char>: "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
+
+
+  pmr_concurrent_vector<char> pmrc;
+  auto t111 = std::chrono::high_resolution_clock::now();
+
+  for (auto i = 0; i < elems; i++){
+      pmrc.push_back('A');
+  }
+  auto t211 = std::chrono::high_resolution_clock::now();
+  std::cout << "inserting pmr_concurrent_vector<char>: "
+      << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
+}
+
+void word_inserter() {
+  auto elems = 200000000;
+
+std::vector<char> chari;
+auto t1 = std::chrono::high_resolution_clock::now();
+
+for (auto i = 0; i < elems; i++){
+  std::string str = "Hallo";
+  std::copy(str.begin(), str.end(), std::back_inserter(chari));
+}
+auto t2 = std::chrono::high_resolution_clock::now();
+std::cout << "inserting hello in std::vector<char>: "
+    << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+
+
+pmr_vector<char> pmr;
+auto t11 = std::chrono::high_resolution_clock::now();
+
+for (auto i = 0; i < elems; i++){
+  std::string str = "Hallo";
+  std::copy(str.begin(), str.end(), std::back_inserter(pmr));
+}
+auto t21 = std::chrono::high_resolution_clock::now();
+std::cout << "inserting hello in pmr_vector<char>: "
+    << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
+
+
+pmr_concurrent_vector<char> pmrc;
+auto t111 = std::chrono::high_resolution_clock::now();
+
+for (auto i = 0; i < elems; i++){
+  std::string str = "Hallo";
+  std::copy(str.begin(), str.end(), std::back_inserter(pmrc));
+}
+auto t211 = std::chrono::high_resolution_clock::now();
+std::cout << "inserting hello pmr_concurrent_vector<char>: "
+    << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
+
+
+}
+
 int main() {
+
+auto elems = 2000000;
+
+
+pmr_vector<char> pmr;
+auto t11 = std::chrono::high_resolution_clock::now();
+
+for (auto i = 0; i < elems; i++){
+  const std::string str =  "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo";
+  pmr.insert (pmr.cend() , str.begin(), str.end());
+
+  // std::copy(str.begin(), str.end(), std::back_inserter(pmr));
+}
+
+  // for (auto ele : pmr) {
+  //   std::cout << ele;
+  // }
+
+auto t21 = std::chrono::high_resolution_clock::now();
+std::cout << "inserting hello in pmr_vector<char>: "
+    << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
+
+pmr_vector<std::string> pmrs;
+auto t111 = std::chrono::high_resolution_clock::now();
+
+for (auto i = 0; i < elems; i++){
+  std::string str = "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo";
+  pmrs.push_back(str);
+}
+auto t211 = std::chrono::high_resolution_clock::now();
+std::cout << "inserting hello in pmr_vector<std::string>: "
+    << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
+
+
+
+
+
+
+
+
+
   // value_vector_from_file();
   // value_vector_from_file_stdstr();
   // sort_swap();
   // benchmark_m();
-  // value_vectors_from_file();
-  memory_test();
+  // value_vectors_from_file_old();
+  // memory_test();
 }
