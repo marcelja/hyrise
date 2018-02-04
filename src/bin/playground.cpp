@@ -295,11 +295,26 @@ void memory_test() {
 
 }
 
+void copy_constructor_test() {
+  std::cout << "Creating value vector" << std::endl;
+  ValueVector<FixedString> a(10);
+  a.push_back(FixedString("aaaaaaaa"));
+  a.push_back(FixedString("bbbbbbbb"));
+
+  std::cout << "Creating fixed_string1" << std::endl;
+  auto fixed_string1 = FixedString("fs1");
+  std::cout << "Creating fixed_string2" << std::endl;
+  auto fixed_string2 = FixedString(fixed_string1);
+  std::cout << "Creating fixed_string3" << std::endl;
+  auto fixed_string3 = FixedString(*a.begin());
+}
+
 int main() {
   // value_vector_from_file();
   // value_vector_from_file_stdstr();
   // sort_swap();
   // benchmark_m();
   // value_vectors_from_file();
-  memory_test();
+  // memory_test();
+  copy_constructor_test();
 }
