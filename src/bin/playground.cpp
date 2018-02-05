@@ -142,11 +142,27 @@ void benchmark_search(std::vector<ValueVector<T>>& value_vectors,
   }
 }
 
+
+
 template <typename T>
 void sort_value_vectors(std::vector<ValueVector<T>>& value_vectors) {
-  for (auto vv : value_vectors) {
-    std::sort(vv.begin(), vv.end());
-    std::cout << "sorted: " << vv[0] << ", " << vv[vv.size() - 1] << std::endl;
+  for (auto vvv : value_vectors) {
+    std::vector<uint64_t> times;
+    // ValueVector<T> vv{};
+    int runs = 10;
+    for (int i = 0; i < runs; ++i) {
+      auto vv = ValueVector<T>(vvv.begin(), vvv.end());
+      // std::cout << "123 " << vv[0] << " " << vv[vv.size() -1] << " " << vv.size() << std::endl;
+      clear_cache();
+      auto t1 = std::chrono::high_resolution_clock::now();
+      std::sort(vv.begin(), vv.end());
+
+      auto t2 = std::chrono::high_resolution_clock::now();
+      times.push_back(std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count());
+    }
+    auto sum_of_elems = std::accumulate(times.begin(), times.end(), 0);
+    // std::cout << "sorted: " << vvv[0] << ", " << vvv[vv.size() - 1] << std::endl;
+    std::cout << sum_of_elems / times.size() << " us" << std::endl;
   }
 }
 
@@ -448,6 +464,7 @@ void iterator_test() {
 
 }
 
+
 int main() {
   // value_vector_from_file();
   // value_vector_from_file_stdstr();
@@ -456,7 +473,9 @@ int main() {
   // value_vectors_from_file();
   // memory_test();
   // long_words();
-  copy_constructor_test();
-  iterator_test();
+  // copy_constructor_test();
+  // iterator_test();
   value_vectors_from_file_old();
+
+
 }
