@@ -28,7 +28,7 @@ void clear_cache() {
 void print_vector_memory(const ValueVector<FixedString>& vector, std::string compiler) {
   uint64_t string_length = vector[0].size();
 
-  std::cout << "Memory consumption: \t"
+  std::cout << "Memory consumption (" << compiler << "):\t"
             << (sizeof(ValueVector<FixedString>) + int(vector.size()) * string_length) / 1000 << " kilobytes"
             << std::endl;
 }
@@ -51,7 +51,7 @@ void print_vector_memory(const ValueVector<std::string>& vector, std::string com
       size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + ceil((string_length + 1) / 16) * 16)) / 1000;
     }
   }
-  std::cout << "Memory consumption: \t" << size << " kilobytes" << std::endl;
+  std::cout << "Memory consumption (" << compiler << "):\t" << size << " kilobytes" << std::endl;
 }
 
 void benchmark_m() {
@@ -60,7 +60,7 @@ void benchmark_m() {
   std::vector<std::string> c;
 
   std::string insert_me{"blablabla"};
-  size_t inserts = 100000;
+  size_t inserts = 10000000;
   {
     auto t1 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < inserts; ++i) a.push_back(insert_me);
@@ -68,8 +68,6 @@ void benchmark_m() {
     std::cout << "inserting " << inserts << " values into ValueVector<std::string>: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
   }
-  print_vector_memory(a, "clang");
-  // std::cin.ignore();
 
   {
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -78,8 +76,6 @@ void benchmark_m() {
     std::cout << "inserting " << inserts << " values into ValueVector<FixedString>: "
               << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
   }
-  print_vector_memory(b, "clang");
-  // std::cin.ignore();
 
   {
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -122,6 +118,7 @@ void read_file(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vect
 
   for (auto& vv : value_vectors) {
     print_vector_memory(vv, "clang");
+    print_vector_memory(vv, "gcc");
   }
 }
 
@@ -144,17 +141,13 @@ void benchmark_search(std::vector<ValueVector<T>>& value_vectors,
   }
 }
 
-
-
 template <typename T>
 void sort_value_vectors(std::vector<ValueVector<T>>& value_vectors) {
   for (auto vvv : value_vectors) {
     std::vector<uint64_t> times;
-    // ValueVector<T> vv{};
     int runs = 10;
     for (int i = 0; i < runs; ++i) {
       auto vv = ValueVector<T>(vvv.begin(), vvv.end());
-      // std::cout << "123 " << vv[0] << " " << vv[vv.size() -1] << " " << vv.size() << std::endl;
       clear_cache();
       auto t1 = std::chrono::high_resolution_clock::now();
       std::sort(vv.begin(), vv.end());
@@ -163,35 +156,39 @@ void sort_value_vectors(std::vector<ValueVector<T>>& value_vectors) {
       times.push_back(std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count());
     }
     auto sum_of_elems = std::accumulate(times.begin(), times.end(), 0);
-    // std::cout << "sorted: " << vvv[0] << ", " << vvv[vv.size() - 1] << std::endl;
-    std::cout << sum_of_elems / times.size() << " us" << std::endl;
+    std::cout << "Avg time for sorting " << vvv[0].size() <<  ": " << sum_of_elems / times.size() << " us" << std::endl;
   }
 }
 
-void value_vectors_from_file_old() {
+void value_vectors_from_file() {
   // includes sorting of FixedString column
   std::vector<ValueVector<FixedString>> value_vectors = {ValueVector<FixedString>(1),   ValueVector<FixedString>(3),
                                                          ValueVector<FixedString>(7),   ValueVector<FixedString>(15),
                                                          ValueVector<FixedString>(31),  ValueVector<FixedString>(63),
                                                          ValueVector<FixedString>(127), ValueVector<FixedString>(255)};
+  std::vector<ValueVector<std::string>> value_vectors_std = {
+      ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(),
+      ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>()};
+  
   std::vector<std::vector<std::string>> search_values;
   for (auto& v : value_vectors) {
     v.size();
     search_values.push_back(std::vector<std::string>());
   }
+  
+  std::cout << "Start inserting in ValueVector<FixedString>" << std::endl;
   read_file(value_vectors, search_values);
   sort_value_vectors(value_vectors);
   std::cout << "FixedString search" << std::endl;
   benchmark_search(value_vectors, search_values);
 
-  std::vector<ValueVector<std::string>> value_vectors_std = {
-      ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(),
-      ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>()};
   std::vector<std::vector<std::string>> search_values2;
   for (auto& v : value_vectors) {
     v.size();
     search_values2.push_back(std::vector<std::string>());
   }
+
+  std::cout << "\nStart inserting in ValueVector<std::string>" << std::endl;
   read_file(value_vectors_std, search_values2);
   sort_value_vectors(value_vectors_std);
 
@@ -208,16 +205,20 @@ void print_vector(ValueVector<T>& vec) {
   std::cout << std::endl;
 }
 
-void sort_swap() {
+void sort_unique() {
   ValueVector<FixedString> a(10);
-  a.push_back(FixedString("aaaaaaaa"));
-  a.push_back(FixedString("aaaaaaaa"));
-  a.push_back(FixedString("aaaaaaaa"));
-  a.push_back(FixedString("abcie"));
-  a.push_back(FixedString("sigt"));
-  a.push_back(FixedString("sigt"));
-  a.push_back("moooeeeepp");
-  a.push_back(FixedString("3295629"));
+  a.push_back("abc");
+  a.push_back("ok");
+  a.push_back("HALLO");
+  a.push_back("TEST");
+  a.push_back("z");
+  a.push_back("OKOKOKOKOK");
+  a.push_back("TEST");
+  a.push_back("qwertyui");
+  a.push_back("z");
+  a.push_back("12345678");
+  a.push_back("TEST");
+  a.push_back("1111111111");
 
   std::cout << "Original:" << std::endl << std::endl;
   print_vector(a);
@@ -231,172 +232,110 @@ void sort_swap() {
   print_vector(a);
 }
 
-std::string gen_random(const int len) {
-  static const char alphanum[] =
-      "0123456789"
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      "abcdefghijklmnopqrstuvwxyz";
 
-  std::string str = "";
+// void single_char() {
+//   auto elems = 2000000000;
 
-  for (int i = 0; i < len; ++i) {
-    str += alphanum[rand() % (sizeof(alphanum) - 1)];
-  }
+//   std::vector<char> chari;
+//   auto t1 = std::chrono::high_resolution_clock::now();
 
-  return str;
-}
+//   for (auto i = 0; i < elems; i++) {
+//     chari.push_back('A');
+//   }
+//   auto t2 = std::chrono::high_resolution_clock::now();
+//   std::cout << "inserting in std::vector<char>: "
+//             << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
 
-void memory_test() {
-  std::cout << gen_random(10) << std::endl;
-  std::cout << gen_random(10) << std::endl;
-  std::cout << gen_random(10) << std::endl;
-  std::cout << gen_random(10) << std::endl;
-  // ValueVector<FixedString> vec(10);
-  // int inserts = 100000000;
-  // vec.reserve(inserts);
-  // for (int i = 0; i < inserts; i++) {
-  //   vec.push_back(gen_random(10));
-  // }
+//   pmr_vector<char> pmr;
+//   auto t11 = std::chrono::high_resolution_clock::now();
 
-  // print_vector_memory(vec, "clang");
-  // print_vector_memory(vec, "gcc");
+//   for (auto i = 0; i < elems; i++) {
+//     pmr.push_back('A');
+//   }
+//   auto t21 = std::chrono::high_resolution_clock::now();
+//   std::cout << "inserting pmr_vector<char>: "
+//             << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
 
-  ValueVector<std::string> vec;
-  int inserts = 100000000;
-  vec.reserve(inserts);
-  for (int i = 0; i < inserts; i++) {
-    vec.push_back(gen_random(30));
-  }
+//   pmr_concurrent_vector<char> pmrc;
+//   auto t111 = std::chrono::high_resolution_clock::now();
 
-  print_vector_memory(vec, "clang");
-  print_vector_memory(vec, "gcc");
-  std::cin.ignore();
-  std::cout << vec.size() << std::endl;
-}
+//   for (auto i = 0; i < elems; i++) {
+//     pmrc.push_back('A');
+//   }
+//   auto t211 = std::chrono::high_resolution_clock::now();
+//   std::cout << "inserting pmr_concurrent_vector<char>: "
+//             << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
+// }
 
-void single_char() {
-  auto elems = 2000000000;
+// void word_inserter() {
+//   auto elems = 200000000;
 
-  std::vector<char> chari;
-  auto t1 = std::chrono::high_resolution_clock::now();
+//   std::vector<char> chari;
+//   auto t1 = std::chrono::high_resolution_clock::now();
 
-  for (auto i = 0; i < elems; i++) {
-    chari.push_back('A');
-  }
-  auto t2 = std::chrono::high_resolution_clock::now();
-  std::cout << "inserting in std::vector<char>: "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+//   for (auto i = 0; i < elems; i++) {
+//     std::string str = "Hallo";
+//     std::copy(str.begin(), str.end(), std::back_inserter(chari));
+//   }
+//   auto t2 = std::chrono::high_resolution_clock::now();
+//   std::cout << "inserting hello in std::vector<char>: "
+//             << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
 
-  pmr_vector<char> pmr;
-  auto t11 = std::chrono::high_resolution_clock::now();
+//   pmr_vector<char> pmr;
+//   auto t11 = std::chrono::high_resolution_clock::now();
 
-  for (auto i = 0; i < elems; i++) {
-    pmr.push_back('A');
-  }
-  auto t21 = std::chrono::high_resolution_clock::now();
-  std::cout << "inserting pmr_vector<char>: "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
+//   for (auto i = 0; i < elems; i++) {
+//     std::string str = "Hallo";
+//     std::copy(str.begin(), str.end(), std::back_inserter(pmr));
+//   }
+//   auto t21 = std::chrono::high_resolution_clock::now();
+//   std::cout << "inserting hello in pmr_vector<char>: "
+//             << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
 
-  pmr_concurrent_vector<char> pmrc;
-  auto t111 = std::chrono::high_resolution_clock::now();
+//   pmr_concurrent_vector<char> pmrc;
+//   auto t111 = std::chrono::high_resolution_clock::now();
 
-  for (auto i = 0; i < elems; i++) {
-    pmrc.push_back('A');
-  }
-  auto t211 = std::chrono::high_resolution_clock::now();
-  std::cout << "inserting pmr_concurrent_vector<char>: "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
-}
+//   for (auto i = 0; i < elems; i++) {
+//     std::string str = "Hallo";
+//     std::copy(str.begin(), str.end(), std::back_inserter(pmrc));
+//   }
+//   auto t211 = std::chrono::high_resolution_clock::now();
+//   std::cout << "inserting hello pmr_concurrent_vector<char>: "
+//             << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
+// }
 
-void word_inserter() {
-  auto elems = 200000000;
+// void long_words() {
+//   auto elems = 2000000;
 
-  std::vector<char> chari;
-  auto t1 = std::chrono::high_resolution_clock::now();
+//   pmr_vector<char> pmr;
+//   auto t11 = std::chrono::high_resolution_clock::now();
 
-  for (auto i = 0; i < elems; i++) {
-    std::string str = "Hallo";
-    std::copy(str.begin(), str.end(), std::back_inserter(chari));
-  }
-  auto t2 = std::chrono::high_resolution_clock::now();
-  std::cout << "inserting hello in std::vector<char>: "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+//   for (auto i = 0; i < elems; i++) {
+//     const std::string str =
+//         "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
+//         "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
+//         "HalloHalloHalloHallo";
+//     pmr.insert(pmr.cend(), str.begin(), str.end());
+//   }
 
-  pmr_vector<char> pmr;
-  auto t11 = std::chrono::high_resolution_clock::now();
+//   auto t21 = std::chrono::high_resolution_clock::now();
+//   std::cout << "inserting hello in pmr_vector<char>: "
+//             << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
 
-  for (auto i = 0; i < elems; i++) {
-    std::string str = "Hallo";
-    std::copy(str.begin(), str.end(), std::back_inserter(pmr));
-  }
-  auto t21 = std::chrono::high_resolution_clock::now();
-  std::cout << "inserting hello in pmr_vector<char>: "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
+//   pmr_vector<std::string> pmrs;
+//   auto t111 = std::chrono::high_resolution_clock::now();
 
-  pmr_concurrent_vector<char> pmrc;
-  auto t111 = std::chrono::high_resolution_clock::now();
-
-  for (auto i = 0; i < elems; i++) {
-    std::string str = "Hallo";
-    std::copy(str.begin(), str.end(), std::back_inserter(pmrc));
-  }
-  auto t211 = std::chrono::high_resolution_clock::now();
-  std::cout << "inserting hello pmr_concurrent_vector<char>: "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
-}
-
-void copy_constructor_test() {
-  std::cout << "Creating value vector" << std::endl;
-  ValueVector<FixedString> a(10);
-  a.push_back(FixedString("aaaaaaaa"));
-  a.push_back(FixedString("bbbbbbbb"));
-
-  std::cout << "Creating fixed_string1" << std::endl;
-  auto fixed_string1 = FixedString("fs1");
-  std::cout << "Creating fixed_string2" << std::endl;
-  auto fixed_string2 = FixedString(fixed_string1);
-  std::cout << "Creating fixed_string3" << std::endl;
-  auto fixed_string3 = FixedString(*a.begin());
-}
-
-void long_words() {
-  auto elems = 2000000;
-
-  pmr_vector<char> pmr;
-  auto t11 = std::chrono::high_resolution_clock::now();
-
-  for (auto i = 0; i < elems; i++) {
-    const std::string str =
-        "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
-        "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
-        "HalloHalloHalloHallo";
-    pmr.insert(pmr.cend(), str.begin(), str.end());
-
-    // std::copy(str.begin(), str.end(), std::back_inserter(pmr));
-  }
-
-  // for (auto ele : pmr) {
-  //   std::cout << ele;
-  // }
-
-  auto t21 = std::chrono::high_resolution_clock::now();
-  std::cout << "inserting hello in pmr_vector<char>: "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
-
-  pmr_vector<std::string> pmrs;
-  auto t111 = std::chrono::high_resolution_clock::now();
-
-  for (auto i = 0; i < elems; i++) {
-    std::string str =
-        "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
-        "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
-        "HalloHalloHalloHallo";
-    pmrs.push_back(str);
-  }
-  auto t211 = std::chrono::high_resolution_clock::now();
-  std::cout << "inserting hello in pmr_vector<std::string>: "
-            << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
-}
+//   for (auto i = 0; i < elems; i++) {
+//     std::string str =
+//         "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
+//         "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
+//         "HalloHalloHalloHallo";
+//     pmrs.push_back(str);
+//   }
+//   auto t211 = std::chrono::high_resolution_clock::now();
+//   std::cout << "inserting hello in pmr_vector<std::string>: "
+//             << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
+// }
 
 void iterator_test() {
   int assignments = 10000000;
@@ -433,16 +372,14 @@ void iterator_test() {
 
 
 int main() {
-  // value_vector_from_file();
-  // value_vector_from_file_stdstr();
-  // sort_swap();
-  // benchmark_m();
-  // value_vectors_from_file();
-  // memory_test();
-  // long_words();
-  // copy_constructor_test();
+  std::cout << "Benchmark inserting strings: \n" << std::endl;
+  benchmark_m();
+
+  std::cout << "\n\nstd::sort and std::unique example: \n" << std::endl;
+  sort_unique();
+
   // iterator_test();
-  value_vectors_from_file_old();
 
-
+  std::cout << "\n\nRead data from generated file: \n" << std::endl;
+  value_vectors_from_file();
 }
