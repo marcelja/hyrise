@@ -39,15 +39,14 @@ void print_vector_memory(const ValueVector<std::string>& vector, std::string com
     if (string_length <= 15) {
       size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * sizeof(std::string)) / 1000;
     } else {
-      size =
-          (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length + 1)) / 1000;
+      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + string_length + 1)) /
+             1000;
     }
   } else if (compiler == "clang") {
     if (string_length <= 22) {
       size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * sizeof(std::string)) / 1000;
     } else {
-      size =
-          (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + 32)) / 1000;
+      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + 32)) / 1000;
     }
   }
   std::cout << "Memory consumption: \t" << size << " kilobytes" << std::endl;
@@ -250,18 +249,18 @@ void sort_swap() {
 }
 
 std::string gen_random(const int len) {
-    static const char alphanum[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
+  static const char alphanum[] =
+      "0123456789"
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      "abcdefghijklmnopqrstuvwxyz";
 
-    std::string str = "";
+  std::string str = "";
 
-    for (int i = 0; i < len; ++i) {
-        str += alphanum[rand() % (sizeof(alphanum) - 1)];
-    }
+  for (int i = 0; i < len; ++i) {
+    str += alphanum[rand() % (sizeof(alphanum) - 1)];
+  }
 
-    return str;
+  return str;
 }
 
 void memory_test() {
@@ -279,7 +278,6 @@ void memory_test() {
   // print_vector_memory(vec, "clang");
   // print_vector_memory(vec, "gcc");
 
-
   ValueVector<std::string> vec;
   int inserts = 100000000;
   vec.reserve(inserts);
@@ -291,8 +289,6 @@ void memory_test() {
   print_vector_memory(vec, "gcc");
   std::cin.ignore();
   std::cout << vec.size() << std::endl;
-
-
 }
 
 void single_char() {
@@ -301,123 +297,131 @@ void single_char() {
   std::vector<char> chari;
   auto t1 = std::chrono::high_resolution_clock::now();
 
-  for (auto i = 0; i < elems; i++){
-      chari.push_back('A');
+  for (auto i = 0; i < elems; i++) {
+    chari.push_back('A');
   }
   auto t2 = std::chrono::high_resolution_clock::now();
   std::cout << "inserting in std::vector<char>: "
-      << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
-
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
 
   pmr_vector<char> pmr;
   auto t11 = std::chrono::high_resolution_clock::now();
 
-  for (auto i = 0; i < elems; i++){
-      pmr.push_back('A');
+  for (auto i = 0; i < elems; i++) {
+    pmr.push_back('A');
   }
   auto t21 = std::chrono::high_resolution_clock::now();
   std::cout << "inserting pmr_vector<char>: "
-      << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
-
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
 
   pmr_concurrent_vector<char> pmrc;
   auto t111 = std::chrono::high_resolution_clock::now();
 
-  for (auto i = 0; i < elems; i++){
-      pmrc.push_back('A');
+  for (auto i = 0; i < elems; i++) {
+    pmrc.push_back('A');
   }
   auto t211 = std::chrono::high_resolution_clock::now();
   std::cout << "inserting pmr_concurrent_vector<char>: "
-      << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
 }
 
 void word_inserter() {
   auto elems = 200000000;
 
-std::vector<char> chari;
-auto t1 = std::chrono::high_resolution_clock::now();
+  std::vector<char> chari;
+  auto t1 = std::chrono::high_resolution_clock::now();
 
-for (auto i = 0; i < elems; i++){
-  std::string str = "Hallo";
-  std::copy(str.begin(), str.end(), std::back_inserter(chari));
-}
-auto t2 = std::chrono::high_resolution_clock::now();
-std::cout << "inserting hello in std::vector<char>: "
-    << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
+  for (auto i = 0; i < elems; i++) {
+    std::string str = "Hallo";
+    std::copy(str.begin(), str.end(), std::back_inserter(chari));
+  }
+  auto t2 = std::chrono::high_resolution_clock::now();
+  std::cout << "inserting hello in std::vector<char>: "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
 
+  pmr_vector<char> pmr;
+  auto t11 = std::chrono::high_resolution_clock::now();
 
-pmr_vector<char> pmr;
-auto t11 = std::chrono::high_resolution_clock::now();
+  for (auto i = 0; i < elems; i++) {
+    std::string str = "Hallo";
+    std::copy(str.begin(), str.end(), std::back_inserter(pmr));
+  }
+  auto t21 = std::chrono::high_resolution_clock::now();
+  std::cout << "inserting hello in pmr_vector<char>: "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
 
-for (auto i = 0; i < elems; i++){
-  std::string str = "Hallo";
-  std::copy(str.begin(), str.end(), std::back_inserter(pmr));
-}
-auto t21 = std::chrono::high_resolution_clock::now();
-std::cout << "inserting hello in pmr_vector<char>: "
-    << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
+  pmr_concurrent_vector<char> pmrc;
+  auto t111 = std::chrono::high_resolution_clock::now();
 
-
-pmr_concurrent_vector<char> pmrc;
-auto t111 = std::chrono::high_resolution_clock::now();
-
-for (auto i = 0; i < elems; i++){
-  std::string str = "Hallo";
-  std::copy(str.begin(), str.end(), std::back_inserter(pmrc));
-}
-auto t211 = std::chrono::high_resolution_clock::now();
-std::cout << "inserting hello pmr_concurrent_vector<char>: "
-    << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
-
-
+  for (auto i = 0; i < elems; i++) {
+    std::string str = "Hallo";
+    std::copy(str.begin(), str.end(), std::back_inserter(pmrc));
+  }
+  auto t211 = std::chrono::high_resolution_clock::now();
+  std::cout << "inserting hello pmr_concurrent_vector<char>: "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
 }
 
-int main() {
+void copy_constructor_test() {
+  std::cout << "Creating value vector" << std::endl;
+  ValueVector<FixedString> a(10);
+  a.push_back(FixedString("aaaaaaaa"));
+  a.push_back(FixedString("bbbbbbbb"));
 
-auto elems = 2000000;
-
-
-pmr_vector<char> pmr;
-auto t11 = std::chrono::high_resolution_clock::now();
-
-for (auto i = 0; i < elems; i++){
-  const std::string str =  "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo";
-  pmr.insert (pmr.cend() , str.begin(), str.end());
-
-  // std::copy(str.begin(), str.end(), std::back_inserter(pmr));
+  std::cout << "Creating fixed_string1" << std::endl;
+  auto fixed_string1 = FixedString("fs1");
+  std::cout << "Creating fixed_string2" << std::endl;
+  auto fixed_string2 = FixedString(fixed_string1);
+  std::cout << "Creating fixed_string3" << std::endl;
+  auto fixed_string3 = FixedString(*a.begin());
 }
+
+void long_words() {
+  auto elems = 2000000;
+
+  pmr_vector<char> pmr;
+  auto t11 = std::chrono::high_resolution_clock::now();
+
+  for (auto i = 0; i < elems; i++) {
+    const std::string str =
+        "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
+        "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
+        "HalloHalloHalloHallo";
+    pmr.insert(pmr.cend(), str.begin(), str.end());
+
+    // std::copy(str.begin(), str.end(), std::back_inserter(pmr));
+  }
 
   // for (auto ele : pmr) {
   //   std::cout << ele;
   // }
 
-auto t21 = std::chrono::high_resolution_clock::now();
-std::cout << "inserting hello in pmr_vector<char>: "
-    << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
+  auto t21 = std::chrono::high_resolution_clock::now();
+  std::cout << "inserting hello in pmr_vector<char>: "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t21 - t11).count() << "ms" << std::endl;
 
-pmr_vector<std::string> pmrs;
-auto t111 = std::chrono::high_resolution_clock::now();
+  pmr_vector<std::string> pmrs;
+  auto t111 = std::chrono::high_resolution_clock::now();
 
-for (auto i = 0; i < elems; i++){
-  std::string str = "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo";
-  pmrs.push_back(str);
+  for (auto i = 0; i < elems; i++) {
+    std::string str =
+        "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
+        "HalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHalloHallo"
+        "HalloHalloHalloHallo";
+    pmrs.push_back(str);
+  }
+  auto t211 = std::chrono::high_resolution_clock::now();
+  std::cout << "inserting hello in pmr_vector<std::string>: "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
 }
-auto t211 = std::chrono::high_resolution_clock::now();
-std::cout << "inserting hello in pmr_vector<std::string>: "
-    << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
 
-
-
-
-
-
-
-
-
+int main() {
   // value_vector_from_file();
   // value_vector_from_file_stdstr();
   // sort_swap();
   // benchmark_m();
-  // value_vectors_from_file_old();
+  // value_vectors_from_file();
   // memory_test();
+  // long_words();
+  copy_constructor_test();
 }
