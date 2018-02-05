@@ -86,7 +86,17 @@ class ValueVector<FixedString> {
     }
   }
 
-  ValueVector(const ValueVector&& other) : _string_length(other._string_length), _vector(other._vector) {}
+  template< class Iter >
+  ValueVector(Iter first, Iter last) {
+    _string_length = first->size();
+    while (first != last) {
+      push_back(*first);
+      ++first;
+    }
+  }
+
+  ValueVector(const ValueVector&& other) : _string_length(other._string_length), _vector(other._vector) {
+  }
 
   ValueVector(const ValueVector& other) : _string_length(other._string_length), _vector(other._vector) {}
 
