@@ -104,7 +104,7 @@ class ValueVector<FixedString> {
 
   void push_back(FixedString&& string);
 
-  void push_back(const std::string& string) { push_back(FixedString(string)); }
+  void push_back(const std::string& string);
 
   FixedString at(const ChunkOffset chunk_offset);
 
