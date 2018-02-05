@@ -4,6 +4,8 @@
 #include <numeric>
 #include <string>
 #include <vector>
+#include <math.h>
+
 
 #include "../lib/storage/value_vector.hpp"
 
@@ -46,7 +48,7 @@ void print_vector_memory(const ValueVector<std::string>& vector, std::string com
     if (string_length <= 22) {
       size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * sizeof(std::string)) / 1000;
     } else {
-      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + 32)) / 1000;
+      size = (sizeof(ValueVector<std::string>) + uint64_t(vector.size()) * (sizeof(std::string) + ceil((string_length + 1) / 16) * 16)) / 1000;
     }
   }
   std::cout << "Memory consumption: \t" << size << " kilobytes" << std::endl;
@@ -92,7 +94,7 @@ template <typename T>
 void read_file(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vector<std::string>>& search_values) {
   std::string line;
   size_t search_counter = 0;
-  size_t searches = 100;
+  size_t searches = 10;
 
   std::ifstream string_table_file("strings_table/string_table.tbl");
   if (string_table_file.is_open()) {
@@ -129,7 +131,7 @@ void benchmark_search(std::vector<ValueVector<T>>& value_vectors,
   for (size_t i = 0; i < value_vectors.size(); ++i) {
     std::vector<uint64_t> times;
     for (auto& sv : search_values[i]) {
-      // clear_cache();
+      clear_cache();
       auto t1 = std::chrono::high_resolution_clock::now();
       std::lower_bound(value_vectors[i].begin(), value_vectors[i].end(), T(sv));
 
@@ -197,41 +199,6 @@ void value_vectors_from_file_old() {
   benchmark_search(value_vectors_std, search_values);
 }
 
-void value_vectors_from_file() {
-  // std::vector<ValueVector<FixedString>> value_vectors = {ValueVector<FixedString>(1),   ValueVector<FixedString>(3),
-  //                                                        ValueVector<FixedString>(7),   ValueVector<FixedString>(15),
-  //                                                        ValueVector<FixedString>(31),  ValueVector<FixedString>(63),
-  //                                                        ValueVector<FixedString>(127), ValueVector<FixedString>(255)};
-  std::vector<ValueVector<FixedString>> value_vectors;
-
-  std::vector<std::vector<std::string>> search_values;
-  for (auto i = 0; i < 8; i++) {
-    search_values.push_back(std::vector<std::string>());
-  }
-  // read_file(value_vectors, search_values);
-
-  std::vector<ValueVector<std::string>> value_vectors_std = {
-      ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(),
-      ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>(), ValueVector<std::string>()};
-  std::vector<std::vector<std::string>> search_values2;
-  for (auto& v : value_vectors) {
-    v.size();
-    search_values2.push_back(std::vector<std::string>());
-  }
-  read_file(value_vectors_std, search_values);
-
-  sort_value_vectors(value_vectors_std);
-  std::cout << "std::string search" << std::endl;
-  benchmark_search(value_vectors_std, search_values);
-
-  // sort_value_vectors(value_vectors);
-
-  for (const auto& vvs : value_vectors_std) {
-    value_vectors.push_back(ValueVector<FixedString>(vvs.begin(), vvs.end(), vvs[0].size()));
-  }
-  std::cout << "FixedString search" << std::endl;
-  benchmark_search(value_vectors, search_values);
-}
 
 template <typename T>
 void print_vector(ValueVector<T>& vec) {
