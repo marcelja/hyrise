@@ -123,7 +123,12 @@ void ValueVector<FixedString>::push_back(FixedString&& string) {
 }
 
 void ValueVector<FixedString>::push_back(const std::string& string) {
-  _vector.insert(_vector.cend(), string.begin(), string.end());
+  auto pos = _vector.size();
+  _vector.resize(_vector.size() + _string_length);
+  string.copy(&_vector[pos], _string_length);
+  if (string.size() < _string_length) {
+    std::fill(_vector.begin() + pos + string.size(), _vector.begin() + pos + _string_length, '\0');
+  }
 }
 
 FixedString ValueVector<FixedString>::at(const ChunkOffset chunk_offset) {

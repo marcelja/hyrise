@@ -57,6 +57,9 @@ void benchmark_m() {
 
   std::string insert_me{"blablabla"};
   size_t inserts = 10000000;
+  a.reserve(inserts);
+  b.reserve(inserts);
+  c.reserve(inserts);
   {
     auto t1 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < inserts; ++i) a.push_back(insert_me);
