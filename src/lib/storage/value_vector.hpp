@@ -102,8 +102,9 @@ class ValueVector<FixedString> {
    public:
     iterator(size_t string_length, const pmr_vector<char>& vector, size_t pos = 0)
         : _string_length(string_length), _vector(vector), _pos(pos) {}
+
     iterator& operator=(const iterator& other) {
-      if (_string_length != other._string_length || _vector != other._vector)
+      if (_string_length != other._string_length || &_vector != &other._vector)
         throw std::runtime_error("can't convert pointers from different vectors");
       _pos = other._pos;
       return *this;

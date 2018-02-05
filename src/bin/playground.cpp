@@ -415,6 +415,39 @@ void long_words() {
             << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
 }
 
+void iterator_test() {
+  int assignments = 10000000;
+
+  std::vector<std::string> a = {"abc", "def", "hifads"};
+  ValueVector<FixedString> b{a.begin(), a.end(), 10};
+
+  auto it = a.begin();
+  auto t111 = std::chrono::high_resolution_clock::now();
+
+  for (int i = 0; i < assignments; i++) {
+    it = a.end();
+    it = a.begin();
+
+  }
+  auto t211 = std::chrono::high_resolution_clock::now();
+  std::cout << "std vect iterator "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
+
+
+  auto it2 = b.begin();
+  t111 = std::chrono::high_resolution_clock::now();
+  for (int i = 0; i < assignments; i++) {
+    it2 = b.end();
+    it2 = b.begin();
+
+  }
+  t211 = std::chrono::high_resolution_clock::now();
+
+  std::cout << "value vector fixed string iterator "
+            << std::chrono::duration_cast<std::chrono::milliseconds>(t211 - t111).count() << "ms" << std::endl;
+
+}
+
 int main() {
   // value_vector_from_file();
   // value_vector_from_file_stdstr();
@@ -424,4 +457,6 @@ int main() {
   // memory_test();
   // long_words();
   copy_constructor_test();
+  iterator_test();
+  value_vectors_from_file_old();
 }

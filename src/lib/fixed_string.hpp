@@ -13,11 +13,11 @@ namespace opossum {
 class FixedString {
  public:
   FixedString(const std::string& string) : _mem((char*)string.c_str()), _string_length(string.size()), _delete(false) {
-    std::cout << "FixedString::&string constructor" << std::endl;
+    // std::cout << "FixedString::&string constructor" << std::endl;
   }
 
   FixedString(char* mem, size_t string_length) : _mem(mem), _string_length(string_length), _delete(false) {
-    std::cout << "FixedString::mem* constructor" << std::endl;
+    // std::cout << "FixedString::mem* constructor" << std::endl;
   }
 
   ~FixedString() {
@@ -31,21 +31,21 @@ class FixedString {
 
   FixedString(FixedString& other)
       : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    std::cout << "FixedString::copy constructor" << std::endl;
+    // std::cout << "FixedString::copy constructor" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
   // copy constructor
   FixedString(const FixedString& other)
       : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    std::cout << "FixedString::copy constructor 2" << std::endl;
+    // std::cout << "FixedString::copy constructor 2" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
   // move constructor
   FixedString(const FixedString&& other)
       : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    std::cout << "FixedString::move constructor" << std::endl;
+    // std::cout << "FixedString::move constructor" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
