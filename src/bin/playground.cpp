@@ -9,10 +9,6 @@
 
 #include "../lib/storage/value_vector.hpp"
 
-namespace opossum {
-
-void swap(const FixedString lha, const FixedString rhs) { lha.swap(rhs); }
-}
 
 using namespace opossum;
 
