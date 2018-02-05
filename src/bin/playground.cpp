@@ -219,15 +219,15 @@ void sort_unique() {
   a.push_back("TEST");
   a.push_back("1111111111");
 
-  std::cout << "Original:" << std::endl << std::endl;
+  std::cout << "\nOriginal:" << std::endl << std::endl;
   print_vector(a);
 
   std::sort(a.begin(), a.end());
-  std::cout << "Sorted:" << std::endl << std::endl;
+  std::cout << "\nSorted:" << std::endl << std::endl;
   print_vector(a);
 
   a.erase(std::unique(a.begin(), a.end()), a.end());
-  std::cout << "Unique + erase:" << std::endl << std::endl;
+  std::cout << "\nUnique + erase:" << std::endl << std::endl;
   print_vector(a);
 }
 
@@ -379,6 +379,6 @@ int main() {
 
   // iterator_test();
 
-  std::cout << "\n\nRead data from generated file: \n" << std::endl;
-  value_vectors_from_file();
+  // std::cout << "\n\nRead data from generated file: \n" << std::endl;
+  // value_vectors_from_file();
 }

@@ -31,21 +31,21 @@ class FixedString {
 
   FixedString(FixedString& other)
       : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    // std::cout << "FixedString::copy constructor" << std::endl;
+    std::cout << "FixedString::copy constructor " << string() << " (" << other.string() << ")" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
   // copy constructor
   FixedString(const FixedString& other)
       : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    // std::cout << "FixedString::copy constructor 2" << std::endl;
+    std::cout << "FixedString::copy constructor const " << string() << " (" << other.string() << ")" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
   // move constructor
   FixedString(const FixedString&& other)
       : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    // std::cout << "FixedString::move constructor" << std::endl;
+    std::cout << "FixedString::move constructor " << string() << " (" << other.string() << ")" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
@@ -70,6 +70,7 @@ class FixedString {
   }
 
   FixedString& operator=(const FixedString& other) {
+    std::cout << string() << " = " << other.string() << std::endl;
     auto copied_length = other.size() < _string_length ? other.size() : _string_length;
     other.copy(_mem, copied_length, 0);
     if (copied_length < _string_length) {
@@ -95,6 +96,7 @@ class FixedString {
   friend void swap(const FixedString lha, const FixedString rhs) { lha.swap(rhs); }
 
   void swap(const FixedString &other) const {
+    std::cout << "swap " << string() << ", " << other.string() << std::endl;
     std::swap_ranges(_mem, _mem + _string_length, other._mem);
   }
 
