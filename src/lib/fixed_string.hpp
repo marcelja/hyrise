@@ -92,7 +92,11 @@ class FixedString {
 
   friend std::ostream& operator<<(std::ostream& os, const FixedString& obj) { return os << obj.string(); }
 
-  void swap(const FixedString& other) const;
+  friend void swap(const FixedString lha, const FixedString rhs) { lha.swap(rhs); }
+
+  void swap(const FixedString &other) const {
+    std::swap_ranges(_mem, _mem + _string_length, other._mem);
+  }
 
  private:
   const std::string _string;
@@ -100,5 +104,11 @@ class FixedString {
   const size_t _string_length;
   const bool _delete;
 };
+
+//namespace opossum {
+
+//void swap(const FixedString lha, const FixedString rhs) { lha.swap(rhs); }
+//}
+
 
 }  // namespace opossum
