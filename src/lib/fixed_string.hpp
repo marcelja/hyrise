@@ -12,7 +12,7 @@ namespace opossum {
 
 class FixedString {
  public:
-  FixedString(const std::string& string) : _mem((char*)string.c_str()), _string_length(string.size()), _delete(false) {
+  FixedString(const std::string& string) : _string(string), _mem((char*)_string.c_str()), _string_length(string.size()), _delete(false) {
     // std::cout << "FixedString::&string constructor" << std::endl;
   }
 
@@ -95,6 +95,7 @@ class FixedString {
   void swap(const FixedString& other) const;
 
  private:
+  const std::string _string;
   char* const _mem;
   const size_t _string_length;
   const bool _delete;
