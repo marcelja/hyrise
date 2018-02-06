@@ -53,7 +53,7 @@ void print_vector_memory(const ValueVector<std::string>& vector, std::string com
 void benchmark_m() {
   ValueVector<std::string> a;
   ValueVector<FixedString> b(10);
-  std::vector<std::string> c;
+  pmr_vector<std::string> c;
 
   std::string insert_me{"blablabla"};
   size_t inserts = 10000000;
@@ -80,7 +80,7 @@ void benchmark_m() {
     auto t1 = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < inserts; ++i) c.push_back(insert_me);
     auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "inserting " << inserts << " values into std::vector<std::string>:      "
+    std::cout << "inserting " << inserts << " values into pmr_vector<std::string>:      "
               << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << "ms" << std::endl;
   }
 }
@@ -379,6 +379,6 @@ int main() {
 
   // iterator_test();
 
-  // std::cout << "\n\nRead data from generated file: \n" << std::endl;
-  // value_vectors_from_file();
+  std::cout << "\n\nRead data from generated file: \n" << std::endl;
+  value_vectors_from_file();
 }

@@ -12,40 +12,35 @@ namespace opossum {
 
 class FixedString {
  public:
-  FixedString(const std::string& string) : _string(string), _mem((char*)_string.c_str()), _string_length(string.size()), _delete(false) {
+  FixedString(const std::string& string) : _mem(static_cast<char *>(alloca(string.size()))), _string_length(string.size()) {
     // std::cout << "FixedString::&string constructor" << std::endl;
+    std::memcpy(_mem, string.c_str(), _string_length);
   }
 
-  FixedString(char* mem, size_t string_length) : _mem(mem), _string_length(string_length), _delete(false) {
+  FixedString(char* mem, size_t string_length) : _mem(mem), _string_length(string_length) {
     // std::cout << "FixedString::mem* constructor" << std::endl;
   }
 
   ~FixedString() {
-    if (_delete) {
-      // std::cout << "FixedString::delete destructor" << std::endl;
-      delete[] _mem;
-      // std::memcpy(_mem, "ffffffffff", _string_length);
-      // std::cout << string();
-    }
   }
 
   FixedString(FixedString& other)
-      : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    std::cout << "FixedString::copy constructor " << string() << " (" << other.string() << ")" << std::endl;
+      : _mem(static_cast<char *>(alloca(other._string_length))), _string_length(other._string_length) {
+    // std::cout << "FixedString::copy constructor " << string() << " (" << other.string() << ")" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
   // copy constructor
   FixedString(const FixedString& other)
-      : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    std::cout << "FixedString::copy constructor const " << string() << " (" << other.string() << ")" << std::endl;
+      : _mem(static_cast<char *>(alloca(other._string_length))), _string_length(other._string_length) {
+    // std::cout << "FixedString::copy constructor const " << string() << " (" << other.string() << ")" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
   // move constructor
   FixedString(const FixedString&& other)
-      : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    std::cout << "FixedString::move constructor " << string() << " (" << other.string() << ")" << std::endl;
+      : _mem(static_cast<char *>(alloca(other._string_length))), _string_length(other._string_length) {
+    // std::cout << "FixedString::move constructor " << string() << " (" << other.string() << ")" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
@@ -62,12 +57,9 @@ class FixedString {
     return std::string(_mem, _string_length);
   }
 
-  const std::vector<char> char_vector() const {
-    // std::cout << "_mem adr: " << &_mem[0] << std::endl;
-    // std::cout << "_mem adr: " << &_mem[0] + _string_length << std::endl;
-    // std::cout << "_mem adr: " << &_mem << std::endl;
-    return std::vector<char>(&_mem[0], &_mem[0] + _string_length);
-  }
+  // const std::vector<char> char_vector() const {
+  //   return std::vector<char>(&_mem[0], &_mem[0] + _string_length);
+  // }
 
   FixedString& operator=(const FixedString& other) {
     std::cout << string() << " = " << other.string() << std::endl;
@@ -96,15 +88,13 @@ class FixedString {
   friend void swap(const FixedString lha, const FixedString rhs) { lha.swap(rhs); }
 
   void swap(const FixedString &other) const {
-    std::cout << "swap " << string() << ", " << other.string() << std::endl;
+    // std::cout << "swap " << string() << ", " << other.string() << std::endl;
     std::swap_ranges(_mem, _mem + _string_length, other._mem);
   }
 
  private:
-  const std::string _string;
   char* const _mem;
   const size_t _string_length;
-  const bool _delete;
 };
 
 //namespace opossum {
