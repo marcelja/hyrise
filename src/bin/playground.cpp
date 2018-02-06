@@ -231,6 +231,30 @@ void sort_unique() {
   print_vector(a);
 }
 
+void sort_insights() {
+  ValueVector<FixedString> a(5);
+  a.push_back("66666");
+  a.push_back("44444");
+  a.push_back("22222");
+  a.push_back("11111");
+  a.push_back("77777");
+  a.push_back("99999");
+  a.push_back("55555");
+  a.push_back("33333");
+  a.push_back("88888");
+
+  std::cout << "\nOriginal:" << std::endl << std::endl;
+  print_vector(a);
+
+  std::sort(a.begin(), a.end());
+  std::cout << "\nSorted:" << std::endl << std::endl;
+  print_vector(a);
+
+  a.erase(std::unique(a.begin(), a.end()), a.end());
+  std::cout << "\nUnique + erase:" << std::endl << std::endl;
+  print_vector(a);
+}
+
 
 // void single_char() {
 //   auto elems = 2000000000;
@@ -371,11 +395,14 @@ void iterator_test() {
 
 
 int main() {
-  std::cout << "Benchmark inserting strings: \n" << std::endl;
-  benchmark_m();
+//  std::cout << "Benchmark inserting strings: \n" << std::endl;
+//  benchmark_m();
 
-  std::cout << "\n\nstd::sort and std::unique example: \n" << std::endl;
-  sort_unique();
+//  std::cout << "\n\nstd::sort and std::unique example: \n" << std::endl;
+//  sort_unique();
+
+  std::cout << "\n\nstd::sort insights example: \n" << std::endl;
+  sort_insights();
 
   // iterator_test();
 
