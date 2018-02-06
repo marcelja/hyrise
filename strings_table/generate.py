@@ -31,8 +31,8 @@ def write_to_file(filename, distinct_strings, rows, columns):
 
 def main():
     columns = 8
-    rows = 1000000
-    distinctness = 0.0001
+    rows = 100000
+    distinctness = 0.01
 
     threads = []
     distinct_strings = [None] * columns

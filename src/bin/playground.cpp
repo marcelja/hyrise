@@ -124,6 +124,7 @@ void read_file(std::vector<ValueVector<T>>& value_vectors, std::vector<std::vect
 template <typename T>
 void benchmark_search(std::vector<ValueVector<T>>& value_vectors,
                       std::vector<std::vector<std::string>>& search_values) {
+
   for (size_t i = 0; i < value_vectors.size(); ++i) {
     std::vector<uint64_t> times;
     for (auto& sv : search_values[i]) {
@@ -179,6 +180,9 @@ void sort_value_vectors(std::vector<ValueVector<T>>& value_vectors) {
     }
     auto sum_of_elems = std::accumulate(times.begin(), times.end(), 0);
     std::cout << "Avg time for sorting " << vvv[0].size() <<  ": " << sum_of_elems / times.size() << " us" << std::endl;
+  }
+  for (auto& vvv : value_vectors) {
+    std::sort(vvv.begin(), vvv.end());
   }
 }
 
