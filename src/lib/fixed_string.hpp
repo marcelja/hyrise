@@ -31,21 +31,21 @@ class FixedString {
 
   FixedString(FixedString& other)
       : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    // std::cout << "FixedString::copy constructor " << string() << " (" << other.string() << ")" << std::endl;
+    // std::cout << "FixedString::copy constructor " << " (" << other.string() << ")" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
   // copy constructor
   FixedString(const FixedString& other)
       : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    // std::cout << "FixedString::copy constructor const " << string() << " (" << other.string() << ")" << std::endl;
+    // std::cout << "FixedString::copy constructor const " << " (" << other.string() << ")" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
   // move constructor
   FixedString(const FixedString&& other)
       : _mem(new char[other._string_length]{}), _string_length(other._string_length), _delete(true) {
-    // std::cout << "FixedString::move constructor " << string() << " (" << other.string() << ")" << std::endl;
+    // std::cout << "FixedString::move constructor " << " (" << other.string() << ")" << std::endl;
     std::memcpy(_mem, other._mem, _string_length);
   }
 
@@ -63,9 +63,6 @@ class FixedString {
   }
 
   const std::vector<char> char_vector() const {
-    // std::cout << "_mem adr: " << &_mem[0] << std::endl;
-    // std::cout << "_mem adr: " << &_mem[0] + _string_length << std::endl;
-    // std::cout << "_mem adr: " << &_mem << std::endl;
     return std::vector<char>(&_mem[0], &_mem[0] + _string_length);
   }
 
