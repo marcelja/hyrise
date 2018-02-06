@@ -141,20 +141,46 @@ void benchmark_search(std::vector<ValueVector<T>>& value_vectors,
   }
 }
 
-template <typename T>
-void benchmark_scan(std::vector<ValueVector<T>>& value_vectors,
+void benchmark_scan(std::vector<ValueVector<std::string>>& value_vectors,
                       std::vector<std::vector<std::string>>& search_values) {
   for (size_t i = 0; i < value_vectors.size(); ++i) {
     std::vector<uint64_t> times;
-    for (auto& sv : search_values[i]) {
+    for (const auto& sv : search_values[i]) {
       clear_cache();
+      uint64_t counter = 0;
       auto t1 = std::chrono::high_resolution_clock::now();
       for (const auto& el : value_vectors[i]){
         if(el == sv){
-          // do nothing
+            ++counter;
         }
       }
+      std::cout << counter;
+      auto t2 = std::chrono::high_resolution_clock::now();
+      times.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count());
+    }
+    auto sum_of_elems = std::accumulate(times.begin(), times.end(), 0);
+    std::cout << "scan+ for index " << i << " (string_length is " << value_vectors[i][0].size()
+              << ") : " << sum_of_elems / times.size() << " ns" << std::endl;
+  }
+}
 
+void benchmark_scan(std::vector<ValueVector<FixedString>>& value_vectors,
+                      std::vector<std::vector<std::string>>& search_values) {
+  std::cout << "here";
+  for (size_t i = 0; i < value_vectors.size(); ++i) {
+    std::vector<uint64_t> times;
+    for (const auto& sv : search_values[i]) {
+      clear_cache();
+      uint64_t counter = 0;
+      sv.size();
+      const auto sv2 = FixedString(sv);
+      auto t1 = std::chrono::high_resolution_clock::now();
+      for (const auto& el : value_vectors[i]){
+        if(el == sv2){
+            ++counter;
+        }
+      }
+      std::cout << counter;
       auto t2 = std::chrono::high_resolution_clock::now();
       times.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count());
     }
@@ -425,5 +451,5 @@ int main() {
   // iterator_test();
 
 //   std::cout << "\n\nRead data from generated file: \n" << std::endl;
-//   value_vectors_from_file();
+  value_vectors_from_file();
 }
