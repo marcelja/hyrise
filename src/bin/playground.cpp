@@ -141,6 +141,29 @@ void benchmark_search(std::vector<ValueVector<T>>& value_vectors,
 }
 
 template <typename T>
+void benchmark_scan(std::vector<ValueVector<T>>& value_vectors,
+                      std::vector<std::vector<std::string>>& search_values) {
+  for (size_t i = 0; i < value_vectors.size(); ++i) {
+    std::vector<uint64_t> times;
+    for (auto& sv : search_values[i]) {
+      clear_cache();
+      auto t1 = std::chrono::high_resolution_clock::now();
+      for (const auto& el : value_vectors[i]){
+        if(el == sv){
+          // do nothing
+        }
+      }
+
+      auto t2 = std::chrono::high_resolution_clock::now();
+      times.push_back(std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1).count());
+    }
+    auto sum_of_elems = std::accumulate(times.begin(), times.end(), 0);
+    std::cout << "scan+ for index " << i << " (string_length is " << value_vectors[i][0].size()
+              << ") : " << sum_of_elems / times.size() << " ns" << std::endl;
+  }
+}
+
+template <typename T>
 void sort_value_vectors(std::vector<ValueVector<T>>& value_vectors) {
   for (auto vvv : value_vectors) {
     std::vector<uint64_t> times;
@@ -177,9 +200,9 @@ void value_vectors_from_file() {
   
   std::cout << "Start inserting in ValueVector<FixedString>" << std::endl;
   read_file(value_vectors, search_values);
-  sort_value_vectors(value_vectors);
-  std::cout << "FixedString search" << std::endl;
-  benchmark_search(value_vectors, search_values);
+//  sort_value_vectors(value_vectors);
+//  std::cout << "FixedString search" << std::endl;
+  benchmark_scan(value_vectors, search_values);
 
   std::vector<std::vector<std::string>> search_values2;
   for (auto& v : value_vectors) {
@@ -189,10 +212,9 @@ void value_vectors_from_file() {
 
   std::cout << "\nStart inserting in ValueVector<std::string>" << std::endl;
   read_file(value_vectors_std, search_values2);
-  sort_value_vectors(value_vectors_std);
 
   std::cout << "std::string search" << std::endl;
-  benchmark_search(value_vectors_std, search_values);
+  benchmark_scan(value_vectors_std, search_values);
 }
 
 
@@ -233,25 +255,17 @@ void sort_unique() {
 
 void sort_insights() {
   ValueVector<FixedString> a(5);
-  a.push_back("66666");
   a.push_back("44444");
   a.push_back("22222");
   a.push_back("11111");
-  a.push_back("77777");
-  a.push_back("99999");
   a.push_back("55555");
   a.push_back("33333");
-  a.push_back("88888");
 
   std::cout << "\nOriginal:" << std::endl << std::endl;
   print_vector(a);
 
   std::sort(a.begin(), a.end());
   std::cout << "\nSorted:" << std::endl << std::endl;
-  print_vector(a);
-
-  a.erase(std::unique(a.begin(), a.end()), a.end());
-  std::cout << "\nUnique + erase:" << std::endl << std::endl;
   print_vector(a);
 }
 
@@ -406,6 +420,6 @@ int main() {
 
   // iterator_test();
 
-  // std::cout << "\n\nRead data from generated file: \n" << std::endl;
-  // value_vectors_from_file();
+//   std::cout << "\n\nRead data from generated file: \n" << std::endl;
+//   value_vectors_from_file();
 }
