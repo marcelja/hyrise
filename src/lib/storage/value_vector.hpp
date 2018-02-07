@@ -7,6 +7,7 @@
 
 #include "fixed_string.hpp"
 #include "types.hpp"
+#include "utils/assert.hpp"
 
 namespace opossum {
 
@@ -114,8 +115,7 @@ class ValueVector<FixedString> {
         : _string_length(string_length), _vector(vector), _pos(pos) {}
 
     iterator& operator=(const iterator& other) {
-      if (_string_length != other._string_length || &_vector != &other._vector)
-        throw std::runtime_error("can't convert pointers from different vectors");
+      DebugAssert(_string_length == other._string_length && &_vector == &other._vector, "can't convert pointers from different vectors");
       _pos = other._pos;
       return *this;
     }
