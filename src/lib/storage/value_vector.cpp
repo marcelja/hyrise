@@ -43,16 +43,6 @@ typename ValueVector<T>::iterator ValueVector<T>::end() noexcept {
 }
 
 template <typename T>
-typename ValueVector<T>::const_iterator ValueVector<T>::begin() const noexcept {
-  return _values.cbegin();
-}
-
-template <typename T>
-typename ValueVector<T>::const_iterator ValueVector<T>::end() const noexcept {
-  return _values.cend();
-}
-
-template <typename T>
 typename ValueVector<T>::reverse_iterator ValueVector<T>::rbegin() noexcept {
   return _values.rbegin();
 }
@@ -73,23 +63,18 @@ typename ValueVector<T>::const_iterator ValueVector<T>::cend() noexcept {
 }
 
 template <typename T>
-T& ValueVector<T>::operator[](size_t n) {
+T& ValueVector<T>::operator[](const size_t n) {
   return _values[n];
 }
 
 template <typename T>
-const T& ValueVector<T>::operator[](size_t n) const {
+const T& ValueVector<T>::operator[](const size_t n) const {
   return _values[n];
 }
 
 template <typename T>
 size_t ValueVector<T>::size() const {
   return _values.size();
-}
-
-template <typename T>
-size_t ValueVector<T>::capacity() const {
-  return _values.capacity();
 }
 
 template <typename T>
@@ -102,61 +87,42 @@ PolymorphicAllocator<T> ValueVector<T>::get_allocator() {
   return _values.get_allocator();
 }
 
+template <typename T>
+void ValueVector<T>::reserve(const size_t n) {
+    _values.reserve(n);
+  }
+
 // Implementation of ValueVector<FixedString> starts here
 
 
 
-
-
-
-void ValueVector<FixedString>::push_back(const FixedString& value) {
-  push_back(std::forward<FixedString>((FixedString&)value));
-}
-
-void ValueVector<FixedString>::push_back(FixedString&& string) {
-  auto pos = _vector.size();
-  _vector.resize(_vector.size() + _string_length);
-  string.copy(&_vector[pos], _string_length);
-  if (string.size() < _string_length) {
-    std::fill(_vector.begin() + pos + string.size(), _vector.begin() + pos + _string_length, '\0');
-  }
-}
-
 void ValueVector<FixedString>::push_back(const std::string& string) {
-  auto pos = _vector.size();
-  _vector.resize(_vector.size() + _string_length);
-  string.copy(&_vector[pos], _string_length);
+  const auto pos = _chars.size();
+  _chars.resize(_chars.size() + _string_length);
+  string.copy(&_chars[pos], _string_length);
   if (string.size() < _string_length) {
-    std::fill(_vector.begin() + pos + string.size(), _vector.begin() + pos + _string_length, '\0');
+    std::fill(_chars.begin() + pos + string.size(), _chars.begin() + pos + _string_length, '\0');
   }
 }
 
 FixedString ValueVector<FixedString>::at(const ChunkOffset chunk_offset) {
-  return FixedString((char*)&_vector.at(chunk_offset * _string_length), _string_length);
+  return FixedString((char*)&_chars.at(chunk_offset * _string_length), _string_length);
 }
 
 ValueVector<FixedString>::iterator ValueVector<FixedString>::begin() noexcept {
-  return iterator(_string_length, _vector, 0);
+  return iterator(_string_length, _chars, 0);
 }
 
 ValueVector<FixedString>::iterator ValueVector<FixedString>::end() noexcept {
-  return iterator(_string_length, _vector, _vector.size());
+  return iterator(_string_length, _chars, _chars.size());
 }
 
-ValueVector<FixedString>::iterator ValueVector<FixedString>::cbegin() noexcept {
-  return iterator(_string_length, _vector, 0);
+ValueVector<FixedString>::iterator ValueVector<FixedString>::cbegin() const noexcept {
+  return iterator(_string_length, _chars, 0);
 }
 
-ValueVector<FixedString>::iterator ValueVector<FixedString>::cend() noexcept {
-  return iterator(_string_length, _vector, _vector.size());
-}
-
-ValueVector<FixedString>::iterator ValueVector<FixedString>::begin() const noexcept {
-  return iterator(_string_length, _vector, 0);
-}
-
-ValueVector<FixedString>::iterator ValueVector<FixedString>::end() const noexcept {
-  return iterator(_string_length, _vector, _vector.size());
+ValueVector<FixedString>::iterator ValueVector<FixedString>::cend() const noexcept {
+  return iterator(_string_length, _chars, _chars.size());
 }
 
 typedef boost::reverse_iterator<ValueVector<FixedString>::iterator> reverse_iterator;
@@ -164,27 +130,29 @@ reverse_iterator ValueVector<FixedString>::rbegin() noexcept { return reverse_it
 
 reverse_iterator ValueVector<FixedString>::rend() noexcept { return reverse_iterator(begin()); }
 
-FixedString ValueVector<FixedString>::operator[](size_t n) {
-  return {FixedString(&_vector[n * _string_length], _string_length)};
+FixedString ValueVector<FixedString>::operator[](const size_t n) {
+  return {FixedString(&_chars[n * _string_length], _string_length)};
 }
 
-const FixedString ValueVector<FixedString>::operator[](size_t n) const {
-  return {FixedString((char*)&_vector[n * _string_length], _string_length)};
+const FixedString ValueVector<FixedString>::operator[](const size_t n) const {
+  return {FixedString((char*)&_chars[n * _string_length], _string_length)};
 }
 
-size_t ValueVector<FixedString>::size() const { return _vector.size() / _string_length; }
-
-size_t ValueVector<FixedString>::capacity() const { return _vector.capacity(); }
+size_t ValueVector<FixedString>::size() const { return _chars.size() / _string_length; }
 
 void ValueVector<FixedString>::erase(const iterator start, const iterator end) {
-  auto it = _vector.begin();
-  std::advance(it, _vector.size() - std::distance(start, end) * _string_length);
-  _vector.erase(it, _vector.end());
+  auto it = _chars.begin();
+  std::advance(it, _chars.size() - std::distance(start, end) * _string_length);
+  _chars.erase(it, _chars.end());
 }
 
-void ValueVector<FixedString>::shrink_to_fit() { _vector.shrink_to_fit(); }
+void ValueVector<FixedString>::shrink_to_fit() { _chars.shrink_to_fit(); }
 
-PolymorphicAllocator<FixedString> ValueVector<FixedString>::get_allocator() { return _vector.get_allocator(); }
+PolymorphicAllocator<FixedString> ValueVector<FixedString>::get_allocator() { return _chars.get_allocator(); }
+
+void ValueVector<FixedString>::reserve(const size_t n) {
+  _chars.reserve(n * _string_length);
+}
 
 EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueVector);
 
