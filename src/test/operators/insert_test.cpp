@@ -9,10 +9,11 @@
 #include "concurrency/transaction_manager.hpp"
 #include "operators/get_table.hpp"
 #include "operators/insert.hpp"
+#include "operators/pqp_expression.hpp"
 #include "operators/projection.hpp"
 #include "operators/table_wrapper.hpp"
 #include "operators/validate.hpp"
-#include "storage/dictionary_compression.hpp"
+#include "storage/deprecated_dictionary_compression.hpp"
 #include "storage/storage_manager.hpp"
 #include "storage/table.hpp"
 
@@ -110,7 +111,7 @@ TEST_F(OperatorsInsertTest, CompressedChunks) {
   // 3 Rows
   auto t = load_table("src/test/tables/int.tbl", 2u);
   StorageManager::get().add_table(t_name, t);
-  opossum::DictionaryCompression::compress_table(*t);
+  opossum::DeprecatedDictionaryCompression::compress_table(*t);
 
   // 10 Rows
   auto t2 = load_table("src/test/tables/10_ints.tbl", Chunk::MAX_SIZE);
@@ -219,7 +220,7 @@ TEST_F(OperatorsInsertTest, InsertSingleNullFromDummyProjection) {
   auto dummy_wrapper = std::make_shared<TableWrapper>(Projection::dummy_table());
   dummy_wrapper->execute();
 
-  auto literal = Projection::ColumnExpressions{Expression::create_literal(NullValue{})};
+  auto literal = Projection::ColumnExpressions{PQPExpression::create_literal(NullValue{})};
   auto projection = std::make_shared<Projection>(dummy_wrapper, literal);
   projection->execute();
 

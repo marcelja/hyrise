@@ -6,11 +6,14 @@
 #include "abstract_lqp_node.hpp"
 #include "all_type_variant.hpp"
 #include "operators/abstract_operator.hpp"
+#include "predicate_node.hpp"
 
 namespace opossum {
 
 class AbstractOperator;
 class TransactionContext;
+class LQPExpression;
+class PQPExpression;
 
 /**
  * Translates an LQP (Logical Query Plan), represented by its root node, into an Operator tree for the execution
@@ -27,6 +30,9 @@ class LQPTranslator final : private Noncopyable {
   // SQL operators
   std::shared_ptr<AbstractOperator> _translate_stored_table_node(const std::shared_ptr<AbstractLQPNode>& node) const;
   std::shared_ptr<AbstractOperator> _translate_predicate_node(const std::shared_ptr<AbstractLQPNode>& node) const;
+  std::shared_ptr<AbstractOperator> _translate_predicate_node_to_index_scan(
+      const std::shared_ptr<PredicateNode>& node, const AllParameterVariant& value, const ColumnID column_id,
+      const std::shared_ptr<AbstractOperator> input_operator) const;
   std::shared_ptr<AbstractOperator> _translate_projection_node(const std::shared_ptr<AbstractLQPNode>& node) const;
   std::shared_ptr<AbstractOperator> _translate_sort_node(const std::shared_ptr<AbstractLQPNode>& node) const;
   std::shared_ptr<AbstractOperator> _translate_join_node(const std::shared_ptr<AbstractLQPNode>& node) const;
@@ -42,6 +48,12 @@ class LQPTranslator final : private Noncopyable {
   // Maintenance operators
   std::shared_ptr<AbstractOperator> _translate_show_tables_node(const std::shared_ptr<AbstractLQPNode>& node) const;
   std::shared_ptr<AbstractOperator> _translate_show_columns_node(const std::shared_ptr<AbstractLQPNode>& node) const;
+
+  // Translate LQP- to PQPExpressions
+  std::vector<std::shared_ptr<PQPExpression>> _translate_expressions(
+      const std::vector<std::shared_ptr<LQPExpression>>& lqp_expressions,
+      const std::shared_ptr<AbstractLQPNode>& node) const;
+
   std::shared_ptr<AbstractOperator> _translate_create_view_node(const std::shared_ptr<AbstractLQPNode>& node) const;
   std::shared_ptr<AbstractOperator> _translate_drop_view_node(const std::shared_ptr<AbstractLQPNode>& node) const;
 
