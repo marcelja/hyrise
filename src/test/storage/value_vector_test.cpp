@@ -50,14 +50,14 @@ TEST_F(ValueVectorTest, Iterator) {
   EXPECT_EQ(valuevector[0], "abc");
 }
 
-TEST_F(ValueVectorTest, ForEachReference) {
-  std::vector<std::string> v1 = {"abc", "def", "ghi"};
-  const auto v2 = ValueVector<std::string>{v1.begin(), v1.end()};
+// TEST_F(ValueVectorTest, ForEachReference) {
+//   std::vector<std::string> v1 = {"abc", "def", "ghi"};
+//   const auto v2 = ValueVector<std::string>{v1.begin(), v1.end()};
 
-  for(const auto& fs : v2) {
-    EXPECT_NE(fs, "NULL");
-  }
-}
+//   for(const auto& fs : v2) {
+//     EXPECT_NE(fs, "NULL");
+//   }
+// }
 
 
 
@@ -175,40 +175,40 @@ TEST_F(ValueVectorTest, ConstValueVectorFixedString) {
   EXPECT_EQ(fixed.string(), "str1");
 }
 
-TEST_F(ValueVectorTest, IteratorConstructor) {
-  std::vector<std::string> v1 = {"abc", "def", "ghi"};
-  auto v2 = ValueVector<std::string>{v1.begin(), v1.end()};
+// TEST_F(ValueVectorTest, IteratorConstructor) {
+//   std::vector<std::string> v1 = {"abc", "def", "ghi"};
+//   auto v2 = ValueVector<std::string>{v1.begin(), v1.end()};
 
-  EXPECT_EQ(v2[2], "ghi");
-  EXPECT_EQ(v2.size(), 3u);
-}
+//   EXPECT_EQ(v2[2], "ghi");
+//   EXPECT_EQ(v2.size(), 3u);
+// }
 
-TEST_F(ValueVectorTest, ConstIteratorConstructor) {
-  std::vector<std::string> v1 = {"abc", "def", "ghi"};
-  auto v2 = ValueVector<std::string>{v1.cbegin(), v1.cend()};
+// TEST_F(ValueVectorTest, ConstIteratorConstructor) {
+//   std::vector<std::string> v1 = {"abc", "def", "ghi"};
+//   auto v2 = ValueVector<std::string>{v1.cbegin(), v1.cend()};
 
-  EXPECT_EQ(v2[0], "abc");
-  EXPECT_EQ(v2.size(), 3u);
-}
+//   EXPECT_EQ(v2[0], "abc");
+//   EXPECT_EQ(v2.size(), 3u);
+// }
 
-TEST_F(ValueVectorTest, FixedStringIteratorConstructors) {
-  std::vector<FixedString> v1 = {FixedString("abc"), FixedString("def"), FixedString("ghi")};
-  auto v2 = ValueVector<FixedString>{v1.begin(), v1.end(), 3};
-  auto v3 = ValueVector<FixedString>{v1.cbegin(), v1.cend(), 3};
+// TEST_F(ValueVectorTest, FixedStringIteratorConstructors) {
+//   std::vector<FixedString> v1 = {FixedString("abc"), FixedString("def"), FixedString("ghi")};
+//   auto v2 = ValueVector<FixedString>{v1.begin(), v1.end(), 3};
+//   auto v3 = ValueVector<FixedString>{v1.cbegin(), v1.cend(), 3};
 
-  EXPECT_EQ(v2[0].string(), "abc");
-  EXPECT_EQ(v2.size(), 3u);
-  EXPECT_EQ(v3[2].string(), "ghi");
-  EXPECT_EQ(v3.size(), 3u);
-}
+//   EXPECT_EQ(v2[0].string(), "abc");
+//   EXPECT_EQ(v2.size(), 3u);
+//   EXPECT_EQ(v3[2].string(), "ghi");
+//   EXPECT_EQ(v3.size(), 3u);
+// }
 
-TEST_F(ValueVectorTest, FixedStringForEachReference) {
-  std::vector<FixedString> v1 = {FixedString("abc"), FixedString("def"), FixedString("ghi")};
-  const auto v2 = ValueVector<FixedString>{v1.begin(), v1.end(), 3};
+// TEST_F(ValueVectorTest, FixedStringForEachReference) {
+//   std::vector<FixedString> v1 = {FixedString("abc"), FixedString("def"), FixedString("ghi")};
+//   const auto v2 = ValueVector<FixedString>{v1.begin(), v1.end(), 3};
 
-  for(const auto& fs : v2) {
-    EXPECT_NE(fs.string(), "NULL");
-  }
-}
+//   for(const auto& fs : v2) {
+//     EXPECT_NE(fs.string(), "NULL");
+//   }
+// }
 
 }  // namespace opossum

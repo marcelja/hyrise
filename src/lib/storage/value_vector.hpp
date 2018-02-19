@@ -21,7 +21,12 @@ class ValueVector {
   ValueVector();
 
   template< class Iter >
-  ValueVector(Iter begin, Iter end);
+  ValueVector(Iter first, Iter last) {
+    while (first != last) {
+      push_back(*first);
+      ++first;
+    }
+  }
 
   ValueVector(const size_t& elements);
 

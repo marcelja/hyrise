@@ -23,15 +23,6 @@ ValueVector<T>::ValueVector(const size_t& elements) {
 }
 
 template <typename T>
-template< class Iter >
-ValueVector<T>::ValueVector(Iter first, Iter last){
-  while (first != last) {
-    push_back(*first);
-    ++first;
-  }
-}
-
-template <typename T>
 void ValueVector<T>::push_back(const T& value) {
   _values.push_back(std::forward<const T>(value));
 }
