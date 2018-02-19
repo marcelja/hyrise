@@ -15,6 +15,7 @@
 #include "types.hpp"
 #include "utils/assert.hpp"
 #include "value_column.hpp"
+#include "value_vector.hpp"
 
 namespace opossum {
 
@@ -45,7 +46,7 @@ class ColumnCompressor : public ColumnCompressorBase {
     // See: https://goo.gl/MCM5rr
     // Create dictionary (enforce uniqueness and sorting)
     const auto& values = value_column->values();
-    auto dictionary = pmr_vector<T>{values.cbegin(), values.cend()};
+    auto dictionary = ValueVector<T>{values.cbegin(), values.cend()};
 
     // Remove null values from value vector
     if (value_column->is_nullable()) {
@@ -102,7 +103,7 @@ class ColumnCompressor : public ColumnCompressorBase {
     return std::make_shared<DictionaryColumn<T>>(std::move(dictionary), attribute_vector);
   }
 
-  ValueID get_value_id(const pmr_vector<T>& dictionary, const T& value) {
+  ValueID get_value_id(const ValueVector<T>& dictionary, const T& value) {
     return static_cast<ValueID>(
         std::distance(dictionary.cbegin(), std::lower_bound(dictionary.cbegin(), dictionary.cend(), value)));
   }

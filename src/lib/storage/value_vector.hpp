@@ -29,9 +29,9 @@ class ValueVector {
     }
   }
 
-  ValueVector(const ValueVector&& other) : _values(other._values) {}
+  ValueVector(const size_t& elements);
 
-  ValueVector(const ValueVector& other) : _values(other._values) {}
+  ValueVector(pmr_vector<T>&& vector) : _values(vector) {};
 
   // TODO(toni): add to VV<FS> 3 times
   explicit ValueVector(const PolymorphicAllocator<T>& alloc, bool nullable = false);
@@ -56,9 +56,9 @@ class ValueVector {
 
   reverse_iterator rend() noexcept;
 
-  const_iterator cbegin() noexcept;
+  const_iterator cbegin() const noexcept;
 
-  const_iterator cend() noexcept;
+  const_iterator cend() const noexcept;
 
   const_iterator begin() const noexcept;
 
@@ -81,6 +81,24 @@ class ValueVector {
   void erase(const iterator start, const iterator end);
 
   void shrink_to_fit();
+
+  pmr_vector<T>& pmr_vector_values() {
+    return _values;
+  }
+
+  const pmr_vector<T>& pmr_vector_values() const {
+    return _values;
+  }
+
+  T* data() noexcept {
+    return _values.data();
+  }
+
+  const T* data() const noexcept {
+    return _values.data();
+  }
+
+  void erase(const_iterator start, const_iterator end);
 
   PolymorphicAllocator<T> get_allocator();
 
@@ -156,9 +174,9 @@ class ValueVector<FixedString> {
 
   iterator end() noexcept;
 
-  iterator cbegin() noexcept;
+  iterator cbegin() const noexcept;
 
-  iterator cend() noexcept;
+  iterator cend() const noexcept;
 
   iterator begin() const noexcept;
 

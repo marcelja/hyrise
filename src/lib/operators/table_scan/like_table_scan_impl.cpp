@@ -17,6 +17,7 @@
 #include "storage/iterables/constant_value_iterable.hpp"
 #include "storage/iterables/value_column_iterable.hpp"
 #include "storage/value_column.hpp"
+#include "storage/value_vector.hpp"
 
 namespace opossum {
 
@@ -86,7 +87,7 @@ void LikeTableScanImpl::handle_dictionary_column(const BaseDictionaryColumn& bas
 }
 
 std::pair<size_t, std::vector<bool>> LikeTableScanImpl::_find_matches_in_dictionary(
-    const pmr_vector<std::string>& dictionary) {
+    const ValueVector<std::string>& dictionary) {
   auto result = std::pair<size_t, std::vector<bool>>{};
 
   auto& count = result.first;

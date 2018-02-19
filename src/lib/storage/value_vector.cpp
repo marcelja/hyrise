@@ -30,6 +30,11 @@ ValueVector<T>::ValueVector(pmr_concurrent_vector<T>&& values, pmr_concurrent_ve
     : _values(std::move(values)), _null_values(std::move(null_values)) {}
 
 template <typename T>
+ValueVector<T>::ValueVector(const size_t& elements) {
+  _values.reserve(elements);
+}
+
+template <typename T>
 void ValueVector<T>::push_back(const T& value) {
   _values.push_back(std::forward<const T>(value));
 }
@@ -60,12 +65,12 @@ typename ValueVector<T>::iterator ValueVector<T>::end() noexcept {
 }
 
 template <typename T>
-typename ValueVector<T>::const_iterator ValueVector<T>::begin() const noexcept {
+typename ValueVector<T>::const_iterator ValueVector<T>::cbegin() const noexcept {
   return _values.cbegin();
 }
 
 template <typename T>
-typename ValueVector<T>::const_iterator ValueVector<T>::end() const noexcept {
+typename ValueVector<T>::const_iterator ValueVector<T>::cend() const noexcept {
   return _values.cend();
 }
 
@@ -80,13 +85,13 @@ typename ValueVector<T>::reverse_iterator ValueVector<T>::rend() noexcept {
 }
 
 template <typename T>
-typename ValueVector<T>::const_iterator ValueVector<T>::cbegin() noexcept {
-  return _values.cbegin();
+typename ValueVector<T>::const_iterator ValueVector<T>::begin() const noexcept {
+  return _values.begin();
 }
 
 template <typename T>
-typename ValueVector<T>::const_iterator ValueVector<T>::cend() noexcept {
-  return _values.cend();
+typename ValueVector<T>::const_iterator ValueVector<T>::end() const noexcept {
+  return _values.end();
 }
 
 template <typename T>
@@ -112,6 +117,11 @@ size_t ValueVector<T>::resize(size_t n) const {
 template <typename T>
 size_t ValueVector<T>::capacity() const {
   return _values.capacity();
+}
+
+template <typename T>
+void ValueVector<T>::erase(const_iterator start, const_iterator end) {
+  _values.erase(start, end);
 }
 
 template <typename T>
@@ -170,11 +180,11 @@ ValueVector<FixedString>::iterator ValueVector<FixedString>::end() noexcept {
   return iterator(_string_length, _vector, _vector.size());
 }
 
-ValueVector<FixedString>::iterator ValueVector<FixedString>::cbegin() noexcept {
+ValueVector<FixedString>::iterator ValueVector<FixedString>::cbegin() const noexcept {
   return iterator(_string_length, _vector, 0);
 }
 
-ValueVector<FixedString>::iterator ValueVector<FixedString>::cend() noexcept {
+ValueVector<FixedString>::iterator ValueVector<FixedString>::cend() const noexcept {
   return iterator(_string_length, _vector, _vector.size());
 }
 

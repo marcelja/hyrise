@@ -9,6 +9,7 @@
 #include "import_export/binary.hpp"
 #include "storage/fitted_attribute_vector.hpp"
 #include "storage/reference_column.hpp"
+#include "storage/value_vector.hpp"
 
 #include "constant_mappings.hpp"
 #include "resolve_type.hpp"
@@ -65,6 +66,7 @@ template <>
 void _export_values(std::ofstream& ofstream, const opossum::pmr_vector<std::string>& values) {
   _export_string_values(ofstream, values);
 }
+
 template <>
 void _export_values(std::ofstream& ofstream, const std::vector<std::string>& values) {
   _export_string_values(ofstream, values);
@@ -77,6 +79,11 @@ void _export_values(std::ofstream& ofstream, const std::vector<bool>& values) {
   const auto writable_bools = std::vector<opossum::BoolAsByteType>(values.begin(), values.end());
   _export_values(ofstream, writable_bools);
 }
+
+// template <typename T>
+// void _export_values(std::ofstream& ofstream, const opossum::ValueVector<T>& values) {
+//   std::cout << "iuh";
+// }
 
 template <typename T>
 void _export_values(std::ofstream& ofstream, const opossum::pmr_concurrent_vector<T>& values) {
@@ -232,7 +239,7 @@ void ExportBinary::ExportBinaryVisitor<T>::handle_dictionary_column(
 
   // Write the dictionary size and dictionary
   _export_value(context->ofstream, static_cast<ValueID>(column.unique_values_count()));
-  _export_values(context->ofstream, *column.dictionary());
+  _export_values(context->ofstream, column.dictionary()->pmr_vector_values());
 
   _export_attribute_vector(context->ofstream, *column.attribute_vector());
 }

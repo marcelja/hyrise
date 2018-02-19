@@ -17,6 +17,7 @@
 #include "storage/chunk.hpp"
 #include "storage/fitted_attribute_vector.hpp"
 #include "storage/storage_manager.hpp"
+#include "storage/value_vector.hpp"
 #include "utils/assert.hpp"
 
 namespace opossum {
@@ -191,7 +192,8 @@ std::shared_ptr<DictionaryColumn<T>> ImportBinary::_import_dictionary_column(std
                                                                              ChunkOffset row_count) {
   const auto attribute_vector_width = _read_value<AttributeVectorWidth>(file);
   const auto dictionary_size = _read_value<ValueID>(file);
-  auto dictionary = _read_values<T>(file, dictionary_size);
+  ValueVector<T> dictionary(std::move(_read_values<T>(file, dictionary_size)));
+  // auto dictionary = _read_values<T>(file, dictionary_size);
   auto attribute_vector = _import_attribute_vector(file, row_count, attribute_vector_width);
   return std::make_shared<DictionaryColumn<T>>(std::move(dictionary), std::move(attribute_vector));
 }

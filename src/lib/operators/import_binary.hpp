@@ -14,6 +14,7 @@
 #include "storage/dictionary_column.hpp"
 #include "storage/reference_column.hpp"
 #include "storage/value_column.hpp"
+#include "storage/value_vector.hpp"
 #include "utils/assert.hpp"
 
 namespace opossum {

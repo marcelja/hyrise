@@ -9,6 +9,7 @@
 #include "all_type_variant.hpp"
 #include "base_dictionary_column.hpp"
 #include "types.hpp"
+#include "value_vector.hpp"
 
 namespace opossum {
 
@@ -23,9 +24,9 @@ class DictionaryColumn : public BaseDictionaryColumn {
    * Creates a Dictionary column from a given dictionary and attribute vector.
    * See dictionary_compression.cpp for more.
    */
-  explicit DictionaryColumn(pmr_vector<T>&& dictionary, const std::shared_ptr<BaseAttributeVector>& attribute_vector);
+  explicit DictionaryColumn(ValueVector<T>&& dictionary, const std::shared_ptr<BaseAttributeVector>& attribute_vector);
 
-  explicit DictionaryColumn(const std::shared_ptr<pmr_vector<T>>& dictionary,
+  explicit DictionaryColumn(const std::shared_ptr<ValueVector<T>>& dictionary,
                             const std::shared_ptr<BaseAttributeVector>& attribute_vector);
 
   // return the value at a certain position. If you want to write efficient operators, back off!
@@ -42,7 +43,7 @@ class DictionaryColumn : public BaseDictionaryColumn {
   void append(const AllTypeVariant&) override;
 
   // returns an underlying dictionary
-  std::shared_ptr<const pmr_vector<T>> dictionary() const;
+  std::shared_ptr<const ValueVector<T>> dictionary() const;
 
   // returns an underlying data structure
   std::shared_ptr<const BaseAttributeVector> attribute_vector() const final;
@@ -80,7 +81,7 @@ class DictionaryColumn : public BaseDictionaryColumn {
   std::shared_ptr<BaseColumn> copy_using_allocator(const PolymorphicAllocator<size_t>& alloc) const override;
 
  protected:
-  std::shared_ptr<pmr_vector<T>> _dictionary;
+  std::shared_ptr<ValueVector<T>> _dictionary;
   std::shared_ptr<BaseAttributeVector> _attribute_vector;
 };
 
