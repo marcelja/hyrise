@@ -37,7 +37,6 @@ namespace detail {
   ((float,       Float,      "float"))  \
   ((double,      Double,     "double")) \
   ((std::string, String,     "string"))
-//  ((FixedString, FixedString,"fixedstring"))
 // Type          Enum Value   String
 // clang-format on
 
