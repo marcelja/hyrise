@@ -25,58 +25,11 @@ ValueVector<T>::ValueVector(const size_t& elements) {
 template <typename T>
 template< class Iter >
 ValueVector<T>::ValueVector(Iter first, Iter last){
-  std::cout << "const auto&&& const ++it;";
+  while (first != last) {
+    push_back(*first);
+    ++first;
+  }
 }
-
-
-// ValueVector<T>::ValueVector(iterator begin, iterator end) {
-//   while (begin != end) {
-//     push_back(*begin);
-//     ++begin;
-//   }
-// }
-
-// template <typename T>
-// ValueVector<T>::ValueVector(typename std::vector<T>::iterator begin, typename std::vector<T>::iterator end) {
-//   while (begin != end) {
-//     push_back(*begin);
-//     ++begin;
-//   }
-// }
-
-// template <typename T>
-// ValueVector<T>::ValueVector(typename pmr_concurrent_vector<T>::iterator begin, typename pmr_concurrent_vector<T>::iterator end) {
-//   while (begin != end) {
-//     push_back(*begin);
-//     ++begin;
-//   }
-// }
-
-// template <typename T>
-// ValueVector<T>::ValueVector(const_iterator cbegin, const_iterator cend) {
-//   while (cbegin != cend) {
-//     push_back(*cbegin);
-//     ++cbegin;
-//   }
-// }
-
-// template <typename T>
-// ValueVector<T>::ValueVector(typename std::vector<T>::const_iterator cbegin,
-//                             typename std::vector<T>::const_iterator cend) {
-//   while (cbegin != cend) {
-//     push_back(*cbegin);
-//     ++cbegin;
-//   }
-// }
-
-// template <typename T>
-// ValueVector<T>::ValueVector(typename pmr_concurrent_vector<T>::const_iterator cbegin,
-//                             typename pmr_concurrent_vector<T>::const_iterator cend) {
-//   while (cbegin != cend) {
-//     push_back(*cbegin);
-//     ++cbegin;
-//   }
-// }
 
 template <typename T>
 void ValueVector<T>::push_back(const T& value) {
@@ -104,12 +57,12 @@ typename ValueVector<T>::iterator ValueVector<T>::end() noexcept {
 }
 
 template <typename T>
-typename ValueVector<T>::const_iterator ValueVector<T>::begin() const noexcept {
+typename ValueVector<T>::const_iterator ValueVector<T>::cbegin() const noexcept {
   return _values.cbegin();
 }
 
 template <typename T>
-typename ValueVector<T>::const_iterator ValueVector<T>::end() const noexcept {
+typename ValueVector<T>::const_iterator ValueVector<T>::cend() const noexcept {
   return _values.cend();
 }
 
@@ -124,13 +77,13 @@ typename ValueVector<T>::reverse_iterator ValueVector<T>::rend() noexcept {
 }
 
 template <typename T>
-typename ValueVector<T>::const_iterator ValueVector<T>::cbegin() noexcept {
-  return _values.cbegin();
+typename ValueVector<T>::const_iterator ValueVector<T>::begin() const noexcept {
+  return _values.begin();
 }
 
 template <typename T>
-typename ValueVector<T>::const_iterator ValueVector<T>::cend() noexcept {
-  return _values.cend();
+typename ValueVector<T>::const_iterator ValueVector<T>::end() const noexcept {
+  return _values.end();
 }
 
 template <typename T>
@@ -170,47 +123,25 @@ PolymorphicAllocator<T> ValueVector<T>::get_allocator() {
 
 // Implementation of ValueVector<FixedString> starts here
 
-ValueVector<FixedString>::ValueVector(typename std::vector<FixedString>::iterator begin,
-                                      typename std::vector<FixedString>::iterator end, size_t string_length)
-    : _string_length(string_length) {
-  while (begin != end) {
-    push_back(*begin);
-    ++begin;
-  }
-}
 
-ValueVector<FixedString>::ValueVector(pmr_vector<FixedString>::iterator begin, pmr_vector<FixedString>::iterator end,
-                                      size_t string_length)
-    : _string_length(string_length) {
-  while (begin != end) {
-    push_back(*begin);
-    ++begin;
-  }
-}
 
-ValueVector<FixedString>::ValueVector(pmr_vector<FixedString>::const_iterator cbegin,
-                                      pmr_vector<FixedString>::const_iterator cend, size_t string_length)
-    : _string_length(string_length) {
-  while (cbegin != cend) {
-    push_back(*cbegin);
-    ++cbegin;
-  }
-}
 
-ValueVector<FixedString>::ValueVector(typename std::vector<FixedString>::const_iterator cbegin,
-                                      typename std::vector<FixedString>::const_iterator cend, size_t string_length)
-    : _string_length(string_length) {
-  while (cbegin != cend) {
-    push_back(*cbegin);
-    ++cbegin;
-  }
-}
+
 
 void ValueVector<FixedString>::push_back(const FixedString& value) {
   push_back(std::forward<FixedString>((FixedString&)value));
 }
 
 void ValueVector<FixedString>::push_back(FixedString&& string) {
+  auto pos = _vector.size();
+  _vector.resize(_vector.size() + _string_length);
+  string.copy(&_vector[pos], _string_length);
+  if (string.size() < _string_length) {
+    std::fill(_vector.begin() + pos + string.size(), _vector.begin() + pos + _string_length, '\0');
+  }
+}
+
+void ValueVector<FixedString>::push_back(const std::string& string) {
   auto pos = _vector.size();
   _vector.resize(_vector.size() + _string_length);
   string.copy(&_vector[pos], _string_length);
@@ -231,11 +162,11 @@ ValueVector<FixedString>::iterator ValueVector<FixedString>::end() noexcept {
   return iterator(_string_length, _vector, _vector.size());
 }
 
-ValueVector<FixedString>::iterator ValueVector<FixedString>::cbegin() noexcept {
+ValueVector<FixedString>::iterator ValueVector<FixedString>::cbegin() const noexcept {
   return iterator(_string_length, _vector, 0);
 }
 
-ValueVector<FixedString>::iterator ValueVector<FixedString>::cend() noexcept {
+ValueVector<FixedString>::iterator ValueVector<FixedString>::cend() const noexcept {
   return iterator(_string_length, _vector, _vector.size());
 }
 

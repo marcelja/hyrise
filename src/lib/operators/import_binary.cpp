@@ -28,33 +28,33 @@ ImportBinary::ImportBinary(const std::string& filename, const std::optional<std:
 const std::string ImportBinary::name() const { return "ImportBinary"; }
 
 template <typename T>
-pmr_vector<T> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
-  pmr_vector<T> values(count);
+ValueVector<T> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
+  ValueVector<T> values(count);
   file.read(reinterpret_cast<char*>(values.data()), values.size() * sizeof(T));
   return values;
 }
 
 // specialized implementation for string values
 template <>
-pmr_vector<std::string> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
+ValueVector<std::string> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
   return _read_string_values(file, count);
 }
 
 // specialized implementation for bool values
 template <>
-pmr_vector<bool> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
+ValueVector<bool> ImportBinary::_read_values(std::ifstream& file, const size_t count) {
   pmr_vector<BoolAsByteType> readable_bools(count);
   file.read(reinterpret_cast<char*>(readable_bools.data()), readable_bools.size() * sizeof(BoolAsByteType));
-  return pmr_vector<bool>(readable_bools.begin(), readable_bools.end());
+  return ValueVector<bool>(readable_bools.begin(), readable_bools.end());
 }
 
 template <typename T>
-pmr_vector<std::string> ImportBinary::_read_string_values(std::ifstream& file, const size_t count) {
+ValueVector<std::string> ImportBinary::_read_string_values(std::ifstream& file, const size_t count) {
   const auto string_lengths = _read_values<T>(file, count);
   const auto total_length = std::accumulate(string_lengths.cbegin(), string_lengths.cend(), static_cast<size_t>(0));
   const auto buffer = _read_values<char>(file, total_length);
 
-  pmr_vector<std::string> values(count);
+  ValueVector<std::string> values(count);
   size_t start = 0;
 
   for (size_t i = 0; i < count; ++i) {
@@ -160,11 +160,11 @@ std::shared_ptr<BaseAttributeVector> ImportBinary::_import_attribute_vector(
     std::ifstream& file, ChunkOffset row_count, AttributeVectorWidth attribute_vector_width) {
   switch (attribute_vector_width) {
     case 1:
-      return std::make_shared<FittedAttributeVector<uint8_t>>(_read_values<uint8_t>(file, row_count));
+      return std::make_shared<FittedAttributeVector<uint8_t>>(_read_values<uint8_t>(file, row_count).pmr_vector_values());
     case 2:
-      return std::make_shared<FittedAttributeVector<uint16_t>>(_read_values<uint16_t>(file, row_count));
+      return std::make_shared<FittedAttributeVector<uint16_t>>(_read_values<uint16_t>(file, row_count).pmr_vector_values());
     case 4:
-      return std::make_shared<FittedAttributeVector<uint32_t>>(_read_values<uint32_t>(file, row_count));
+      return std::make_shared<FittedAttributeVector<uint32_t>>(_read_values<uint32_t>(file, row_count).pmr_vector_values());
     default:
       Fail("Cannot import attribute vector with width: " + std::to_string(attribute_vector_width));
       return {};

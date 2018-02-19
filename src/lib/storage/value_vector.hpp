@@ -7,6 +7,7 @@
 
 #include "fixed_string.hpp"
 #include "types.hpp"
+#include "utils/assert.hpp"
 
 namespace opossum {
 
@@ -18,26 +19,11 @@ class ValueVector {
   using reverse_iterator = typename pmr_vector<T>::reverse_iterator;
 
   ValueVector();
-template< class Iter >
+
+  template< class Iter >
   ValueVector(Iter begin, Iter end);
 
   ValueVector(const size_t& elements);
-
-  // ValueVector(typename std::vector<T>::iterator begin, typename std::vector<T>::iterator end);
-
-  // ValueVector(typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end);
-
-  // ValueVector(typename pmr_concurrent_vector<T>::iterator begin, typename pmr_concurrent_vector<T>::iterator end);
-
-  // ValueVector(typename pmr_concurrent_vector<T>::const_iterator begin, typename pmr_concurrent_vector<T>::const_iterator end);
-
-  // ValueVector(iterator begin, iterator end);
-
-  // ValueVector(const_iterator cbegin, const_iterator cend);
-
-  // ValueVector(const ValueVector&& other) : _values(other._values) {}
-
-  // ValueVector(const ValueVector& other) : _values(other._values) {}
 
   void push_back(const T& value);
 
@@ -53,9 +39,9 @@ template< class Iter >
 
   reverse_iterator rend() noexcept;
 
-  const_iterator cbegin() noexcept;
+  const_iterator cbegin() const noexcept;
 
-  const_iterator cend() noexcept;
+  const_iterator cend() const noexcept;
 
   const_iterator begin() const noexcept;
 
@@ -69,7 +55,23 @@ template< class Iter >
 
   size_t capacity() const;
 
+  void reserve(size_t n) {
+    _values.reserve(n);
+  }
+
   void shrink_to_fit();
+
+  pmr_vector<T>& pmr_vector_values() {
+    return _values;
+  }
+
+  T* data() noexcept {
+    return _values.data();
+  }
+
+  const T* data() const noexcept {
+    return _values.data();
+  }
 
   void erase(const_iterator start, const_iterator end);
 
@@ -84,18 +86,25 @@ class ValueVector<FixedString> {
  public:
   explicit ValueVector(size_t string_length) : _string_length(string_length) {}
 
-  ValueVector(typename std::vector<FixedString>::iterator begin, typename std::vector<FixedString>::iterator end,
-              size_t string_length);
+  template< class Iter >
+  ValueVector(Iter first, Iter last, size_t string_length) : _string_length(string_length) {
+    while (first != last) {
+      push_back(*first);
+      ++first;
+    }
+  }
 
-  ValueVector(pmr_vector<FixedString>::iterator begin, pmr_vector<FixedString>::iterator end, size_t string_length);
+  template< class Iter >
+  ValueVector(Iter first, Iter last) {
+    _string_length = first->size();
+    while (first != last) {
+      push_back(*first);
+      ++first;
+    }
+  }
 
-  ValueVector(pmr_vector<FixedString>::const_iterator cbegin, pmr_vector<FixedString>::const_iterator cend,
-              size_t string_length);
-
-  ValueVector(typename std::vector<FixedString>::const_iterator cbegin,
-              typename std::vector<FixedString>::const_iterator cend, size_t string_length);
-
-  ValueVector(const ValueVector&& other) : _string_length(other._string_length), _vector(other._vector) {}
+  ValueVector(const ValueVector&& other) : _string_length(other._string_length), _vector(other._vector) {
+  }
 
   ValueVector(const ValueVector& other) : _string_length(other._string_length), _vector(other._vector) {}
 
@@ -103,7 +112,7 @@ class ValueVector<FixedString> {
 
   void push_back(FixedString&& string);
 
-  void push_back(const std::string& string) { push_back(FixedString(string)); }
+  void push_back(const std::string& string);
 
   FixedString at(const ChunkOffset chunk_offset);
 
@@ -111,9 +120,9 @@ class ValueVector<FixedString> {
    public:
     iterator(size_t string_length, const pmr_vector<char>& vector, size_t pos = 0)
         : _string_length(string_length), _vector(vector), _pos(pos) {}
+
     iterator& operator=(const iterator& other) {
-      if (_string_length != other._string_length || _vector != other._vector)
-        throw std::runtime_error("can't convert pointers from different vectors");
+      DebugAssert(_string_length == other._string_length && &_vector == &other._vector, "can't convert pointers from different vectors");
       _pos = other._pos;
       return *this;
     }
@@ -139,9 +148,9 @@ class ValueVector<FixedString> {
 
   iterator end() noexcept;
 
-  iterator cbegin() noexcept;
+  iterator cbegin() const noexcept;
 
-  iterator cend() noexcept;
+  iterator cend() const noexcept;
 
   iterator begin() const noexcept;
 
@@ -163,6 +172,10 @@ class ValueVector<FixedString> {
   void erase(const iterator start, const iterator end);
 
   void shrink_to_fit();
+
+  void reserve(size_t n) {
+    _vector.reserve(n * _string_length);
+  }
 
   PolymorphicAllocator<FixedString> get_allocator();
 
