@@ -12,7 +12,7 @@
 
 namespace opossum {
 
-template <typename T>
+template <typename T, typename Vec = pmr_vector<T> >
 class ValueVector {
  public:
   using iterator = typename pmr_concurrent_vector<T>::iterator;
@@ -32,11 +32,6 @@ class ValueVector {
   ValueVector(const size_t& elements);
 
   ValueVector(pmr_vector<T>&& vector) : _values(vector) {};
-
-  // TODO(toni): add to VV<FS> 3 times
-  explicit ValueVector(const PolymorphicAllocator<T>& alloc, bool nullable = false);
-  explicit ValueVector(pmr_concurrent_vector<T>&& values);
-  explicit ValueVector(pmr_concurrent_vector<T>&& values, pmr_concurrent_vector<bool>&& null_values);
 
   // explicit ValueVector(const PolymorphicAllocator<T>& alloc);
 
@@ -103,8 +98,8 @@ class ValueVector {
   PolymorphicAllocator<T> get_allocator();
 
  protected:
-  pmr_vector<T> _values;
-  std::optional<pmr_concurrent_vector<bool>> _null_values;
+  // std::vector<T, Alloc> _values;
+  Vec _values;
 };
 
 template <>

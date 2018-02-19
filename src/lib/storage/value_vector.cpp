@@ -18,18 +18,6 @@ template <typename T>
 ValueVector<T>::ValueVector() {}
 
 template <typename T>
-ValueVector<T>::ValueVector(const PolymorphicAllocator<T>& alloc, bool nullable) : _values(alloc) {
-  if (nullable) _null_values = pmr_concurrent_vector<bool>(alloc);
-}
-
-template <typename T>
-ValueVector<T>::ValueVector(pmr_concurrent_vector<T>&& values) : _values(std::move(values)) {}
-
-template <typename T>
-ValueVector<T>::ValueVector(pmr_concurrent_vector<T>&& values, pmr_concurrent_vector<bool>&& null_values)
-    : _values(std::move(values)), _null_values(std::move(null_values)) {}
-
-template <typename T>
 ValueVector<T>::ValueVector(const size_t& elements) {
   _values.reserve(elements);
 }

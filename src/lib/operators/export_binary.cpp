@@ -93,12 +93,12 @@ void _export_values(std::ofstream& ofstream, const opossum::pmr_concurrent_vecto
 }
 
 // specialized implementation for string values
-template <>
-void _export_values(std::ofstream& ofstream, const opossum::pmr_concurrent_vector<std::string>& values) {
-  // TODO(all): could be faster if we directly write the values into the stream without prior conversion
-  const auto value_block = std::vector<std::string>{values.begin(), values.end()};
-  _export_string_values(ofstream, value_block);
-}
+// template <>
+// void _export_values(std::ofstream& ofstream, const opossum::pmr_concurrent_vector<std::string>& values) {
+//   // TODO(all): could be faster if we directly write the values into the stream without prior conversion
+//   const auto value_block = std::vector<std::string>{values.begin(), values.end()};
+//   _export_string_values(ofstream, value_block);
+// }
 
 // specialized implementation for bool values
 template <>
@@ -183,7 +183,7 @@ void ExportBinary::ExportBinaryVisitor<T>::handle_value_column(const BaseValueCo
     _export_values(context->ofstream, column.null_values());
   }
 
-  _export_values(context->ofstream, column.values());
+  _export_values(context->ofstream, column.values().pmr_vector_values());
 }
 
 template <typename T>

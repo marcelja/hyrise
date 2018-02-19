@@ -5,6 +5,7 @@
 
 #include "iterables.hpp"
 #include "storage/value_column.hpp"
+#include "storage/value_vector.hpp"
 
 namespace opossum {
 
@@ -70,7 +71,7 @@ class ValueColumnIterable : public IndexableIterable<ValueColumnIterable<T>> {
 
   class NullableIterator : public BaseIterator<NullableIterator, NullableColumnValue<T>> {
    public:
-    using ValueIterator = typename pmr_concurrent_vector<T>::const_iterator;
+    using ValueIterator = typename ValueVector<T>::const_iterator;
     using NullValueIterator = pmr_concurrent_vector<bool>::const_iterator;
 
    public:
@@ -100,11 +101,11 @@ class ValueColumnIterable : public IndexableIterable<ValueColumnIterable<T>> {
   };
 
   class IndexedIterator : public BaseIndexedIterator<IndexedIterator, ColumnValue<T>> {
-   public:
-    using ValueVector = pmr_concurrent_vector<T>;
+   // public:
+    // using ValueVector = ValueVector<T>;
 
    public:
-    explicit IndexedIterator(const ValueVector& values, const ChunkOffsetsIterator& chunk_offsets_it)
+    explicit IndexedIterator(const ValueVector<T>& values, const ChunkOffsetsIterator& chunk_offsets_it)
         : BaseIndexedIterator<IndexedIterator, ColumnValue<T>>{chunk_offsets_it}, _values{values} {}
 
    private:
@@ -120,16 +121,16 @@ class ValueColumnIterable : public IndexableIterable<ValueColumnIterable<T>> {
     }
 
    private:
-    const ValueVector& _values;
+    const ValueVector<T>& _values;
   };
 
   class NullableIndexedIterator : public BaseIndexedIterator<NullableIndexedIterator, NullableColumnValue<T>> {
    public:
-    using ValueVector = pmr_concurrent_vector<T>;
+    // using ValueVector = ValueVector<T>;
     using NullValueVector = pmr_concurrent_vector<bool>;
 
    public:
-    explicit NullableIndexedIterator(const ValueVector& values, const NullValueVector& null_values,
+    explicit NullableIndexedIterator(const ValueVector<T>& values, const NullValueVector& null_values,
                                      const ChunkOffsetsIterator& chunk_offsets_it)
         : BaseIndexedIterator<NullableIndexedIterator, NullableColumnValue<T>>{chunk_offsets_it},
           _values{values},
@@ -149,7 +150,7 @@ class ValueColumnIterable : public IndexableIterable<ValueColumnIterable<T>> {
     }
 
    private:
-    const ValueVector& _values;
+    const ValueVector<T>& _values;
     const NullValueVector& _null_values;
   };
 };
