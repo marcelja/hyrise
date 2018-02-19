@@ -65,7 +65,7 @@ class DictionaryColumnIterable : public IndexableIterable<DictionaryColumnIterab
 
   class IndexedIterator : public BaseIndexedIterator<IndexedIterator, NullableColumnValue<T>> {
    public:
-    using Dictionary = pmr_vector<T>;
+    using Dictionary = ValueVector<T>;
 
    public:
     explicit IndexedIterator(const Dictionary& dictionary, const BaseAttributeVector& attribute_vector,

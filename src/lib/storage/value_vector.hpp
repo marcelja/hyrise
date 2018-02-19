@@ -25,6 +25,8 @@ class ValueVector {
 
   ValueVector(const size_t& elements);
 
+  ValueVector(pmr_vector<T>&& vector) : _values(vector) {};
+
   void push_back(const T& value);
 
   void push_back(T&& value);
@@ -62,6 +64,10 @@ class ValueVector {
   void shrink_to_fit();
 
   pmr_vector<T>& pmr_vector_values() {
+    return _values;
+  }
+
+  const pmr_vector<T>& pmr_vector_values() const {
     return _values;
   }
 

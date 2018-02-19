@@ -62,19 +62,15 @@ void _export_values(std::ofstream& ofstream, const std::vector<T, Alloc>& values
 }
 
 // specialized implementation for string values
-// template <>
-// void _export_values(std::ofstream& ofstream, const opossum::pmr_vector<std::string>& values) {
-//   _export_string_values(ofstream, values);
-// }
+template <>
+void _export_values(std::ofstream& ofstream, const opossum::pmr_vector<std::string>& values) {
+  _export_string_values(ofstream, values);
+}
+
 template <>
 void _export_values(std::ofstream& ofstream, const std::vector<std::string>& values) {
   _export_string_values(ofstream, values);
 }
-
-// template <>
-// void _export_values(std::ofstream& ofstream, const opossum::ValueVector<std::string>& values) {
-//   _export_string_values(ofstream, values);
-// }
 
 // specialized implementation for bool values
 template <>
@@ -84,10 +80,10 @@ void _export_values(std::ofstream& ofstream, const std::vector<bool>& values) {
   _export_values(ofstream, writable_bools);
 }
 
-template <typename T>
-void _export_values(std::ofstream& ofstream, const opossum::ValueVector<T>& values) {
-  std::cout << "iuh";
-}
+// template <typename T>
+// void _export_values(std::ofstream& ofstream, const opossum::ValueVector<T>& values) {
+//   std::cout << "iuh";
+// }
 
 template <typename T>
 void _export_values(std::ofstream& ofstream, const opossum::pmr_concurrent_vector<T>& values) {
@@ -243,7 +239,7 @@ void ExportBinary::ExportBinaryVisitor<T>::handle_dictionary_column(
 
   // Write the dictionary size and dictionary
   _export_value(context->ofstream, static_cast<ValueID>(column.unique_values_count()));
-  _export_values(context->ofstream, *column.dictionary());
+  _export_values(context->ofstream, column.dictionary()->pmr_vector_values());
 
   _export_attribute_vector(context->ofstream, *column.attribute_vector());
 }
