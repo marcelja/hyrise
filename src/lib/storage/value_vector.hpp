@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 
 #include <memory>
 #include <string>
@@ -14,9 +15,9 @@ namespace opossum {
 template <typename T>
 class ValueVector {
  public:
-  using iterator = typename pmr_vector<T>::iterator;
-  using const_iterator = typename pmr_vector<T>::const_iterator;
-  using reverse_iterator = typename pmr_vector<T>::reverse_iterator;
+  using iterator = typename pmr_concurrent_vector<T>::iterator;
+  using const_iterator = typename pmr_concurrent_vector<T>::const_iterator;
+  using reverse_iterator = typename pmr_concurrent_vector<T>::reverse_iterator;
 
   ValueVector();
 
@@ -32,11 +33,20 @@ class ValueVector {
 
   ValueVector(const ValueVector& other) : _values(other._values) {}
 
+  // TODO(toni): add to VV<FS> 3 times
+  explicit ValueVector(const PolymorphicAllocator<T>& alloc, bool nullable = false);
+  explicit ValueVector(pmr_concurrent_vector<T>&& values);
+  explicit ValueVector(pmr_concurrent_vector<T>&& values, pmr_concurrent_vector<bool>&& null_values);
+
+  // explicit ValueVector(const PolymorphicAllocator<T>& alloc);
+
   void push_back(const T& value);
 
   void push_back(T&& value);
 
   T& at(const ChunkOffset chunk_offset);
+  
+  const T& at(const ChunkOffset chunk_offset) const;
 
   iterator begin() noexcept;
 
@@ -62,9 +72,13 @@ class ValueVector {
 
   size_t capacity() const;
 
+  void resize(size_t n);
+
   void reserve(size_t n) {
     _values.reserve(n);
   }
+
+  void erase(const iterator start, const iterator end);
 
   void shrink_to_fit();
 
@@ -72,6 +86,7 @@ class ValueVector {
 
  protected:
   pmr_vector<T> _values;
+  std::optional<pmr_concurrent_vector<bool>> _null_values;
 };
 
 template <>
@@ -174,7 +189,8 @@ class ValueVector<FixedString> {
 
  private:
   size_t _string_length;
-  pmr_vector<char> _vector;
+  // pmr_vector<char> _vector;
+  pmr_concurrent_vector<char> _vector;
 };
 
 }  // namespace opossum

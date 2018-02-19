@@ -94,12 +94,12 @@ void ValueColumn<std::string>::append(const AllTypeVariant& val) {
 }
 
 template <typename T>
-const pmr_concurrent_vector<T>& ValueColumn<T>::values() const {
+const ValueVector<T>& ValueColumn<T>::values() const {
   return _values;
 }
 
 template <typename T>
-pmr_concurrent_vector<T>& ValueColumn<T>::values() {
+ValueVector<T>& ValueColumn<T>::values() {
   return _values;
 }
 

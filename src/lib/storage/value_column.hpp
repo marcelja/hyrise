@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "base_value_column.hpp"
+#include "value_vector.hpp"
 
 namespace opossum {
 
@@ -38,8 +39,8 @@ class ValueColumn : public BaseValueColumn {
   // Return all values. This is the preferred method to check a value at a certain index. Usually you need to
   // access more than a single value anyway.
   // e.g. auto& values = col.values(); and then: values.at(i); in your loop.
-  const pmr_concurrent_vector<T>& values() const;
-  pmr_concurrent_vector<T>& values();
+  const ValueVector<T>& values() const;
+  ValueVector<T>& values();
 
   // return a generated vector of all values (or nulls)
   const pmr_concurrent_vector<std::optional<T>> materialize_values() const;
@@ -64,7 +65,7 @@ class ValueColumn : public BaseValueColumn {
   std::shared_ptr<BaseColumn> copy_using_allocator(const PolymorphicAllocator<size_t>& alloc) const override;
 
  protected:
-  pmr_concurrent_vector<T> _values;
+  ValueVector<T> _values;
 
   // While a ValueColumn knows if it is nullable or not by looking at this optional, a DictionaryColumn does not.
   // For this reason, we need to store the nullable information separately in the table's definition.

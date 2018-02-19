@@ -18,6 +18,18 @@ template <typename T>
 ValueVector<T>::ValueVector() {}
 
 template <typename T>
+ValueVector<T>::ValueVector(const PolymorphicAllocator<T>& alloc, bool nullable) : _values(alloc) {
+  if (nullable) _null_values = pmr_concurrent_vector<bool>(alloc);
+}
+
+template <typename T>
+ValueVector<T>::ValueVector(pmr_concurrent_vector<T>&& values) : _values(std::move(values)) {}
+
+template <typename T>
+ValueVector<T>::ValueVector(pmr_concurrent_vector<T>&& values, pmr_concurrent_vector<bool>&& null_values)
+    : _values(std::move(values)), _null_values(std::move(null_values)) {}
+
+template <typename T>
 void ValueVector<T>::push_back(const T& value) {
   _values.push_back(std::forward<const T>(value));
 }
@@ -29,6 +41,11 @@ void ValueVector<T>::push_back(T&& value) {
 
 template <typename T>
 T& ValueVector<T>::at(const ChunkOffset chunk_offset) {
+  return _values.at(chunk_offset);
+}
+
+template <typename T>
+const T& ValueVector<T>::at(const ChunkOffset chunk_offset) {
   return _values.at(chunk_offset);
 }
 
@@ -88,6 +105,11 @@ size_t ValueVector<T>::size() const {
 }
 
 template <typename T>
+size_t ValueVector<T>::resize(size_t n) const {
+  return _values.resize(n);
+}
+
+template <typename T>
 size_t ValueVector<T>::capacity() const {
   return _values.capacity();
 }
@@ -100,6 +122,11 @@ void ValueVector<T>::shrink_to_fit() {
 template <typename T>
 PolymorphicAllocator<T> ValueVector<T>::get_allocator() {
   return _values.get_allocator();
+}
+
+template <typename T>
+void ValueVector<T>::erase(const iterator start, const iterator end) {
+  _values.erase(start, _vector.end());
 }
 
 // Implementation of ValueVector<FixedString> starts here
