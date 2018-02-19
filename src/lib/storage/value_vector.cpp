@@ -89,12 +89,10 @@ PolymorphicAllocator<T> ValueVector<T>::get_allocator() {
 
 template <typename T>
 void ValueVector<T>::reserve(const size_t n) {
-    _values.reserve(n);
-  }
+  _values.reserve(n);
+}
 
 // Implementation of ValueVector<FixedString> starts here
-
-
 
 void ValueVector<FixedString>::push_back(const std::string& string) {
   const auto pos = _chars.size();
@@ -106,7 +104,7 @@ void ValueVector<FixedString>::push_back(const std::string& string) {
 }
 
 FixedString ValueVector<FixedString>::at(const ChunkOffset chunk_offset) {
-  return FixedString((char*)&_chars.at(chunk_offset * _string_length), _string_length);
+  return FixedString(reinterpret_cast<char*>(&_chars.at(chunk_offset * _string_length)), _string_length);
 }
 
 ValueVector<FixedString>::iterator ValueVector<FixedString>::begin() noexcept {
@@ -131,11 +129,11 @@ reverse_iterator ValueVector<FixedString>::rbegin() noexcept { return reverse_it
 reverse_iterator ValueVector<FixedString>::rend() noexcept { return reverse_iterator(begin()); }
 
 FixedString ValueVector<FixedString>::operator[](const size_t n) {
-  return {FixedString(&_chars[n * _string_length], _string_length)};
+  return FixedString(&_chars[n * _string_length], _string_length);
 }
 
 const FixedString ValueVector<FixedString>::operator[](const size_t n) const {
-  return {FixedString((char*)&_chars[n * _string_length], _string_length)};
+  return FixedString(const_cast<char*>(&_chars[n * _string_length]), _string_length);
 }
 
 size_t ValueVector<FixedString>::size() const { return _chars.size() / _string_length; }
@@ -150,9 +148,7 @@ void ValueVector<FixedString>::shrink_to_fit() { _chars.shrink_to_fit(); }
 
 PolymorphicAllocator<FixedString> ValueVector<FixedString>::get_allocator() { return _chars.get_allocator(); }
 
-void ValueVector<FixedString>::reserve(const size_t n) {
-  _chars.reserve(n * _string_length);
-}
+void ValueVector<FixedString>::reserve(const size_t n) { _chars.reserve(n * _string_length); }
 
 EXPLICITLY_INSTANTIATE_DATA_TYPES(ValueVector);
 

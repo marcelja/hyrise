@@ -20,8 +20,8 @@ class ValueVector {
 
   ValueVector();
 
-  // TODO move to cpp
-  template< class Iter >
+  // TODO(team_btm): move to cpp
+  template <class Iter>
   ValueVector(Iter first, Iter last) {
     while (first != last) {
       push_back(*first);
@@ -72,16 +72,19 @@ class ValueVector<FixedString> {
  public:
   explicit ValueVector(size_t string_length) : _string_length(string_length) {}
 
-  // TODO move to cpp
-  template< class Iter >
-  ValueVector(Iter first, Iter last, size_t string_length) : _string_length(string_length) { _iterator_push_back(first, last); }
-
-  // TODO move to cpp
-  template< class Iter >
-  ValueVector(Iter first, Iter last) : _string_length(first->size()) { _iterator_push_back(first, last); }
-
-  ValueVector(const ValueVector&& other) : _string_length(other._string_length), _chars(other._chars) {
+  // TODO(team_btm): move to cpp
+  template <class Iter>
+  ValueVector(Iter first, Iter last, size_t string_length) : _string_length(string_length) {
+    _iterator_push_back(first, last);
   }
+
+  // TODO(team_btm): move to cpp
+  template <class Iter>
+  ValueVector(Iter first, Iter last) : _string_length(first->size()) {
+    _iterator_push_back(first, last);
+  }
+
+  ValueVector(const ValueVector&& other) : _string_length(other._string_length), _chars(other._chars) {}
 
   ValueVector(const ValueVector& other) : _string_length(other._string_length), _chars(other._chars) {}
 
@@ -89,13 +92,14 @@ class ValueVector<FixedString> {
 
   FixedString at(const ChunkOffset chunk_offset);
 
-  // TODO move??
+  // TODO(team_btm): move??
   class iterator : public boost::iterator_facade<iterator, FixedString, std::random_access_iterator_tag, FixedString> {
    public:
     iterator(size_t string_length, const pmr_vector<char>& vector, size_t pos = 0)
         : _string_length(string_length), _chars(vector), _pos(pos) {}
     iterator& operator=(const iterator& other) {
-      DebugAssert(_string_length == other._string_length && &_chars == &other._chars, "can't convert pointers from different vectors");
+      DebugAssert(_string_length == other._string_length && &_chars == &other._chars,
+                  "can't convert pointers from different vectors");
       _pos = other._pos;
       return *this;
     }
@@ -110,7 +114,7 @@ class ValueVector<FixedString> {
     void advance(typename facade::difference_type n) { _pos += n * _string_length; }
     void increment() { _pos += _string_length; }
     void decrement() { _pos -= _string_length; }
-    FixedString dereference() const { return FixedString((char*)&_chars[_pos], _string_length); }
+    FixedString dereference() const { return FixedString(const_cast<char*>(&_chars[_pos]), _string_length); }
 
     const size_t _string_length;
     const pmr_vector<char>& _chars;
@@ -148,8 +152,7 @@ class ValueVector<FixedString> {
   const size_t _string_length;
   pmr_vector<char> _chars;
 
-
-  template< class Iter >
+  template <class Iter>
   void _iterator_push_back(Iter first, Iter last) {
     while (first != last) {
       push_back(*first);

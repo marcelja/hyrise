@@ -152,7 +152,7 @@ TEST_F(ValueVectorTest, ShrinkFixedString) {
 
   valuevector.shrink_to_fit();
 
-  // TODO test otherwise
+  // TODO(team_btm): test otherwise
   // EXPECT_EQ(valuevector.capacity(), 4u);
 }
 
