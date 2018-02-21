@@ -11,6 +11,8 @@
 
 namespace opossum {
 
+// ValueVector is a data type, which stores all its values in a vector and
+// is capable of storing FixedStrings.
 template <typename T>
 class ValueVector {
  public:
@@ -18,59 +20,76 @@ class ValueVector {
   using const_iterator = typename pmr_vector<T>::const_iterator;
   using reverse_iterator = typename pmr_vector<T>::reverse_iterator;
 
+  // TODO(team_btm): check rule of 3/5
   ValueVector();
 
-  // TODO(team_btm): move to cpp
   template <class Iter>
   ValueVector(Iter first, Iter last) {
+    _iterator_push_back(first, last);
+  }
+
+  template <class Iter>
+  ValueVector(Iter first, Iter last, const PolymorphicAllocator<size_t>& alloc) : _values(alloc) {
+    _iterator_push_back(first, last);
+  }
+
+  // Create a ValueVector with given values
+  ValueVector(const ValueVector<T>&& other) : _values(other._values) {}
+  ValueVector(const ValueVector<T>& other) : _values(other._values) {}
+  ValueVector(const ValueVector<T>& other, const PolymorphicAllocator<size_t>& alloc) : _values(other._values, alloc) {}
+
+  // Add a value to the end of the vector
+  void push_back(const T& value);
+  void push_back(T&& value);
+
+  // Make the ValueVector iterable in different ways
+  iterator begin() noexcept;
+  iterator end() noexcept;
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+
+  reverse_iterator rbegin() noexcept;
+  reverse_iterator rend() noexcept;
+
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
+
+  // Remove elements from the vector
+  void erase(iterator start, iterator end) {
+    _values.erase(start, end);
+  }
+
+  // Return the value at a certain position.
+  T& operator[](const size_t n);
+  const T& operator[](const size_t n) const;
+
+  T& at(const ChunkOffset chunk_offset);
+
+  // Return the number of entries in the column.
+  size_t size() const;
+
+  // Request the vector capacity to be at least enough to contain n elements
+  void reserve(const size_t n);
+
+  // Reduce capacity to fit its size
+  void shrink_to_fit();
+
+  // Return a copy of the allocator object associated with the vector of values
+  PolymorphicAllocator<T> get_allocator();
+  
+  // Return the calculated size of ValueVector in main memory
+  size_t data_size() const;
+
+ protected:
+  pmr_vector<T> _values;
+
+  template <class Iter>
+  void _iterator_push_back(Iter first, Iter last) {
     while (first != last) {
       push_back(*first);
       ++first;
     }
   }
-
-  ValueVector(const ValueVector<T>&& other) : _values(other._values) {}
-
-  ValueVector(const ValueVector<T>& other) : _values(other._values) {}
-
-  ValueVector(const ValueVector<T>& other, const PolymorphicAllocator<size_t>& alloc) : _values(other._values, alloc) {}
-
-  void push_back(const T& value);
-
-  void push_back(T&& value);
-
-  T& at(const ChunkOffset chunk_offset);
-
-  iterator begin() noexcept;
-
-  iterator end() noexcept;
-
-  const_iterator begin() const noexcept;
-
-  const_iterator end() const noexcept;
-
-  reverse_iterator rbegin() noexcept;
-
-  reverse_iterator rend() noexcept;
-
-  const_iterator cbegin() const noexcept;
-
-  const_iterator cend() const noexcept;
-
-  T& operator[](const size_t n);
-
-  const T& operator[](const size_t n) const;
-
-  size_t size() const;
-
-  void reserve(const size_t n);
-
-  void shrink_to_fit();
-
-  PolymorphicAllocator<T> get_allocator();
-
- protected:
-  pmr_vector<T> _values;
 };
 
 template <>
@@ -78,30 +97,32 @@ class ValueVector<FixedString> {
  public:
   explicit ValueVector(size_t string_length) : _string_length(string_length) {}
 
-  // TODO(team_btm): move to cpp
+  // Create a ValueVector of FixedStrings with given values by iterating over other container
   template <class Iter>
   ValueVector(Iter first, Iter last, size_t string_length) : _string_length(string_length) {
     _iterator_push_back(first, last);
   }
 
-  // TODO(team_btm): move to cpp
   template <class Iter>
   ValueVector(Iter first, Iter last) : _string_length(first->size()) {
     _iterator_push_back(first, last);
   }
 
+  // Create a ValueVector of FixedStrings with given values
   ValueVector(const ValueVector<FixedString>&& other) : _string_length(other._string_length), _chars(other._chars) {}
-
   ValueVector(const ValueVector<FixedString>& other) : _string_length(other._string_length), _chars(other._chars) {}
-
   ValueVector(const ValueVector<FixedString>& other, const PolymorphicAllocator<size_t>& alloc)
       : _string_length(other._string_length), _chars(other._chars, alloc) {}
 
+  // Add a string to the end of the vector
   void push_back(const std::string& string);
+
+  // Return the value at a certain position.
+  FixedString operator[](const size_t n);
+  const FixedString operator[](const size_t n) const;
 
   FixedString at(const ChunkOffset chunk_offset);
 
-  // TODO(team_btm): move??
   class iterator : public boost::iterator_facade<iterator, FixedString, std::random_access_iterator_tag, FixedString> {
    public:
     iterator(size_t string_length, const pmr_vector<char>& vector, size_t pos = 0)
@@ -130,38 +151,38 @@ class ValueVector<FixedString> {
     size_t _pos;
   };
 
+  // Make the ValueVector of FixedStrings iterable in different ways
   iterator begin() noexcept;
-
   iterator end() noexcept;
-
   iterator begin() const noexcept;
-
   iterator end() const noexcept;
 
   iterator cbegin() const noexcept;
-
   iterator cend() const noexcept;
 
   typedef boost::reverse_iterator<iterator> reverse_iterator;
   reverse_iterator rbegin() noexcept;
-
   reverse_iterator rend() noexcept;
 
-  FixedString operator[](const size_t n);
-
-  const FixedString operator[](const size_t n) const;
-
+  // Return the number of entries in the column.
   size_t size() const;
 
-  void erase(const iterator start, const iterator end);
-
-  void shrink_to_fit();
-
+  // Request the vector capacity to be at least enough to contain n elements
   void reserve(const size_t n);
 
+  // Remove elements from the vector
+  void erase(const iterator start, const iterator end);
+
+  // Reduce capacity to fit its size
+  void shrink_to_fit();
+
+  // Return a copy of the allocator object associated with the vector of values
   PolymorphicAllocator<FixedString> get_allocator();
 
- private:
+  // Return the calculated size of ValueVector in main memory
+  size_t data_size() const;
+
+ protected:
   const size_t _string_length;
   pmr_vector<char> _chars;
 
