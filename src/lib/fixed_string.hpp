@@ -30,7 +30,7 @@ class FixedString {
   }
 
   FixedString(const FixedString&& other)
-      : _mem(new char[other._string_length]{}), _string_length(other._string_length) {
+      : _mem(other._delete ? other._mem : new char[other._string_length]{}), _string_length(other._string_length) {
     std::memcpy(_mem, other._mem, _string_length);
   }
 
