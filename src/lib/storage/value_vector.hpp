@@ -123,6 +123,7 @@ class ValueVector<FixedString> {
 
   // Add a string to the end of the vector
   void push_back(const std::string& string);
+  void push_back(const FixedString& fixed_string);
 
   // Return the value at a certain position.
   const std::string operator[](const size_t n) const;

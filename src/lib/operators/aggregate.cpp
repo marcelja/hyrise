@@ -16,6 +16,7 @@
 #include "storage/create_iterable_from_column.hpp"
 #include "type_comparison.hpp"
 #include "utils/assert.hpp"
+#include "fixed_string.hpp"
 
 namespace opossum {
 
@@ -330,7 +331,8 @@ std::shared_ptr<const Table> Aggregate::_on_execute() {
       if (aggregate.function != AggregateFunction::Count) {
         Fail("Aggregate: Asterisk is only valid with COUNT");
       }
-    } else if (input_table->column_type(*aggregate.column) == DataType::String &&
+    } else if ((input_table->column_type(*aggregate.column) == DataType::String || 
+        input_table->column_type(*aggregate.column) == DataType::Fixed_String) &&
                (aggregate.function == AggregateFunction::Sum || aggregate.function == AggregateFunction::Avg)) {
       Fail("Aggregate: Cannot calculate SUM or AVG on string column");
     }

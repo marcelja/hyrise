@@ -137,6 +137,15 @@ void ValueVector<FixedString>::push_back(const std::string& string) {
   }
 }
 
+void ValueVector<FixedString>::push_back(const FixedString& fixed_string) {
+  const auto pos = _chars.size();
+  _chars.resize(_chars.size() + _string_length);
+  fixed_string.copy(&_chars[pos], _string_length);
+  if (fixed_string.size() < _string_length) {
+    std::fill(_chars.begin() + pos + fixed_string.size(), _chars.begin() + pos + _string_length, '\0');
+  }
+}
+
 FixedString ValueVector<FixedString>::at(const ChunkOffset chunk_offset) {
   return FixedString(&_chars.at(chunk_offset * _string_length), _string_length);
 }

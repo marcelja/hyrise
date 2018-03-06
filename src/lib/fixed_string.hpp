@@ -29,6 +29,7 @@ class FixedString {
   FixedString(char* mem, size_t string_length) : _mem(mem), _string_length(string_length), _delete(false) {}
 
   FixedString() : _mem(new char[1]{}), _string_length(1) {}
+  FixedString(long unsigned int bla) : _mem(new char[1]{}), _string_length(1) {}
 
   // Create a FixedString with an existing one
   FixedString(const FixedString& other) : _mem(new char[other._string_length]{}), _string_length(other._string_length) {
@@ -73,13 +74,23 @@ class FixedString {
 
   // Compare FixedStrings by comparing the underlying char arrays
   bool operator<(const FixedString& other) const { return memcmp(_mem, other._mem, _string_length) < 0; }
+  bool operator<=(const FixedString& other) const { return memcmp(_mem, other._mem, _string_length) <= 0; }
+  bool operator>(const FixedString& other) const { return memcmp(_mem, other._mem, _string_length) > 0; }
+  bool operator>=(const FixedString& other) const { return memcmp(_mem, other._mem, _string_length) >= 0; }
   bool operator==(const FixedString& other) const { return memcmp(_mem, other._mem, _string_length) == 0; }
+
+  operator int() const { return 42; }
 
   // Prints FixedString as string
   friend std::ostream& operator<<(std::ostream& os, const FixedString& obj) { return os << obj.string(); }
 
   // Support swappable concept needed for sorting values. See: http://en.cppreference.com/w/cpp/concept/Swappable
   friend void swap(const FixedString& lhs, const FixedString& rhs) { lhs.swap(rhs); }
+
+
+  friend std::istream& operator>>(std::istream& istream, FixedString& v) {
+    return istream >> std::skipws;
+  }
 
   // Swap two FixedStrings by exchanging the underlying memory's content
   void swap(const FixedString& other) const { std::swap_ranges(_mem, _mem + _string_length, other._mem); }
