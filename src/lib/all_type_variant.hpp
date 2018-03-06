@@ -23,6 +23,7 @@
 
 #include "null_value.hpp"
 #include "types.hpp"
+#include "fixed_string.hpp"
 
 namespace opossum {
 
@@ -36,7 +37,8 @@ namespace detail {
   ((int64_t,     Long,       "long"))   \
   ((float,       Float,      "float"))  \
   ((double,      Double,     "double")) \
-  ((std::string, String,     "string"))
+  ((std::string, String,     "string")) \
+  ((FixedString, Fixed_String,     "fixed_string"))
 // Type          Enum Value   String
 // clang-format on
 

@@ -17,12 +17,18 @@ class FixedString {
  public:
   // Create a FixedString from a std::string
   // We did not find any good solution for creating a char array on stack
-  explicit FixedString(const std::string& string) : _mem(new char[string.size()]{}), _string_length(string.size()) {
+  // explicit FixedString(const std::string& string) : _mem(new char[string.size()]{}), _string_length(string.size()) {
+  //   std::memcpy(_mem, string.c_str(), _string_length);
+  // }
+
+  FixedString(const std::string& string) : _mem(new char[string.size()]{}), _string_length(string.size()) {
     std::memcpy(_mem, string.c_str(), _string_length);
   }
 
   // Create a FixedString from a memory address
   FixedString(char* mem, size_t string_length) : _mem(mem), _string_length(string_length), _delete(false) {}
+
+  FixedString() : _mem(new char[1]{}), _string_length(1) {}
 
   // Create a FixedString with an existing one
   FixedString(const FixedString& other) : _mem(new char[other._string_length]{}), _string_length(other._string_length) {
