@@ -130,24 +130,7 @@ bool AbstractExpression<DerivedExpression>::is_logical_operator() const {
 
 template <typename DerivedExpression>
 bool AbstractExpression<DerivedExpression>::is_binary_operator() const {
-  if (is_arithmetic_operator()) return true;
-
-  switch (_type) {
-    case ExpressionType::Equals:
-    case ExpressionType::NotEquals:
-    case ExpressionType::LessThan:
-    case ExpressionType::LessThanEquals:
-    case ExpressionType::GreaterThan:
-    case ExpressionType::GreaterThanEquals:
-    case ExpressionType::Like:
-    case ExpressionType::NotLike:
-    case ExpressionType::And:
-    case ExpressionType::Or:
-    case ExpressionType::Between:
-      return true;
-    default:
-      return false;
-  }
+  return is_binary_operator_type(_type);
 }
 
 template <typename DerivedExpression>
@@ -164,6 +147,11 @@ bool AbstractExpression<DerivedExpression>::is_unary_operator() const {
 template <typename DerivedExpression>
 bool AbstractExpression<DerivedExpression>::is_null_literal() const {
   return _type == ExpressionType::Literal && _value && variant_is_null(*_value);
+}
+
+template <typename DerivedExpression>
+bool AbstractExpression<DerivedExpression>::is_subselect() const {
+  return _type == ExpressionType::Subselect;
 }
 
 template <typename DerivedExpression>
@@ -193,7 +181,7 @@ const std::string AbstractExpression<DerivedExpression>::description() const {
       }
       desc << "]";
       break;
-    case ExpressionType::Select:
+    case ExpressionType::Subselect:
       desc << "[" << alias_string << "]";
       break;
     default: {}
@@ -254,6 +242,8 @@ std::string AbstractExpression<DerivedExpression>::to_string(
              _aggregate_function_arguments[0]->to_string(input_column_names, true) + ")";
     case ExpressionType::Star:
       return std::string("*");
+    case ExpressionType::Subselect:
+      return "subquery";
     default:
       // Handled further down.
       break;
@@ -398,5 +388,30 @@ std::shared_ptr<DerivedExpression> AbstractExpression<DerivedExpression>::create
 
 template class AbstractExpression<LQPExpression>;
 template class AbstractExpression<PQPExpression>;
+
+bool is_binary_operator_type(const ExpressionType type) {
+  switch (type) {
+    case ExpressionType::Subtraction:
+    case ExpressionType::Addition:
+    case ExpressionType::Multiplication:
+    case ExpressionType::Division:
+    case ExpressionType::Modulo:
+    case ExpressionType::Power:
+    case ExpressionType::Equals:
+    case ExpressionType::NotEquals:
+    case ExpressionType::LessThan:
+    case ExpressionType::LessThanEquals:
+    case ExpressionType::GreaterThan:
+    case ExpressionType::GreaterThanEquals:
+    case ExpressionType::Like:
+    case ExpressionType::NotLike:
+    case ExpressionType::And:
+    case ExpressionType::Or:
+    case ExpressionType::Between:
+      return true;
+    default:
+      return false;
+  }
+}
 
 }  // namespace opossum

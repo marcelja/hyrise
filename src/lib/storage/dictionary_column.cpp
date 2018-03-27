@@ -4,8 +4,7 @@
 #include <string>
 
 #include "fixed_string.hpp"
-#include "storage/column_visitable.hpp"
-#include "storage/value_column.hpp"
+#include "resolve_type.hpp"
 #include "storage/vector_compression/base_compressed_vector.hpp"
 #include "type_cast.hpp"
 #include "utils/assert.hpp"
@@ -17,7 +16,10 @@ template <typename T>
 DictionaryColumn<T>::DictionaryColumn(const std::shared_ptr<const ValueVector<T>>& dictionary,
                                       const std::shared_ptr<const BaseCompressedVector>& attribute_vector,
                                       const ValueID null_value_id)
-    : _dictionary{dictionary}, _attribute_vector{attribute_vector}, _null_value_id{null_value_id} {}
+    : BaseDictionaryColumn(data_type_from_type<T>()),
+      _dictionary{dictionary},
+      _attribute_vector{attribute_vector},
+      _null_value_id{null_value_id} {}
 
 template <typename T>
 const AllTypeVariant DictionaryColumn<T>::operator[](const ChunkOffset chunk_offset) const {
@@ -48,9 +50,18 @@ size_t DictionaryColumn<T>::size() const {
 template <typename T>
 std::shared_ptr<BaseColumn> DictionaryColumn<T>::copy_using_allocator(const PolymorphicAllocator<size_t>& alloc) const {
   auto new_attribute_vector_ptr = _attribute_vector->copy_using_allocator(alloc);
+  auto new_attribute_vector_sptr = std::shared_ptr<const BaseCompressedVector>(std::move(new_attribute_vector_ptr));
   auto new_dictionary = ValueVector<T>{*_dictionary, alloc};
-  auto new_dictionary_ptr = std::allocate_shared<ValueVector<T>>(alloc, std::move(new_dictionary));
-  return std::allocate_shared<DictionaryColumn<T>>(alloc, new_dictionary_ptr, new_attribute_vector_ptr, _null_value_id);
+  auto new_dictionary_ptr = std::allocate_shared<pmr_vector<T>>(alloc, std::move(new_dictionary));
+  return std::allocate_shared<DictionaryColumn<T>>(alloc, new_dictionary_ptr, new_attribute_vector_sptr,
+                                                   _null_value_id);
+  
+// <<<<<<< HEAD
+//   auto new_dictionary_ptr = std::allocate_shared<ValueVector<T>>(alloc, std::move(new_dictionary));
+//   return std::allocate_shared<DictionaryColumn<T>>(alloc, new_dictionary_ptr, new_attribute_vector_ptr, _null_value_id);
+// =======
+//   auto new_dictionary = pmr_vector<T>{*_dictionary, alloc};
+// >>>>>>> upstream/master
 }
 
 template <typename T>
@@ -59,7 +70,9 @@ size_t DictionaryColumn<T>::estimate_memory_usage() const {
 }
 
 template <typename T>
-CompressedVectorType DictionaryColumn<T>::compressed_vector_type() const { return _attribute_vector->type(); }
+CompressedVectorType DictionaryColumn<T>::compressed_vector_type() const {
+  return _attribute_vector->type();
+}
 
 template <typename T>
 ValueID DictionaryColumn<T>::lower_bound(const AllTypeVariant& value) const {
@@ -122,7 +135,7 @@ const ValueID DictionaryColumn<T>::null_value_id() const {
 
 // Since FixedString data type is not part of the AllTypeVariant, we have
 // too explicitly instantiate FixedString template class.
-template class DictionaryColumn<FixedString>;
+// template class DictionaryColumn<FixedString>;
 EXPLICITLY_INSTANTIATE_DATA_TYPES(DictionaryColumn);
 
 }  // namespace opossum
