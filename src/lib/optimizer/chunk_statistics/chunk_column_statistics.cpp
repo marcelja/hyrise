@@ -50,7 +50,7 @@ std::shared_ptr<ChunkColumnStatistics> ChunkColumnStatistics::build_statistics(D
     // clang-format off
     if constexpr(std::is_same_v<ColumnType, DictionaryColumn<DataTypeT>>) {
         // we can use the fact that dictionary columns have an accessor for the dictionary
-        const auto& dictionary = *typed_column.dictionary();
+        const dictionary_vector_t<DataTypeT> dictionary = *typed_column.dictionary();
         statistics = build_statistics_from_dictionary(dictionary);
     } else {
       if constexpr(std::is_base_of_v<BaseEncodedColumn, ColumnType>) {
@@ -63,7 +63,7 @@ std::shared_ptr<ChunkColumnStatistics> ChunkColumnStatistics::build_statistics(D
             values.insert(value.value());
           }
         });
-        pmr_vector<DataTypeT> dictionary{values.cbegin(), values.cend()};
+        dictionary_vector_t<DataTypeT> dictionary{values.cbegin(), values.cend()};
         std::sort(dictionary.begin(), dictionary.end());
         statistics = build_statistics_from_dictionary(dictionary);
       } else {
