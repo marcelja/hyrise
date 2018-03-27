@@ -26,9 +26,9 @@ namespace opossum {
 class DictionaryEncoder : public ColumnEncoder<DictionaryEncoder> {
  public:
   static constexpr auto _encoding_type = enum_c<EncodingType, EncodingType::Dictionary>;
+  static constexpr auto _uses_vector_compression = true;  // see base_column_encoder.hpp for details
   // Allow usage of FixedString in the DictionaryColumn
   static const auto _enable_fixed_strings = false;
-  static constexpr auto _uses_vector_compression = true;  // see base_column_encoder.hpp for details
 
   template <typename T>
   std::shared_ptr<BaseEncodedColumn> _on_encode(const std::shared_ptr<const ValueColumn<T>>& value_column) {
@@ -37,15 +37,16 @@ class DictionaryEncoder : public ColumnEncoder<DictionaryEncoder> {
     const auto& values = value_column->values();
     const auto alloc = values.get_allocator();
 
-    if (_enable_fixed_strings && std::is_same<T, std::string>::value) {
-      const auto fixed_string_length = _calculate_fixed_string_length(values);
-      if (fixed_string_length != 0) {
-        // Use FixedString for dictionary compression
-        // return _on_encode_fixed_string();
+    if
+      constexpr(_enable_fixed_strings && std::is_same<T, std::string>::value) {
+        const auto fixed_string_length = _calculate_fixed_string_length(values);
+        if (fixed_string_length != 0) {
+          // Use FixedString for dictionary compression
+          // return _on_encode_fixed_string();
+        }
       }
-    }
 
-    auto dictionary = ValueVector<T>{values.cbegin(), values.cend(), alloc};
+    auto dictionary = dictionary_vector_t<T>{values.cbegin(), values.cend(), alloc};
 
     // Remove null values from value vector
     if (value_column->is_nullable()) {
@@ -103,28 +104,17 @@ class DictionaryEncoder : public ColumnEncoder<DictionaryEncoder> {
     const auto max_value = dictionary.size() + 1u;
 
     auto encoded_attribute_vector = compress_vector(attribute_vector, vector_compression_type(), alloc, {max_value});
-
-// <<<<<<< HEAD
-    auto dictionary_sptr = std::allocate_shared<ValueVector<T>>(alloc, std::move(dictionary));
-    auto attribute_vector_sptr = std::shared_ptr< const BaseCompressedVector>(std::move(encoded_attribute_vector));
-// =======
-//     auto dictionary_sptr = std::allocate_shared<pmr_vector<T>>(alloc, std::move(dictionary));
-//     auto attribute_vector_sptr = std::shared_ptr<const BaseCompressedVector>(std::move(encoded_attribute_vector));
-// >>>>>>> upstream/master
+    auto dictionary_sptr = std::allocate_shared<pmr_vector<T>>(alloc, std::move(dictionary));
+    auto attribute_vector_sptr = std::shared_ptr<const BaseCompressedVector>(std::move(encoded_attribute_vector));
     return std::allocate_shared<DictionaryColumn<T>>(alloc, dictionary_sptr, attribute_vector_sptr,
                                                      ValueID{null_value_id});
   }
 
  private:
   template <typename T>
-  static ValueID _get_value_id(const ValueVector<T>& dictionary, const T& value) {
+  static ValueID _get_value_id(const dictionary_vector_t<T>& dictionary, const T& value) {
     return static_cast<ValueID>(
         std::distance(dictionary.cbegin(), std::lower_bound(dictionary.cbegin(), dictionary.cend(), value)));
-  }
-
-  template <typename T>
-  size_t _calculate_fixed_string_length(const pmr_concurrent_vector<T>& values) const {
-    return 0;
   }
 
   size_t _calculate_fixed_string_length(const pmr_concurrent_vector<std::string>& values) const {

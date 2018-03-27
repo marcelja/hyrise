@@ -21,7 +21,7 @@
 namespace opossum {
 
 template <typename T>
-static std::shared_ptr<ChunkColumnStatistics> build_statistics_from_dictionary(const pmr_vector<T>& dictionary) {
+static std::shared_ptr<ChunkColumnStatistics> build_statistics_from_dictionary(const dictionary_vector_t<T>& dictionary) {
   auto statistics = std::make_shared<ChunkColumnStatistics>();
   // only create statistics when the compressed dictionary is not empty
   if (!dictionary.empty()) {

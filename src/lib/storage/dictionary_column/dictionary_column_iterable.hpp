@@ -48,8 +48,8 @@ class DictionaryColumnIterable : public PointAccessibleColumnIterable<Dictionary
   template <typename ZsIteratorType>
   class Iterator : public BaseColumnIterator<Iterator<ZsIteratorType>, ColumnIteratorValue<T>> {
    public:
-    explicit Iterator(const ValueVector<T>& dictionary, const ValueID null_value_id, const ZsIteratorType attribute_it,
-                      ChunkOffset chunk_offset)
+    explicit Iterator(const dictionary_vector_t<T>& dictionary, const ValueID null_value_id,
+                      const ZsIteratorType attribute_it, ChunkOffset chunk_offset)
         : _dictionary{dictionary},
           _null_value_id{null_value_id},
           _attribute_it{attribute_it},
@@ -75,7 +75,7 @@ class DictionaryColumnIterable : public PointAccessibleColumnIterable<Dictionary
     }
 
    private:
-    const ValueVector<T>& _dictionary;
+    const dictionary_vector_t<T>& _dictionary;
     const ValueID _null_value_id;
     ZsIteratorType _attribute_it;
     ChunkOffset _chunk_offset;
@@ -85,8 +85,8 @@ class DictionaryColumnIterable : public PointAccessibleColumnIterable<Dictionary
   class PointAccessIterator
       : public BasePointAccessColumnIterator<PointAccessIterator<ZsDecoderType>, ColumnIteratorValue<T>> {
    public:
-    PointAccessIterator(const ValueVector<T>& dictionary, const ValueID null_value_id, ZsDecoderType& attribute_decoder,
-                        ChunkOffsetsIterator chunk_offsets_it)
+    PointAccessIterator(const dictionary_vector_t<T>& dictionary, const ValueID null_value_id,
+                        ZsDecoderType& attribute_decoder, ChunkOffsetsIterator chunk_offsets_it)
         : BasePointAccessColumnIterator<PointAccessIterator<ZsDecoderType>, ColumnIteratorValue<T>>{chunk_offsets_it},
           _dictionary{dictionary},
           _null_value_id{null_value_id},
@@ -107,7 +107,7 @@ class DictionaryColumnIterable : public PointAccessibleColumnIterable<Dictionary
     }
 
    private:
-    const ValueVector<T>& _dictionary;
+    const dictionary_vector_t<T>& _dictionary;
     const ValueID _null_value_id;
     ZsDecoderType& _attribute_decoder;
   };

@@ -11,8 +11,12 @@ class FixedStringTest : public BaseTest {};
 
 TEST_F(FixedStringTest, StringLength) {
   FixedString str1 = FixedString(std::string("astring"));
+  FixedString str2 = FixedString(std::string("astring\0\0", 9));
 
   EXPECT_EQ(str1.size(), 7u);
+  EXPECT_EQ(str1.maximum_length(), 7u);
+  EXPECT_EQ(str2.size(), 7u);
+  EXPECT_EQ(str2.maximum_length(), 9u);
 }
 
 TEST_F(FixedStringTest, CharvectorToString) {
@@ -39,15 +43,19 @@ TEST_F(FixedStringTest, Constructors) {
 }
 
 TEST_F(FixedStringTest, CompareStrings) {
-  std::vector<char> a{'a', 'b', 'c', 'f'};
-  std::vector<char> b{'b', 'b', 'c', 'f'};
+  EXPECT_TRUE(FixedString("abcd") < FixedString("bbcd"));
+  EXPECT_TRUE(FixedString("abcd") < FixedString("bcd"));
+  EXPECT_TRUE(FixedString("abc") < FixedString("abcd"));
+  EXPECT_TRUE(FixedString("abc\0") < FixedString("abcd"));
+  EXPECT_FALSE(FixedString("abcdd") < FixedString("abcd"));
+  EXPECT_FALSE(FixedString("abcdd") < FixedString("abcd\0"));
+  EXPECT_FALSE(FixedString("abcd") < FixedString("abcd"));
 
-  auto str1 = FixedString(&a[0], 4);
-  auto str2 = FixedString(&b[0], 4);
-  auto str3 = FixedString(&b[0], 4);
-
-  EXPECT_TRUE(str1 < str2);
-  EXPECT_TRUE(str2 == str3);
+  EXPECT_TRUE(FixedString("abcd") == FixedString("abcd"));
+  EXPECT_TRUE(FixedString("abcd\0") == FixedString("abcd"));
+  EXPECT_FALSE(FixedString("abcd") == FixedString("abc"));
+  EXPECT_FALSE(FixedString("abc") == FixedString("abcd"));
+  EXPECT_FALSE(FixedString("abc") == FixedString("bbcd"));
 }
 
 TEST_F(FixedStringTest, CompareStringsRef) {
