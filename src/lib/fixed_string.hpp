@@ -31,8 +31,10 @@ class FixedString {
   // FixedString(const FixedString& other);
 
   // FixedString& operator=(const FixedString&);
-  FixedString operator=(FixedString const&);
-  FixedString(FixedString const&) = default;
+  FixedString& operator=(const FixedString&);
+  FixedString(const FixedString&) = default;
+  // FixedString(FixedString&&) = default;
+  // FixedString& operator=(FixedString&&);
 
   // Copy assign
   // FixedString& operator=(const FixedString& other);
