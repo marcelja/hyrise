@@ -26,6 +26,7 @@ FixedStringIterator& FixedStringIterator::operator=(const FixedStringIterator& o
 }
 
 bool FixedStringIterator::equal(FixedStringIterator const& other) const { return this->_pos == other._pos; }
+
 typename facade::difference_type FixedStringIterator::distance_to(FixedStringIterator const& other) const {
   if (_string_length == 0) return 0;
   return (std::intptr_t(other._pos) - std::intptr_t(this->_pos)) / std::intptr_t(_string_length);

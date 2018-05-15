@@ -11,34 +11,9 @@
 
 namespace opossum {
 
-FixedString::FixedString(const std::string& string) : _mem(new char[string.size()]{}), _maximum_length(string.size()) {
-  std::memcpy(_mem, string.c_str(), _maximum_length);
-}
-
 FixedString::FixedString(char* mem, size_t string_length)
-    : _mem(mem), _maximum_length(string_length), _owns_memory(false) {}
+    : _mem(mem), _maximum_length(string_length) {}
 
-FixedString::FixedString(const FixedString& other)
-    : _mem(new char[other._maximum_length]{}), _maximum_length(other._maximum_length) {
-  std::memcpy(_mem, other._mem, _maximum_length);
-}
-
-FixedString::~FixedString() {
-  if (_owns_memory) delete[] _mem;
-}
-
-FixedString& FixedString::operator=(const FixedString& other) {
-  DebugAssert(other.maximum_length() <= _maximum_length,
-              "Other FixedString is longer than current maximum string length");
-  const auto copied_length = std::min(other.maximum_length(), _maximum_length);
-  other._copy_to(_mem, copied_length);
-  // Fill unused fields of char array with null terminator, in order to overwrite the content of
-  // the old FixedString. This is especially important if the old FixedString was longer than the other FixedString.
-  if (copied_length < _maximum_length) {
-    memset(_mem + copied_length, '\0', _maximum_length - copied_length);
-  }
-  return *this;
-}
 
 size_t FixedString::size() const {
   const auto position = std::find(_mem, _mem + _maximum_length, '\0');
@@ -63,6 +38,14 @@ bool FixedString::operator<(const FixedString& other) const {
   const auto result = memcmp(_mem, other._mem, smallest_length);
   if (result == 0) return size() < other.size();
   return result < 0;
+}
+
+bool FixedString::operator<(const std::string& other) const {
+  return string() < other;
+}
+
+bool operator<(const std::string& lhs, FixedString& other) {
+  return lhs < other.string();
 }
 
 bool FixedString::operator==(const FixedString& other) const {
