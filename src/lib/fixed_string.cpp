@@ -22,23 +22,21 @@ size_t FixedString::size() const {
 }
 
 FixedString& FixedString::operator=(const FixedString& other) {
-    _mem = FixedString(other);
-    return new_fs;
-// std::cout << "operator=" << std::endl;
-//   std::cout << "current: " << *this << std::endl;
-//   std::cout << "other: " << other << std::endl;
-//   // DebugAssert(other.maximum_length() <= _maximum_length,
-//   //             "Other FixedString is longer than current maximum string length");
-//   const auto copied_length = std::min(other.maximum_length(), _maximum_length);
-//   other._copy_to(_mem, copied_length);
-//   // Fill unused fields of char array with null terminator, in order to overwrite the content of
-//   // the old FixedString. This is especially important if the old FixedString was longer than the other FixedString.
-//   if (copied_length < _maximum_length) {
-//     memset(_mem + copied_length, '\0', _maximum_length - copied_length);
-//   }
-//   std::cout << "current: " << *this << std::endl;
-//   std::cout << "other: " << other << std::endl;
-//   return *this;
+std::cout << "operator=" << std::endl;
+  std::cout << "current: " << *this << std::endl;
+  std::cout << "other: " << other << std::endl;
+  // DebugAssert(other.maximum_length() <= _maximum_length,
+  //             "Other FixedString is longer than current maximum string length");
+  const auto copied_length = std::min(other.maximum_length(), _maximum_length);
+  other._copy_to(_mem, copied_length);
+  // Fill unused fields of char array with null terminator, in order to overwrite the content of
+  // the old FixedString. This is especially important if the old FixedString was longer than the other FixedString.
+  if (copied_length < _maximum_length) {
+    memset(_mem + copied_length, '\0', _maximum_length - copied_length);
+  }
+  std::cout << "current: " << *this << std::endl;
+  std::cout << "other: " << other << std::endl;
+  return *this;
 }
 
 
