@@ -28,12 +28,18 @@ class FixedString {
   FixedString(char* mem, size_t string_length);
 
   // Create a FixedString with an existing one
-  FixedString(const FixedString& other);
+  // FixedString(const FixedString& other);
+
+  FixedString(const FixedString&) = delete;
+
+  FixedString(FixedString&& other);
 
   ~FixedString();
 
   // Copy assign
   FixedString& operator=(const FixedString& other);
+
+  // FixedString& operator=(FixedString&& other);
 
   // Returns the length of the string
   size_t size() const;

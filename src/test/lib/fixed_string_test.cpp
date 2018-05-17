@@ -35,8 +35,11 @@ TEST_F(FixedStringTest, Constructors) {
   auto str3 = FixedString("barbaz");
   EXPECT_EQ(str3.string(), "barbaz");
 
-  auto str4 = FixedString(str1);
+  str1.size();
+
+  auto str4 = FixedString(std::move(str1));
   EXPECT_EQ(str4.string(), "foo");
+  str4.size();
 
   FixedString str5("barbaz");
   str5 = FixedString("foo");

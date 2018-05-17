@@ -18,16 +18,27 @@ FixedString::FixedString(const std::string& string) : _mem(new char[string.size(
 FixedString::FixedString(char* mem, size_t string_length)
     : _mem(mem), _maximum_length(string_length), _owns_memory(false) {}
 
-FixedString::FixedString(const FixedString& other)
-    : _mem(new char[other._maximum_length]{}), _maximum_length(other._maximum_length) {
-  std::memcpy(_mem, other._mem, _maximum_length);
+FixedString::FixedString(FixedString&& other)
+    : _mem(std::move(other._mem)), _maximum_length(std::move(other._maximum_length)), _owns_memory(false) {
+  std::cout << "Move constructor, this _mem: " << static_cast<void*>(_mem) << std::endl
+            << "                 other _mem: " << static_cast<void*>(other._mem) << std::endl
+            << std::endl;
 }
+
+// FixedString::FixedString(FixedString&& other)
+//     : _mem(new char[other._maximum_length]{}), _maximum_length(std::move(other._maximum_length)) {
+//   std::memcpy(_mem, other._mem, _maximum_length);
+// }
 
 FixedString::~FixedString() {
   if (_owns_memory) delete[] _mem;
 }
 
 FixedString& FixedString::operator=(const FixedString& other) {
+  std::cout << "Copy assign, this _mem: " << static_cast<void*>(_mem) << std::endl
+            << "            other _mem: " << static_cast<void*>(other._mem) << std::endl
+            << std::endl;
+
   DebugAssert(other.maximum_length() <= _maximum_length,
               "Other FixedString is longer than current maximum string length");
   const auto copied_length = std::min(other.maximum_length(), _maximum_length);
@@ -73,6 +84,9 @@ bool FixedString::operator==(const FixedString& other) const {
 void FixedString::swap(FixedString& other) {
   DebugAssert(_maximum_length == other.maximum_length(),
               "FixedStrings must have the same maximum_length in order to swap them");
+  std::cout << "Swap, this _mem: " << static_cast<void*>(_mem) << std::endl
+            << "     other _mem: " << static_cast<void*>(other._mem) << std::endl
+            << std::endl;
   std::swap_ranges(_mem, _mem + _maximum_length, other._mem);
 }
 
