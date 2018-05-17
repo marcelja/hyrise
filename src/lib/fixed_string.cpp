@@ -19,7 +19,9 @@ FixedString::FixedString(char* mem, size_t string_length)
     : _mem(mem), _maximum_length(string_length), _owns_memory(false) {}
 
 FixedString::FixedString(FixedString&& other)
-    : _mem(std::move(other._mem)), _maximum_length(std::move(other._maximum_length)), _owns_memory(false) {
+    : _mem(std::move(other._mem)),
+      _maximum_length(std::move(other._maximum_length)),
+      _owns_memory(std::move(_owns_memory)) {
   std::cout << "Move constructor, this _mem: " << static_cast<void*>(_mem) << std::endl
             << "                 other _mem: " << static_cast<void*>(other._mem) << std::endl
             << std::endl;
