@@ -197,7 +197,6 @@ TEST_F(FixedStringVectorTest, Reserve) {
 TEST_F(FixedStringVectorTest, Sort) {
   auto fixedstring_vector = FixedStringVector(10u);
   fixedstring_vector.push_back("Larry");
-  fixedstring_vector.push_back("Bill");
   fixedstring_vector.push_back("Alexander");
   fixedstring_vector.push_back("Mark");
   fixedstring_vector.push_back("Hasso");

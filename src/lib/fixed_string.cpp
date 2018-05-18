@@ -30,11 +30,14 @@ FixedString::FixedString(FixedString&& other)
 // FixedString::FixedString(FixedString&& other)
 //     : _mem(new char[other._maximum_length]{}), _maximum_length(std::move(other._maximum_length)) {
 //   std::memcpy(_mem, other._mem, _maximum_length);
+// std::cout << "Move constructor, this _mem: " << static_cast<void*>(_mem) << std::endl
+//           << "                 other _mem: " << static_cast<void*>(other._mem) << std::endl
+//           << std::endl;
 // }
 
-FixedString::~FixedString() {
-  if (_owns_memory) delete[] _mem;
-}
+// FixedString::~FixedString() {
+//   if (_owns_memory) delete[] _mem;
+// }
 
 FixedString& FixedString::operator=(const FixedString& other) {
   std::cout << "Copy assign, this _mem: " << static_cast<void*>(_mem) << std::endl
