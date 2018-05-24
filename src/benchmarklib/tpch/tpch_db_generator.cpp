@@ -9,6 +9,8 @@ extern "C" {
 #include <utility>
 
 #include "storage/chunk.hpp"
+#include "storage/chunk_encoder.hpp"
+
 #include "storage/storage_manager.hpp"
 
 /**
@@ -309,6 +311,23 @@ void TpchDbGenerator::generate_and_store() {
 
   for (auto& table : tables) {
     StorageManager::get().add_table(tpch_table_names.at(table.first), table.second);
+
+    std::vector<ColumnEncodingSpec> abc;
+    std::vector<DataType> def;
+
+    for (auto& cd : table.second->column_definitions()) {
+      def.push_back(cd.data_type);
+      if (cd.data_type == DataType::String) {
+        abc.push_back(ColumnEncodingSpec(EncodingType::FixedStringDictionary));
+      } else {
+        abc.push_back(ColumnEncodingSpec(EncodingType::Dictionary));
+      }
+    }
+
+    for (ChunkID chunk_id{0}; chunk_id < table.second->chunk_count(); ++chunk_id) {
+      auto chunk = table.second->get_chunk(chunk_id);
+      ChunkEncoder::encode_chunk(chunk, def, abc);
+    }
   }
 }
 
