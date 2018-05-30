@@ -37,9 +37,13 @@ class DictionaryEncoder : public ColumnEncoder<DictionaryEncoder<Encoding>> {
 
     if constexpr (Encoding == EncodingType::FixedStringDictionary) {
       // Encode a column with a FixedStringVector as dictionary. std::string is the only supported type
-      return _encode_dictionary_column(
-          FixedStringVector{values.cbegin(), values.cend(), _calculate_fixed_string_length(values)}, value_column);
+
+      std::cout << "\nfixed str enc" << std::endl;
+      auto test = _calculate_fixed_string_length(values);
+      std::cout << "max len in dict: " << test << std::endl;
+      return _encode_dictionary_column(FixedStringVector{values.cbegin(), values.cend(), test}, value_column);
     } else {
+      std::cout << "\ndict str enc" << std::endl;
       // Encode a column with a pmr_vector<T> as dictionary
       return _encode_dictionary_column(pmr_vector<T>{values.cbegin(), values.cend(), values.get_allocator()},
                                        value_column);
@@ -59,6 +63,7 @@ class DictionaryEncoder : public ColumnEncoder<DictionaryEncoder<Encoding>> {
     const auto& values = value_column->values();
     const auto alloc = values.get_allocator();
 
+    std::cout << "value size " << values.size() << std::endl;
     // Remove null values from value vector
     if (value_column->is_nullable()) {
       const auto& null_values = value_column->null_values();
@@ -76,9 +81,16 @@ class DictionaryEncoder : public ColumnEncoder<DictionaryEncoder<Encoding>> {
       dictionary.erase(erase_from_here_it, dictionary.end());
     }
 
+    auto start = std::chrono::system_clock::now();
     std::sort(dictionary.begin(), dictionary.end());
     dictionary.erase(std::unique(dictionary.begin(), dictionary.end()), dictionary.end());
     dictionary.shrink_to_fit();
+
+    auto end = std::chrono::system_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "sort, erase, shring_to_fit time: " << elapsed.count() << std::endl;
+
+    std::cout << "dictionary size " << dictionary.size() << std::endl;
 
     auto attribute_vector = pmr_vector<uint32_t>{values.get_allocator()};
     attribute_vector.reserve(values.size());

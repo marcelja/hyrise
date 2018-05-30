@@ -308,6 +308,7 @@ std::unordered_map<TpchTable, std::shared_ptr<Table>> TpchDbGenerator::generate(
 
 void TpchDbGenerator::generate_and_store() {
   const auto tables = generate();
+  auto start = std::chrono::system_clock::now();
 
   for (auto& table : tables) {
     StorageManager::get().add_table(tpch_table_names.at(table.first), table.second);
@@ -329,6 +330,13 @@ void TpchDbGenerator::generate_and_store() {
       ChunkEncoder::encode_chunk(chunk, def, abc);
     }
   }
+  auto end = std::chrono::system_clock::now();
+  auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+  std::cout << elapsed.count() << std::endl;
+
+  std::cout << "press enter" << std::endl;
+  std::cin.ignore();
+  std::cout << "done" << std::endl;
 }
 
 }  // namespace opossum
