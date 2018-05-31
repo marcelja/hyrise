@@ -32,6 +32,8 @@ class ValueColumn : public BaseValueColumn {
   // Returns whether a value is NULL
   bool is_null(const ChunkOffset chunk_offset) const;
 
+  size_t max_len() const override;
+
   // return the value at a certain position.
   // Only use if you are certain that no null values are present, otherwise an Assert fails.
   const T get(const ChunkOffset chunk_offset) const;

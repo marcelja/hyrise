@@ -327,13 +327,30 @@ void TpchDbGenerator::generate_and_store() {
 
     for (ChunkID chunk_id{0}; chunk_id < table.second->chunk_count(); ++chunk_id) {
       auto chunk = table.second->get_chunk(chunk_id);
-      ChunkEncoder::encode_chunk(chunk, def, abc);
-    }
-  }
-  auto end = std::chrono::system_clock::now();
-  auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - start);
-  std::cout << elapsed.count() << std::endl;
+      std::vector<ColumnEncodingSpec> ghi;
 
+      for (ColumnID column_id{0}; column_id < chunk->column_count(); ++column_id) {
+        if (def[column_id] == DataType::String) {
+          const auto base_column = chunk->get_column(column_id);
+          const auto value_column = std::dynamic_pointer_cast<const BaseValueColumn>(base_column);
+
+          const auto max_len = value_column->max_len();
+          std::cout << "max len: " << max_len << std::endl;
+          if (max_len < 30) {
+            ghi.push_back(ColumnEncodingSpec(EncodingType::FixedStringDictionary));
+          } else {
+            ghi.push_back(ColumnEncodingSpec(EncodingType::Dictionary));
+          }
+        } else {
+          ghi.push_back(abc[column_id]);
+        }
+      }
+      ChunkEncoder::encode_chunk(chunk, def, ghi);
+    }
+    auto end = std::chrono::system_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+    std::cout << elapsed.count() << std::endl;
+  }
   std::cout << "press enter" << std::endl;
   std::cin.ignore();
   std::cout << "done" << std::endl;

@@ -16,6 +16,8 @@ class BaseValueColumn : public BaseColumn {
   // returns true if column supports null values
   virtual bool is_nullable() const = 0;
 
+  virtual size_t max_len() const = 0;
+
   /**
    * @brief Returns null array
    *

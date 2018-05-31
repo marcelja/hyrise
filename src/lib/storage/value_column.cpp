@@ -121,6 +121,18 @@ pmr_concurrent_vector<T>& ValueColumn<T>::values() {
 }
 
 template <typename T>
+size_t ValueColumn<T>::max_len() const {
+  if constexpr (std::is_same<std::string, T>::value) {
+    size_t max_len = 0;
+    for (const auto& v : _values) {
+      if (v.size() > max_len) max_len = v.size();
+    }
+    return max_len;
+  }
+  return 0u;
+}
+
+template <typename T>
 bool ValueColumn<T>::is_nullable() const {
   return static_cast<bool>(_null_values);
 }
